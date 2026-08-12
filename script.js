@@ -64,7 +64,23 @@ const demoData = {
     { id: "r5", name: "HS-101", room_type: "Lecture" },
     { id: "r6", name: "TH-203", room_type: "Lecture" },
     { id: "r7", name: "T-204", room_type: "Lecture" },
-    { id: "r8", name: "CRIMLAB", room_type: "Laboratory" }
+    { id: "r8", name: "CRIMLAB", room_type: "Laboratory" },
+    { id: "r9", name: "205", room_type: "Lecture" },
+    { id: "r10", name: "206", room_type: "Lecture" },
+    { id: "r11", name: "207", room_type: "Lecture" },
+    { id: "r12", name: "208", room_type: "Lecture" },
+    { id: "r13", name: "HS102", room_type: "Lecture" },
+    { id: "r14", name: "HS103", room_type: "Lecture" },
+    { id: "r15", name: "HS104", room_type: "Lecture" },
+    { id: "r16", name: "HS105", room_type: "Lecture" },
+    { id: "r17", name: "HS106", room_type: "Lecture" },
+    { id: "r18", name: "HS107", room_type: "Lecture" },
+    { id: "r19", name: "HS108", room_type: "Lecture" },
+    { id: "r20", name: "HS109", room_type: "Lecture" },
+    { id: "r21", name: "HS110", room_type: "Lecture" },
+    { id: "r22", name: "Library 1", room_type: "Both" },
+    { id: "r23", name: "Library 2", room_type: "Both" },
+    { id: "r24", name: "TBL Room", room_type: "Both" }
   ],
   subjects: [
     {
@@ -403,6 +419,13 @@ function isHighSchoolRoom(roomName) {
   }
 
   return false;
+}
+
+// Check if room name is one of the special rooms (Library 1, Library 2, TBL room)
+function isSpecialRoom(roomName) {
+  if (!roomName) return false;
+  const normalized = roomName.toUpperCase().replace(/\s+|-/g, '');
+  return (normalized === 'LIBRARY1' || normalized === 'LIBRARY2' || normalized === 'TBLROOM');
 }
 
 // Check if the scheduled times are allowed for High School rooms based on the day
@@ -1338,10 +1361,16 @@ function runAutoScheduler() {
     const targetDuration = subject.lab_hours > 0 ? 3 : 2; // labs prefer 3 hours, lectures prefer 2
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
-    // Sort rooms based on major vs general subject room priorities:
-    // If major: try lab rooms (COMLAB, CRIMLAB) first, then others
-    // If general: try lecture rooms first, then lab rooms last so major subjects have priorities on them
+    // Sort rooms based on major vs general subject room priorities, with special rooms (Library 1, 2, TBL) as absolute last resource:
     const sortedRooms = [...db.rooms].sort((a, b) => {
+      const aSpecial = isSpecialRoom(a.name);
+      const bSpecial = isSpecialRoom(b.name);
+
+      // If one is special and the other is not, the special room goes to the end
+      if (aSpecial && !bSpecial) return 1;
+      if (!aSpecial && bSpecial) return -1;
+      if (aSpecial && bSpecial) return 0; // maintain relative order of special rooms
+
       const isALab = a.name.toUpperCase().includes('COMLAB') || a.name.toUpperCase().includes('CRIMLAB');
       const isBLab = b.name.toUpperCase().includes('COMLAB') || b.name.toUpperCase().includes('CRIMLAB');
 

@@ -68,7 +68,23 @@ INSERT IGNORE INTO rooms (id, name, room_type) VALUES
 ('r5', 'HS-101', 'Lecture'),
 ('r6', 'TH-203', 'Lecture'),
 ('r7', 'T-204', 'Lecture'),
-('r8', 'CRIMLAB', 'Laboratory');
+('r8', 'CRIMLAB', 'Laboratory'),
+('r9', '205', 'Lecture'),
+('r10', '206', 'Lecture'),
+('r11', '207', 'Lecture'),
+('r12', '208', 'Lecture'),
+('r13', 'HS102', 'Lecture'),
+('r14', 'HS103', 'Lecture'),
+('r15', 'HS104', 'Lecture'),
+('r16', 'HS105', 'Lecture'),
+('r17', 'HS106', 'Lecture'),
+('r18', 'HS107', 'Lecture'),
+('r19', 'HS108', 'Lecture'),
+('r20', 'HS109', 'Lecture'),
+('r21', 'HS110', 'Lecture'),
+('r22', 'Library 1', 'Both'),
+('r23', 'Library 2', 'Both'),
+('r24', 'TBL Room', 'Both');
 
 INSERT IGNORE INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES
 ('s1', 'Computer Programming 1 CC102', 'BSIT', 1, '1A', 3, 2, 2, 1),
