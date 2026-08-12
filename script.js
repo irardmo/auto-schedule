@@ -857,14 +857,13 @@ function populateFormSelects() {
     filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
   });
 
-  // Waterfall Selects Population
-  const waterfallSub = document.getElementById('waterfall-subject');
-  if (waterfallSub) {
-    waterfallSub.innerHTML = '<option value="">Select base Subject/Dept...</option>';
-    // Group subjects by code/title to split sections beautifully
+  // Waterfall / Batch Generate Selects Population
+  const existingList = document.getElementById('existing-subjects-list');
+  if (existingList) {
+    existingList.innerHTML = '';
     const uniqueTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
     uniqueTitles.forEach(title => {
-      waterfallSub.innerHTML += `<option value="${title}">${title}</option>`;
+      existingList.innerHTML += `<option value="${title}">`;
     });
   }
 
@@ -1574,14 +1573,21 @@ function runAutoScheduler() {
 }
 
 // --- WATERFALL SUBJECT SHARING ENGINE ---
-function runWaterfallScheduler() {
-  const subjectTitle = document.getElementById('waterfall-subject').value;
+async function runWaterfallScheduler() {
+  const subjectTitle = document.getElementById('batch-subject').value.trim();
+  const course = document.getElementById('batch-course').value.trim();
+  const yearLevel = parseInt(document.getElementById('batch-year').value, 10);
+  const numSections = parseInt(document.getElementById('batch-sections-count').value, 10) || 1;
+  const units = parseInt(document.getElementById('batch-units').value, 10) || 3;
+  const lec_hours = parseInt(document.getElementById('batch-lec-hours').value, 10) || 0;
+  const lab_hours = parseInt(document.getElementById('batch-lab-hours').value, 10) || 0;
+
   const preferredRoomId = document.getElementById('waterfall-room').value;
   const logContainer = document.getElementById('autoSchedulerResults');
   const consoleEl = document.getElementById('schedulerConsole');
 
-  if (!subjectTitle) {
-    showToast("Please select a subject to split-schedule!", "danger");
+  if (!subjectTitle || !course) {
+    showToast("Please enter Subject Title and Course/Department!", "danger");
     return;
   }
 
@@ -1593,47 +1599,120 @@ function runWaterfallScheduler() {
   }
 
   logContainer.classList.remove('d-none');
-  consoleEl.innerHTML = `Starting Waterfall Subject Sharing Allocator for subject group: <strong>${subjectTitle}</strong>...<br>`;
+  consoleEl.innerHTML = `Starting Waterfall Batch Auto-Generator for: <strong>${subjectTitle}</strong> (${course})...<br>`;
 
-  // Filter db.subjects that match this title_and_code AND are currently unscheduled
+  // Dynamically add subjects/sections to the database if they don't exist yet, or just collect them
+  // We'll create distinct section codes like A, B, C, D... etc based on numSections
+  const createdSubjects = [];
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  for (let i = 0; i < numSections; i++) {
+    const sectionLetter = alphabet[i] || String(i + 1);
+    const sectionCode = `${yearLevel}${sectionLetter}`;
+
+    // Look if already exists in db.subjects to prevent duplicate creation
+    let existingSub = db.subjects.find(s =>
+      s.title_and_code === subjectTitle &&
+      s.course === course &&
+      s.year_level === yearLevel &&
+      s.block_section === sectionCode
+    );
+
+    if (!existingSub) {
+      existingSub = {
+        id: 's_batch_' + uniqueId(),
+        title_and_code: subjectTitle,
+        course: course,
+        year_level: yearLevel,
+        block_section: sectionCode,
+        units: units,
+        lec_hours: lec_hours,
+        lab_hours: lab_hours,
+        is_major: (subjectTitle.toUpperCase().includes('CC') || subjectTitle.toUpperCase().includes('IM') || subjectTitle.toUpperCase().includes('PF') || subjectTitle.toUpperCase().includes('PROGRAMMING')) ? 1 : 0
+      };
+      db.subjects.push(existingSub);
+    }
+    createdSubjects.push(existingSub);
+  }
+
+  // Persist the newly created batch subjects to database
+  await saveDatabase();
+
+  // Filter createdSubjects that are currently unscheduled
   const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
-  const subjectsToSchedule = db.subjects.filter(s => s.title_and_code === subjectTitle && !scheduledSubjectIds.has(s.id));
+  const subjectsToSchedule = createdSubjects.filter(s => !scheduledSubjectIds.has(s.id));
 
   if (subjectsToSchedule.length === 0) {
-    consoleEl.innerHTML += `<span class="text-warning">All sections for "${subjectTitle}" are already scheduled. No new actions taken.</span><br>`;
+    consoleEl.innerHTML += `<span class="text-warning">All requested sections for "${subjectTitle}" are already scheduled. No new actions taken.</span><br>`;
     showToast("All sections of this subject are already scheduled!", "warning");
     return;
   }
 
   consoleEl.innerHTML += `Found <strong class="text-primary">${subjectsToSchedule.length} unscheduled sections</strong> to split-load among <strong class="text-primary">${selectedTeacherIds.length} teachers</strong>.<br>`;
 
+  // 1st Year: 3 Units means 3 hours duration.
+  // Higher Years (2, 3, 4): 3 Units means 2 hours duration.
+  let targetDuration = 2;
+  if (units === 3) {
+    if (yearLevel === 1) {
+      targetDuration = 3;
+    } else {
+      targetDuration = 2;
+    }
+  } else {
+    targetDuration = lec_hours + lab_hours || units;
+  }
+
+  consoleEl.innerHTML += `Duration configured to: <strong>${targetDuration} Hour(s)</strong> per block (Year Level: ${yearLevel}, Units: ${units}).<br>`;
+
+  // Build standard list of timeslots, heavily prioritized to minimize empty daily gaps (compress schedules for a day with only lunch break).
+  // Standard compression timeslots list starting sequentially:
+  // Mon-Sat:
+  // AM Block 1: 08:00 - 10:00 (2h) or 08:00 - 11:00 (3h)
+  // AM Block 2: 10:00 - 12:00 (2h) (follows AM Block 1 perfectly)
+  // LUNCH BREAK: 12:00 - 13:00 / 12:00 - 14:00
+  // PM Block 1: 13:00 - 15:00 (2h) or 13:00 - 16:00 (3h)
+  // PM Block 2: 15:00 - 17:00 (2h) (follows PM Block 1 perfectly)
+  // Evening Block: 17:00 - 19:00 (2h) (follows PM Block 2 perfectly)
   const standardTimeSlots = [
-    { start: "08:00", end: "10:00", dur: 2 },
-    { start: "10:00", end: "12:00", dur: 2 },
-    { start: "12:00", end: "14:00", dur: 2 },
-    { start: "14:00", end: "16:00", dur: 2 },
-    { start: "16:00", end: "18:00", dur: 2 },
-    { start: "17:00", end: "19:00", dur: 2 },
+    // 3 Hour blocks (ideal for 1st year 3 units)
     { start: "08:00", end: "11:00", dur: 3 },
-    { start: "12:00", end: "15:00", dur: 3 },
-    { start: "15:00", end: "18:00", dur: 3 },
-    { start: "16:00", end: "19:00", dur: 3 }
+    { start: "13:00", end: "16:00", dur: 3 }, // Perfect PM block starting post-lunch
+    { start: "16:00", end: "19:00", dur: 3 }, // Evening block
+
+    // 2 Hour blocks
+    { start: "08:00", end: "10:00", dur: 2 },
+    { start: "10:00", end: "12:00", dur: 2 }, // Back-to-back with 8-10, stops at lunch 12
+    { start: "13:00", end: "15:00", dur: 2 }, // Starts right after lunch at 1
+    { start: "15:00", end: "17:00", dur: 2 }, // Back-to-back with 1-3 PM
+    { start: "17:00", end: "19:00", dur: 2 }, // Back-to-back with 3-5 PM
+
+    // 1 Hour blocks
+    { start: "08:00", end: "09:00", dur: 1 },
+    { start: "09:00", end: "10:00", dur: 1 },
+    { start: "10:00", end: "11:00", dur: 1 },
+    { start: "11:00", end: "12:00", dur: 1 },
+    { start: "13:00", end: "14:00", dur: 1 },
+    { start: "14:00", end: "15:00", dur: 1 },
+    { start: "15:00", end: "16:00", dur: 1 },
+    { start: "16:00", end: "17:00", dur: 1 },
+    { start: "17:00", end: "18:00", dur: 1 },
+    { start: "18:00", end: "19:00", dur: 1 }
   ];
 
   const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
   let successfullyScheduled = 0;
 
-  subjectsToSchedule.forEach(subject => {
+  for (let subject of subjectsToSchedule) {
     let isScheduled = false;
 
-    // Core waterfall logic: Sort participating teachers dynamically for each section by their current workload unit counts (ascending)
+    // Waterfall logic: Sort participating teachers dynamically for each section by their current workload unit counts (ascending)
     const participatingTeachers = db.instructors
       .filter(t => selectedTeacherIds.includes(t.id))
       .sort((a, b) => calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id));
 
-    consoleEl.innerHTML += `Scheduling Section: <strong>${subject.course} ${subject.year_level}${subject.block_section}</strong>...<br>`;
+    consoleEl.innerHTML += `Scheduling Section: <strong>${subject.course} ${subject.block_section}</strong>...<br>`;
 
-    const targetDuration = subject.lab_hours > 0 ? 3 : 2;
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
     // Sort rooms: If a specific room is preferred, put it first in the list
@@ -1704,9 +1783,9 @@ function runWaterfallScheduler() {
     if (!isScheduled) {
       consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Waterfall Failed:</span> Could not find valid conflict-free slot for this section among chosen instructors.<br>`;
     }
-  });
+  }
 
-  saveDatabase();
+  await saveDatabase();
   showToast(`Waterfall Allocation complete. Successfully scheduled ${successfullyScheduled}/${subjectsToSchedule.length} sections!`);
 }
 

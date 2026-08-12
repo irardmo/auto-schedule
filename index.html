@@ -399,22 +399,56 @@
             </div>
           </div>
 
-          <!-- Waterfall Subject sharing allocator card -->
+          <!-- Custom Batch Generator & Auto-Scheduler Card -->
           <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3 border-light">
-              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-water me-2 text-primary"></i>Waterfall Subject Sharing Allocator</h5>
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Custom Batch Generator & Auto-Scheduler</h5>
             </div>
             <div class="card-body">
-              <p class="text-muted small">Input a subject (e.g. Physical Education) and select the instructors to split and distribute the load. The system distributes the schedules sequentially (waterfall logic), prioritizing instructors with the fewest currently assigned teaching units first.</p>
+              <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
               <form id="waterfallForm" onsubmit="event.preventDefault();">
                 <div class="row g-3">
                   <div class="col-md-6">
-                    <label class="form-label fw-semibold">Subject to Distribute <span class="text-danger">*</span></label>
-                    <select class="form-select" id="waterfall-subject">
+                    <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="batch-subject" placeholder="e.g. Physical Education PE 101" list="existing-subjects-list" required>
+                    <datalist id="existing-subjects-list">
                       <!-- Filled dynamically -->
-                    </select>
+                    </datalist>
                   </div>
                   <div class="col-md-6">
+                    <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="batch-course" placeholder="e.g. BSIT" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-year">
+                      <option value="1">1st Year (3 Units = 3 Hours duration)</option>
+                      <option value="2">2nd Year (3 Units = 2 Hours duration)</option>
+                      <option value="3">3rd Year (3 Units = 2 Hours duration)</option>
+                      <option value="4">4th Year (3 Units = 2 Hours duration)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Number of Sections <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="3" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-units">
+                      <option value="3" selected>3 Units</option>
+                      <option value="2">2 Units</option>
+                      <option value="1">1 Unit</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lecture Hours</label>
+                    <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lab Hours</label>
+                    <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
+                  </div>
+                  <div class="col-md-4">
                     <label class="form-label fw-semibold">Preferred Room (Optional)</label>
                     <select class="form-select" id="waterfall-room">
                       <option value="">Any available room</option>
@@ -429,7 +463,7 @@
                   </div>
                   <div class="col-12 d-flex justify-content-end">
                     <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
-                      <i class="bi bi-lightning-fill"></i> Distribute & Schedule with Waterfall Logic
+                      <i class="bi bi-lightning-fill"></i> Auto-Generate Rooms, Times & Schedules
                     </button>
                   </div>
                 </div>
