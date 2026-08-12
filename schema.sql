@@ -4,7 +4,7 @@
 CREATE TABLE instructors (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    designation TEXT NOT NULL CHECK (designation IN ('Licensed Teacher', 'Regular Teacher', 'Admin', 'Director', 'Program Head')),
+    designation TEXT NOT NULL CHECK (designation IN ('Licensed Teacher', 'Regular Teacher', 'Part-time', 'Part-time Teacher', 'Admin', 'Director', 'Program Head')),
     degree TEXT,
     area TEXT DEFAULT 'ACADEMICS',
     employee_no TEXT,

@@ -240,6 +240,8 @@ function getMaxUnitsForDesignation(designation) {
   switch (designation) {
     case 'Licensed Teacher': return 27;
     case 'Regular Teacher': return 24;
+    case 'Part-time':
+    case 'Part-time Teacher': return 12;
     case 'Admin': return 9;
     case 'Director': return 15;
     case 'Program Head': return 18;
@@ -458,8 +460,13 @@ function validateSchedule(candidate) {
     const isNewSubject = !db.schedules.some(s => s.instructor_id === candidate.instructor_id && s.subject_id === candidate.subject_id && s.id !== candidate.id);
 
     const candidateUnits = isNewSubject ? currentUnits + subject.units : currentUnits;
-    if (candidateUnits > teacher.max_units) {
-      errors.push(`Teacher Load Limit Exceeded: ${teacher.name} would have ${candidateUnits} units (Max allowed: ${teacher.max_units} units for Designation: ${teacher.designation}).`);
+    const baseLimit = teacher.max_units;
+    const hardLimit = baseLimit + 2;
+
+    if (candidateUnits > hardLimit) {
+      errors.push(`Teacher Load Limit Exceeded: ${teacher.name} would have ${candidateUnits} units. The absolute maximum limit including +2 grace is ${hardLimit} units (Base: ${baseLimit} units for Designation: ${teacher.designation}).`);
+    } else if (candidateUnits > baseLimit) {
+      warnings.push(`Load Limit Grace Note: ${teacher.name} exceeds base limit of ${baseLimit} units, but is within the +2 grace allowance (${candidateUnits}/${hardLimit} units).`);
     }
   }
 

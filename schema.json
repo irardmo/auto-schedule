@@ -12,7 +12,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Admin", "Director", "Program Head"] },
+          "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Part-time", "Part-time Teacher", "Admin", "Director", "Program Head"] },
           "degree": { "type": ["string", "null"] },
           "area": { "type": "string" },
           "employee_no": { "type": ["string", "null"] },
