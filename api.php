@@ -113,7 +113,13 @@ try {
         ('s5', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
         ('s6', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2A', 3, 2, 2, 1),
         ('s7', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
-        ('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, '1A', 3, 3, 0, 0);");
+        ('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, '1A', 3, 3, 0, 0),
+        ('s9', 'Physical Education PE 101', 'BSIT', 1, '1A', 2, 2, 0, 0),
+        ('s10', 'Physical Education PE 101', 'BSIT', 1, '1B', 2, 2, 0, 0),
+        ('s11', 'Physical Education PE 101', 'BSIT', 2, '2A', 2, 2, 0, 0),
+        ('s12', 'Physical Education PE 101', 'BSIT', 2, '2B', 2, 2, 0, 0),
+        ('s13', 'Physical Education PE 101', 'BSIT', 3, '3A', 2, 2, 0, 0),
+        ('s14', 'Physical Education PE 101', 'BSIT', 3, '3B', 2, 2, 0, 0);");
 
         $conn->exec("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
         ('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),

@@ -170,6 +170,72 @@ const demoData = {
       lec_hours: 3,
       lab_hours: 0,
       is_major: 0
+    },
+    {
+      id: "s9",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 1,
+      block_section: "1A",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
+    },
+    {
+      id: "s10",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 1,
+      block_section: "1B",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
+    },
+    {
+      id: "s11",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 2,
+      block_section: "2A",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
+    },
+    {
+      id: "s12",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 2,
+      block_section: "2B",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
+    },
+    {
+      id: "s13",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 3,
+      block_section: "3A",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
+    },
+    {
+      id: "s14",
+      title_and_code: "Physical Education PE 101",
+      course: "BSIT",
+      year_level: 3,
+      block_section: "3B",
+      units: 2,
+      lec_hours: 2,
+      lab_hours: 0,
+      is_major: 0
     }
   ],
   schedules: [
@@ -790,6 +856,42 @@ function populateFormSelects() {
   blocks.forEach(b => {
     filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
   });
+
+  // Waterfall Selects Population
+  const waterfallSub = document.getElementById('waterfall-subject');
+  if (waterfallSub) {
+    waterfallSub.innerHTML = '<option value="">Select base Subject/Dept...</option>';
+    // Group subjects by code/title to split sections beautifully
+    const uniqueTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
+    uniqueTitles.forEach(title => {
+      waterfallSub.innerHTML += `<option value="${title}">${title}</option>`;
+    });
+  }
+
+  const waterfallRm = document.getElementById('waterfall-room');
+  if (waterfallRm) {
+    waterfallRm.innerHTML = '<option value="">Any available room</option>';
+    db.rooms.forEach(r => {
+      waterfallRm.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
+    });
+  }
+
+  const waterfallTeachersDiv = document.getElementById('waterfall-instructors-list');
+  if (waterfallTeachersDiv) {
+    waterfallTeachersDiv.innerHTML = '';
+    db.instructors.forEach(t => {
+      waterfallTeachersDiv.innerHTML += `
+        <div class="col-md-6 col-12">
+          <div class="form-check">
+            <input class="form-check-input waterfall-teacher-checkbox" type="checkbox" value="${t.id}" id="chk-wf-${t.id}">
+            <label class="form-check-label small fw-medium" for="chk-wf-${t.id}">
+              ${t.name} <span class="text-primary">(${getMaxUnitsForDesignation(t.designation)} max)</span>
+            </label>
+          </div>
+        </div>
+      `;
+    });
+  }
 }
 
 function populatePrintTeachers() {
@@ -803,6 +905,7 @@ function populatePrintTeachers() {
 
 // Update UI view renderings
 function renderAllViews() {
+  populateFormSelects();
   renderSchedulesTable();
   renderInstructorsTable();
   renderSubjectsTable();
@@ -1386,13 +1489,39 @@ function runAutoScheduler() {
       return 0;
     });
 
-    for (let teacher of db.instructors) {
+    // Waterfall logic for choosing teachers: Always prioritize instructors with fewer units currently assigned
+    const sortedTeachers = [...db.instructors].sort((a, b) => {
+      return calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id);
+    });
+
+    for (let teacher of sortedTeachers) {
+      const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
+
+      // Prefer Saturday (S) and Evening time blocks (4 PM to 7 PM) for part-time schedules
+      const sortedDays = [...standardDays].sort((a, b) => {
+        if (isPartTime) {
+          if (a === 'S' && b !== 'S') return -1;
+          if (b === 'S' && a !== 'S') return 1;
+        }
+        return 0;
+      });
+
+      const sortedSlots = [...filteredSlots].sort((a, b) => {
+        if (isPartTime) {
+          const aIsEve = timesOverlap(a.start, a.end, "16:00", "19:00");
+          const bIsEve = timesOverlap(b.start, b.end, "16:00", "19:00");
+          if (aIsEve && !bIsEve) return -1;
+          if (!aIsEve && bIsEve) return 1;
+        }
+        return 0;
+      });
+
       for (let room of sortedRooms) {
         if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab/CrimLab
         if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
 
-        for (let day of standardDays) {
-          for (let slot of filteredSlots) {
+        for (let day of sortedDays) {
+          for (let slot of sortedSlots) {
 
             const candidate = {
               id: 'temp_' + uniqueId(),
@@ -1442,6 +1571,143 @@ function runAutoScheduler() {
 
   saveDatabase();
   showToast(`Auto-Scheduler finished. ${scheduledCount} successfully scheduled, ${unscheduledCount} failed.`);
+}
+
+// --- WATERFALL SUBJECT SHARING ENGINE ---
+function runWaterfallScheduler() {
+  const subjectTitle = document.getElementById('waterfall-subject').value;
+  const preferredRoomId = document.getElementById('waterfall-room').value;
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+
+  if (!subjectTitle) {
+    showToast("Please select a subject to split-schedule!", "danger");
+    return;
+  }
+
+  // Find all participating teacher checkboxes
+  const selectedTeacherIds = Array.from(document.querySelectorAll('.waterfall-teacher-checkbox:checked')).map(cb => cb.value);
+  if (selectedTeacherIds.length === 0) {
+    showToast("Please select at least one participating teacher!", "danger");
+    return;
+  }
+
+  logContainer.classList.remove('d-none');
+  consoleEl.innerHTML = `Starting Waterfall Subject Sharing Allocator for subject group: <strong>${subjectTitle}</strong>...<br>`;
+
+  // Filter db.subjects that match this title_and_code AND are currently unscheduled
+  const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
+  const subjectsToSchedule = db.subjects.filter(s => s.title_and_code === subjectTitle && !scheduledSubjectIds.has(s.id));
+
+  if (subjectsToSchedule.length === 0) {
+    consoleEl.innerHTML += `<span class="text-warning">All sections for "${subjectTitle}" are already scheduled. No new actions taken.</span><br>`;
+    showToast("All sections of this subject are already scheduled!", "warning");
+    return;
+  }
+
+  consoleEl.innerHTML += `Found <strong class="text-primary">${subjectsToSchedule.length} unscheduled sections</strong> to split-load among <strong class="text-primary">${selectedTeacherIds.length} teachers</strong>.<br>`;
+
+  const standardTimeSlots = [
+    { start: "08:00", end: "10:00", dur: 2 },
+    { start: "10:00", end: "12:00", dur: 2 },
+    { start: "12:00", end: "14:00", dur: 2 },
+    { start: "14:00", end: "16:00", dur: 2 },
+    { start: "16:00", end: "18:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 },
+    { start: "08:00", end: "11:00", dur: 3 },
+    { start: "12:00", end: "15:00", dur: 3 },
+    { start: "15:00", end: "18:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 }
+  ];
+
+  const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  let successfullyScheduled = 0;
+
+  subjectsToSchedule.forEach(subject => {
+    let isScheduled = false;
+
+    // Core waterfall logic: Sort participating teachers dynamically for each section by their current workload unit counts (ascending)
+    const participatingTeachers = db.instructors
+      .filter(t => selectedTeacherIds.includes(t.id))
+      .sort((a, b) => calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id));
+
+    consoleEl.innerHTML += `Scheduling Section: <strong>${subject.course} ${subject.year_level}${subject.block_section}</strong>...<br>`;
+
+    const targetDuration = subject.lab_hours > 0 ? 3 : 2;
+    const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
+
+    // Sort rooms: If a specific room is preferred, put it first in the list
+    const sortedRooms = [...db.rooms].sort((a, b) => {
+      if (preferredRoomId) {
+        if (a.id === preferredRoomId) return -1;
+        if (b.id === preferredRoomId) return 1;
+      }
+      return 0;
+    });
+
+    for (let teacher of participatingTeachers) {
+      const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
+
+      // Part-time schedules prefer Saturday and Evening blocks
+      const sortedDays = [...standardDays].sort((a, b) => {
+        if (isPartTime) {
+          if (a === 'S' && b !== 'S') return -1;
+          if (b === 'S' && a !== 'S') return 1;
+        }
+        return 0;
+      });
+
+      const sortedSlots = [...filteredSlots].sort((a, b) => {
+        if (isPartTime) {
+          const aIsEve = timesOverlap(a.start, a.end, "16:00", "19:00");
+          const bIsEve = timesOverlap(b.start, b.end, "16:00", "19:00");
+          if (aIsEve && !bIsEve) return -1;
+          if (!aIsEve && bIsEve) return 1;
+        }
+        return 0;
+      });
+
+      for (let room of sortedRooms) {
+        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue;
+        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
+
+        for (let day of sortedDays) {
+          for (let slot of sortedSlots) {
+
+            const candidate = {
+              id: 'temp_' + uniqueId(),
+              instructor_id: teacher.id,
+              room_id: room.id,
+              day,
+              time_start: slot.start,
+              time_end: slot.end,
+              subject_id: subject.id
+            };
+
+            const validation = validateSchedule(candidate);
+            if (validation.valid) {
+              candidate.id = uniqueId();
+              db.schedules.push(candidate);
+              isScheduled = true;
+              successfullyScheduled++;
+              consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Waterfall Assigned:</span> ${teacher.name} (${calculateTeacherTotalUnits(teacher.id)} units) -> Room: ${room.name} on ${day} (${slot.start}-${slot.end})<br>`;
+              break;
+            }
+          }
+          if (isScheduled) break;
+        }
+        if (isScheduled) break;
+      }
+      if (isScheduled) break;
+    }
+
+    if (!isScheduled) {
+      consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Waterfall Failed:</span> Could not find valid conflict-free slot for this section among chosen instructors.<br>`;
+    }
+  });
+
+  saveDatabase();
+  showToast(`Waterfall Allocation complete. Successfully scheduled ${successfullyScheduled}/${subjectsToSchedule.length} sections!`);
 }
 
 // --- PRINT LAYOUT GENERATOR (Matching the Image) ---

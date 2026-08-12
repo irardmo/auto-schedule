@@ -399,6 +399,44 @@
             </div>
           </div>
 
+          <!-- Waterfall Subject sharing allocator card -->
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-water me-2 text-primary"></i>Waterfall Subject Sharing Allocator</h5>
+            </div>
+            <div class="card-body">
+              <p class="text-muted small">Input a subject (e.g. Physical Education) and select the instructors to split and distribute the load. The system distributes the schedules sequentially (waterfall logic), prioritizing instructors with the fewest currently assigned teaching units first.</p>
+              <form id="waterfallForm" onsubmit="event.preventDefault();">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Subject to Distribute <span class="text-danger">*</span></label>
+                    <select class="form-select" id="waterfall-subject">
+                      <!-- Filled dynamically -->
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Preferred Room (Optional)</label>
+                    <select class="form-select" id="waterfall-room">
+                      <option value="">Any available room</option>
+                      <!-- Filled dynamically -->
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label fw-semibold d-block">Select Participating Instructors <span class="text-danger">*</span></label>
+                    <div id="waterfall-instructors-list" class="row g-2 p-2 bg-light rounded" style="max-height: 180px; overflow-y: auto;">
+                      <!-- Filled dynamically with checkboxes -->
+                    </div>
+                  </div>
+                  <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                      <i class="bi bi-lightning-fill"></i> Distribute & Schedule with Waterfall Logic
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <!-- Log Box / Result Box -->
           <div class="card border-0 shadow-sm d-none" id="autoSchedulerResults">
             <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
