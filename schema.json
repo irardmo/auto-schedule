@@ -38,7 +38,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "title_and_code", "course", "year_level", "block_section", "units", "lec_hours", "lab_hours"],
+        "required": ["id", "title_and_code", "course", "year_level", "block_section", "units", "lec_hours", "lab_hours", "is_major"],
         "properties": {
           "id": { "type": "string" },
           "title_and_code": { "type": "string" },
@@ -47,7 +47,8 @@
           "block_section": { "type": "string" },
           "units": { "type": "integer" },
           "lec_hours": { "type": "integer" },
-          "lab_hours": { "type": "integer" }
+          "lab_hours": { "type": "integer" },
+          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 }
         }
       }
     },

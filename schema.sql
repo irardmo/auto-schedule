@@ -29,7 +29,8 @@ CREATE TABLE subjects (
     block_section TEXT NOT NULL, -- e.g. "1A"
     units INTEGER NOT NULL,
     lec_hours INTEGER NOT NULL DEFAULT 0,
-    lab_hours INTEGER NOT NULL DEFAULT 0
+    lab_hours INTEGER NOT NULL DEFAULT 0,
+    is_major INTEGER NOT NULL DEFAULT 0
 );
 
 -- 4. Schedules Table (Holds active assignments and connects entities with foreign keys)

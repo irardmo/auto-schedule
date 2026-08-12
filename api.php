@@ -52,7 +52,8 @@ try {
         block_section VARCHAR(50) NOT NULL,
         units INT NOT NULL,
         lec_hours INT NOT NULL DEFAULT 0,
-        lab_hours INT NOT NULL DEFAULT 0
+        lab_hours INT NOT NULL DEFAULT 0,
+        is_major INT NOT NULL DEFAULT 0
     ) ENGINE=InnoDB;");
 
     // Create Schedules
@@ -85,17 +86,18 @@ try {
         ('r4', 'TH-COMLAB', 'Laboratory'),
         ('r5', 'HS-101', 'Lecture'),
         ('r6', 'TH-203', 'Lecture'),
-        ('r7', 'T-204', 'Lecture');");
+        ('r7', 'T-204', 'Lecture'),
+        ('r8', 'CRIMLAB', 'Laboratory');");
 
-        $conn->exec("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours) VALUES
-        ('s1', 'Computer Programming 1 CC102', 'BSIT', 1, '1A', 3, 2, 2),
-        ('s2', 'SYSTEM ADMIN AND MAINTENANCE SA 101', 'BSIT', 3, '3', 3, 2, 2),
-        ('s3', 'Social and Professional Issues SP 101', 'BSIT', 3, '3', 3, 3, 0),
-        ('s4', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2A', 3, 2, 2),
-        ('s5', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2B', 3, 2, 2),
-        ('s6', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2A', 3, 2, 2),
-        ('s7', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2B', 3, 2, 2),
-        ('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, '1A', 3, 3, 0);");
+        $conn->exec("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES
+        ('s1', 'Computer Programming 1 CC102', 'BSIT', 1, '1A', 3, 2, 2, 1),
+        ('s2', 'SYSTEM ADMIN AND MAINTENANCE SA 101', 'BSIT', 3, '3', 3, 2, 2, 1),
+        ('s3', 'Social and Professional Issues SP 101', 'BSIT', 3, '3', 3, 3, 0, 0),
+        ('s4', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2A', 3, 2, 2, 1),
+        ('s5', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
+        ('s6', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2A', 3, 2, 2, 1),
+        ('s7', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
+        ('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, '1A', 3, 3, 0, 0);");
 
         $conn->exec("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
         ('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
@@ -165,12 +167,13 @@ switch ($action) {
                 }
 
                 if (isset($data['subjects']) && is_array($data['subjects'])) {
-                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['subjects'] as $sub) {
                         $stmt->execute([
                             $sub['id'], $sub['title_and_code'], $sub['course'],
                             $sub['year_level'], $sub['block_section'],
-                            $sub['units'], $sub['lec_hours'], $sub['lab_hours']
+                            $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
+                            $sub['is_major'] ?? 0
                         ]);
                     }
                 }

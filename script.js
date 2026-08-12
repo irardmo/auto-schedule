@@ -63,7 +63,8 @@ const demoData = {
     { id: "r4", name: "TH-COMLAB", room_type: "Laboratory" },
     { id: "r5", name: "HS-101", room_type: "Lecture" },
     { id: "r6", name: "TH-203", room_type: "Lecture" },
-    { id: "r7", name: "T-204", room_type: "Lecture" }
+    { id: "r7", name: "T-204", room_type: "Lecture" },
+    { id: "r8", name: "CRIMLAB", room_type: "Laboratory" }
   ],
   subjects: [
     {
@@ -74,7 +75,8 @@ const demoData = {
       block_section: "1A",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s2",
@@ -84,7 +86,8 @@ const demoData = {
       block_section: "3",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s3",
@@ -94,7 +97,8 @@ const demoData = {
       block_section: "3",
       units: 3,
       lec_hours: 3,
-      lab_hours: 0
+      lab_hours: 0,
+      is_major: 0
     },
     {
       id: "s4",
@@ -104,7 +108,8 @@ const demoData = {
       block_section: "2A",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s5",
@@ -114,7 +119,8 @@ const demoData = {
       block_section: "2B",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s6",
@@ -124,7 +130,8 @@ const demoData = {
       block_section: "2A",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s7",
@@ -134,7 +141,8 @@ const demoData = {
       block_section: "2B",
       units: 3,
       lec_hours: 2,
-      lab_hours: 2
+      lab_hours: 2,
+      is_major: 1
     },
     {
       id: "s8",
@@ -144,7 +152,8 @@ const demoData = {
       block_section: "1A",
       units: 3,
       lec_hours: 3,
-      lab_hours: 0
+      lab_hours: 0,
+      is_major: 0
     }
   ],
   schedules: [
@@ -270,7 +279,8 @@ async function loadDatabase() {
         year_level: parseInt(s.year_level, 10),
         units: parseInt(s.units, 10),
         lec_hours: parseInt(s.lec_hours, 10),
-        lab_hours: parseInt(s.lab_hours, 10)
+        lab_hours: parseInt(s.lab_hours, 10),
+        is_major: parseInt(s.is_major || 0, 10)
       }));
       db.schedules = result.schedules || [];
 
@@ -294,7 +304,8 @@ async function loadDatabase() {
           year_level: parseInt(s.year_level, 10),
           units: parseInt(s.units, 10),
           lec_hours: parseInt(s.lec_hours, 10),
-          lab_hours: parseInt(s.lab_hours, 10)
+          lab_hours: parseInt(s.lab_hours, 10),
+          is_major: parseInt(s.is_major || 0, 10)
         }));
       } catch (parseErr) {
         db = JSON.parse(JSON.stringify(demoData));
@@ -361,6 +372,68 @@ function daysOverlap(day1, day2) {
   return false;
 }
 
+// Get constituent single days from a composite day code
+function getConstituentDays(dayStr) {
+  if (!dayStr) return [];
+  if (dayStr === 'MT') return ['M', 'T'];
+  if (dayStr === 'TTH') return ['T', 'TH'];
+  if (dayStr === 'MWF') return ['M', 'W', 'F'];
+  if (dayStr === 'Monday-Friday') return ['M', 'T', 'W', 'TH', 'F'];
+  return [dayStr]; // e.g. M, T, W, TH, F, S
+}
+
+// Check if a room name is designated for high school (205-208, or HS101-HS110)
+function isHighSchoolRoom(roomName) {
+  if (!roomName) return false;
+  const normalized = roomName.toUpperCase().replace(/\s+|-/g, ''); // normalize "HS-101" to "HS101", etc.
+
+  // check for numeric 205 to 208
+  if (/^\d+$/.test(normalized)) {
+    const val = parseInt(normalized, 10);
+    if (val >= 205 && val <= 208) return true;
+  }
+
+  // check for HS101 to HS110
+  const hsMatch = normalized.match(/^HS(\d+)$/);
+  if (hsMatch) {
+    const val = parseInt(hsMatch[1], 10);
+    if (val >= 101 && val <= 110) return true;
+  }
+
+  return false;
+}
+
+// Check if the scheduled times are allowed for High School rooms based on the day
+function isHighSchoolRoomTimeAllowed(day, startStr, endStr) {
+  const constituents = getConstituentDays(day);
+  const startMins = parseTimeToMinutes(startStr);
+  const endMins = parseTimeToMinutes(endStr);
+
+  for (let d of constituents) {
+    let allowedStart = null;
+    let allowedEnd = null;
+
+    if (d === 'M' || d === 'T' || d === 'W') {
+      allowedStart = parseTimeToMinutes("16:00"); // 4:00 PM
+      allowedEnd = parseTimeToMinutes("19:00");   // 7:00 PM
+    } else if (d === 'TH') {
+      allowedStart = parseTimeToMinutes("17:00"); // 5:00 PM
+      allowedEnd = parseTimeToMinutes("19:00");   // 7:00 PM
+    } else if (d === 'F' || d === 'S') {
+      allowedStart = parseTimeToMinutes("07:00"); // 7:00 AM
+      allowedEnd = parseTimeToMinutes("19:00");   // 7:00 PM
+    } else {
+      // Sunday is not permitted
+      return false;
+    }
+
+    if (startMins < allowedStart || endMins > allowedEnd) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // Fully customizable time overlap checker
 function timesOverlap(start1, end1, start2, end2) {
   const s1 = parseTimeToMinutes(start1);
@@ -375,10 +448,11 @@ function validateSchedule(candidate) {
   const errors = [];
   const warnings = [];
 
-  // 1. Load limit rule
   const teacher = db.instructors.find(t => t.id === candidate.instructor_id);
   const subject = db.subjects.find(s => s.id === candidate.subject_id);
+  const room = db.rooms.find(r => r.id === candidate.room_id);
 
+  // 1. Load limit rule
   if (teacher && subject) {
     const currentUnits = calculateTeacherTotalUnits(candidate.instructor_id);
     const isNewSubject = !db.schedules.some(s => s.instructor_id === candidate.instructor_id && s.subject_id === candidate.subject_id && s.id !== candidate.id);
@@ -386,6 +460,27 @@ function validateSchedule(candidate) {
     const candidateUnits = isNewSubject ? currentUnits + subject.units : currentUnits;
     if (candidateUnits > teacher.max_units) {
       errors.push(`Teacher Load Limit Exceeded: ${teacher.name} would have ${candidateUnits} units (Max allowed: ${teacher.max_units} units for Designation: ${teacher.designation}).`);
+    }
+  }
+
+  // 2. High School Room availability constraints
+  if (room && isHighSchoolRoom(room.name)) {
+    if (!isHighSchoolRoomTimeAllowed(candidate.day, candidate.time_start, candidate.time_end)) {
+      errors.push(`Room Constraint: High School Room ${room.name} is only available Mon-Wed 4PM-7PM (16:00-19:00), Thu 5PM-7PM (17:00-19:00), and Fri-Sat 7AM-7PM (07:00-19:00).`);
+    }
+  }
+
+  // 3. Program Head scheduling constraints
+  if (teacher && teacher.designation === 'Program Head') {
+    const constituents = getConstituentDays(candidate.day);
+    if (constituents.includes('S')) {
+      errors.push(`Program Head Constraint: ${teacher.name} is a Program Head and cannot be scheduled on Saturday.`);
+    }
+    if (timesOverlap(candidate.time_start, candidate.time_end, "12:00", "13:00")) {
+      errors.push(`Program Head Constraint: ${teacher.name} (Program Head) cannot have schedules during the 12:00 PM - 1:00 PM lunch period.`);
+    }
+    if (timesOverlap(candidate.time_start, candidate.time_end, "16:00", "19:00")) {
+      errors.push(`Program Head Constraint: ${teacher.name} (Program Head) cannot have schedules during late hours (4:00 PM - 7:00 PM).`);
     }
   }
 
@@ -830,10 +925,15 @@ function renderSubjectsTable() {
   table.innerHTML = '';
 
   db.subjects.forEach(s => {
+    const typeBadge = s.is_major
+      ? '<span class="badge bg-danger">Major</span>'
+      : '<span class="badge bg-secondary">General</span>';
+
     table.innerHTML += `
       <tr>
         <td class="fw-bold text-dark">${s.title_and_code}</td>
         <td>${s.course}</td>
+        <td>${typeBadge}</td>
         <td>${s.year_level} Year</td>
         <td>Block ${s.block_section}</td>
         <td class="text-center fw-bold text-primary">${s.units}</td>
@@ -1062,6 +1162,7 @@ function saveSubject(e) {
   const units = parseInt(document.getElementById('subject-units').value);
   const lec_hours = parseInt(document.getElementById('subject-lec').value);
   const lab_hours = parseInt(document.getElementById('subject-lab').value);
+  const is_major = document.getElementById('subject-is-major').checked ? 1 : 0;
 
   const subject = {
     id: id || uniqueId(),
@@ -1071,7 +1172,8 @@ function saveSubject(e) {
     block_section,
     units,
     lec_hours,
-    lab_hours
+    lab_hours,
+    is_major
   };
 
   if (id) {
@@ -1097,6 +1199,7 @@ function editSubject(id) {
     document.getElementById('subject-units').value = s.units;
     document.getElementById('subject-lec').value = s.lec_hours;
     document.getElementById('subject-lab').value = s.lab_hours;
+    document.getElementById('subject-is-major').checked = s.is_major === 1;
   }
 }
 
@@ -1112,6 +1215,7 @@ function deleteSubject(id) {
 function clearSubjectForm() {
   document.getElementById('subjectForm').reset();
   document.getElementById('subject-id').value = "";
+  document.getElementById('subject-is-major').checked = false;
 }
 
 // ROOMS
@@ -1178,16 +1282,19 @@ function runAutoScheduler() {
   }
 
   // Define Standard Time slots and days available for schedule blocks
+  // Adding more evening/afternoon slots for High School Room constraints if needed
   const standardTimeSlots = [
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
     { start: "12:00", end: "14:00", dur: 2 },
     { start: "14:00", end: "16:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 }, // Perfect for HS Mon-Thu evening slots
     // 3 Hour blocks
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "12:00", end: "15:00", dur: 3 },
     { start: "15:00", end: "18:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 }, // Perfect for HS Mon-Wed slots
     // 1 and 1.5 Hour Blocks
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
@@ -1204,8 +1311,14 @@ function runAutoScheduler() {
 
   const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
 
+  // Sort subjects to prioritize major subjects first
+  // major subjects (is_major === 1) should be scheduled first to prioritize COMLAB and CRIMLAB
+  const sortedSubjects = [...db.subjects].sort((a, b) => {
+    return (b.is_major || 0) - (a.is_major || 0);
+  });
+
   // Loop through all subjects
-  db.subjects.forEach(subject => {
+  sortedSubjects.forEach(subject => {
     if (scheduledSubjectIds.has(subject.id)) {
       consoleEl.innerHTML += `Subject: <span class="text-info">${subject.title_and_code}</span> is already scheduled.<br>`;
       scheduledCount++;
@@ -1213,15 +1326,34 @@ function runAutoScheduler() {
     }
 
     let isScheduled = false;
-    consoleEl.innerHTML += `Scheduling subject: <strong>${subject.title_and_code}</strong> (Section: ${subject.course} ${subject.year_level}${subject.block_section})...<br>`;
+    consoleEl.innerHTML += `Scheduling subject: <strong>${subject.title_and_code}</strong> (${subject.is_major ? '<span class="text-danger fw-bold">MAJOR</span>' : 'GENERAL'} - Section: ${subject.course} ${subject.year_level}${subject.block_section})...<br>`;
 
     const targetDuration = subject.lab_hours > 0 ? 3 : 2; // labs prefer 3 hours, lectures prefer 2
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
+    // Sort rooms based on major vs general subject room priorities:
+    // If major: try lab rooms (COMLAB, CRIMLAB) first, then others
+    // If general: try lecture rooms first, then lab rooms last so major subjects have priorities on them
+    const sortedRooms = [...db.rooms].sort((a, b) => {
+      const isALab = a.name.toUpperCase().includes('COMLAB') || a.name.toUpperCase().includes('CRIMLAB');
+      const isBLab = b.name.toUpperCase().includes('COMLAB') || b.name.toUpperCase().includes('CRIMLAB');
+
+      if (subject.is_major) {
+        // Prioritize lab rooms
+        if (isALab && !isBLab) return -1;
+        if (!isALab && isBLab) return 1;
+      } else {
+        // Prioritize non-lab rooms first
+        if (!isALab && isBLab) return -1;
+        if (isALab && !isBLab) return 1;
+      }
+      return 0;
+    });
+
     for (let teacher of db.instructors) {
-      for (let room of db.rooms) {
-        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab
-        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB') continue; // Lectures prefer standard rooms
+      for (let room of sortedRooms) {
+        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab/CrimLab
+        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
 
         for (let day of standardDays) {
           for (let slot of filteredSlots) {
