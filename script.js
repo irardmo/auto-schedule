@@ -1,6 +1,6 @@
 // Southwestern Institute of Business and Technology (SIBT) Scheduling Logic Engine
 
-// Initialize Database in Local Storage
+// Initialize Database structure
 let db = {
   instructors: [],
   rooms: [],
@@ -8,7 +8,7 @@ let db = {
   schedules: []
 };
 
-// Initial SIBT Demo Dataset matching instrcuctor.png & Program head.png
+// SIBT Demo Dataset matching instrcuctor.png & Program head.png
 const demoData = {
   instructors: [
     {
@@ -223,6 +223,9 @@ const demoData = {
   ]
 };
 
+// MySQL API Endpoint configuration
+const API_URL = "api.php";
+
 // Helper to determine max units by designation as specified in prompt
 function getMaxUnitsForDesignation(designation) {
   switch (designation) {
@@ -251,28 +254,83 @@ function calculateTeacherTotalUnits(teacherId) {
   return totalUnits;
 }
 
-// Load DB from LocalStorage or Load Demo Data if empty
-function loadDatabase() {
-  const saved = localStorage.getItem('sibt_scheduling_db');
-  if (saved) {
-    try {
-      db = JSON.parse(saved);
-      // Ensure arrays exist
-      db.instructors = db.instructors || [];
-      db.rooms = db.rooms || [];
-      db.subjects = db.subjects || [];
-      db.schedules = db.schedules || [];
-    } catch (e) {
-      console.error("Failed to parse database from local storage, loading demo data", e);
-      resetToDemoData();
+// Load DB from MySQL with LocalStorage fallback
+async function loadDatabase() {
+  try {
+    const response = await fetch(`${API_URL}?action=get_all`);
+    const result = await response.json();
+    if (result && result.status === 'success') {
+      db.instructors = (result.instructors || []).map(i => ({
+        ...i,
+        max_units: parseInt(i.max_units, 10)
+      }));
+      db.rooms = result.rooms || [];
+      db.subjects = (result.subjects || []).map(s => ({
+        ...s,
+        year_level: parseInt(s.year_level, 10),
+        units: parseInt(s.units, 10),
+        lec_hours: parseInt(s.lec_hours, 10),
+        lab_hours: parseInt(s.lab_hours, 10)
+      }));
+      db.schedules = result.schedules || [];
+
+      // Keep local storage copy updated for complete sync
+      localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
+      console.log("Database successfully synced with XAMPP MySQL backend.");
+    } else {
+      throw new Error("API returned non-success status");
     }
-  } else {
-    resetToDemoData();
+  } catch (e) {
+    console.warn("Could not sync with MySQL database. Using offline local storage mode instead.", e);
+    // Offline local storage fallback
+    const saved = localStorage.getItem('sibt_scheduling_db');
+    if (saved) {
+      try {
+        db = JSON.parse(saved);
+        // Ensure values are numbers in localstorage too
+        db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
+        db.subjects = (db.subjects || []).map(s => ({
+          ...s,
+          year_level: parseInt(s.year_level, 10),
+          units: parseInt(s.units, 10),
+          lec_hours: parseInt(s.lec_hours, 10),
+          lab_hours: parseInt(s.lab_hours, 10)
+        }));
+      } catch (parseErr) {
+        db = JSON.parse(JSON.stringify(demoData));
+      }
+    } else {
+      db = JSON.parse(JSON.stringify(demoData));
+    }
   }
+
+  updateStats();
+  renderAllViews();
 }
 
-function saveDatabase() {
+// Save Full Database state to MySQL with LocalStorage fallback
+async function saveDatabase() {
+  // Sync to Local Storage first
   localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
+
+  try {
+    const response = await fetch(`${API_URL}?action=save_database`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(db)
+    });
+    const result = await response.json();
+    if (result && result.status === 'success') {
+      console.log("XAMPP MySQL database update persisted.");
+    } else {
+      throw new Error(result.message || "MySQL persist failed");
+    }
+  } catch (e) {
+    console.warn("Could not sync data update to MySQL database server:", e);
+  }
+
   updateStats();
   renderAllViews();
 }
@@ -626,7 +684,7 @@ function renderAllViews() {
   renderRoomsTable();
 }
 
-// 1. RENDER SCHEDULE RECORDS TABLE (With Custom Filter Logic)
+// RENDER SCHEDULE RECORDS TABLE (With Custom Filter Logic)
 let activeFilters = {
   teacher: "",
   course: "",
@@ -737,7 +795,7 @@ function renderSchedulesTable() {
   });
 }
 
-// 2. RENDER INSTRUCTORS TABLE
+// RENDER INSTRUCTORS TABLE
 function renderInstructorsTable() {
   const table = document.getElementById('teachersListTable');
   if (!table) return;
@@ -765,7 +823,7 @@ function renderInstructorsTable() {
   });
 }
 
-// 3. RENDER SUBJECTS TABLE
+// RENDER SUBJECTS TABLE
 function renderSubjectsTable() {
   const table = document.getElementById('subjectsListTable');
   if (!table) return;
@@ -793,7 +851,7 @@ function renderSubjectsTable() {
   });
 }
 
-// 4. RENDER ROOMS TABLE
+// RENDER ROOMS TABLE
 function renderRoomsTable() {
   const table = document.getElementById('roomsListTable');
   if (!table) return;
@@ -1120,7 +1178,6 @@ function runAutoScheduler() {
   }
 
   // Define Standard Time slots and days available for schedule blocks
-  // Time slots format: Time start, time end, duration in hours
   const standardTimeSlots = [
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
@@ -1145,8 +1202,6 @@ function runAutoScheduler() {
   let scheduledCount = 0;
   let unscheduledCount = 0;
 
-  // Let's identify which subjects already have scheduled sessions in this run
-  // To avoid double-generating.
   const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
 
   // Loop through all subjects
@@ -1160,22 +1215,17 @@ function runAutoScheduler() {
     let isScheduled = false;
     consoleEl.innerHTML += `Scheduling subject: <strong>${subject.title_and_code}</strong> (Section: ${subject.course} ${subject.year_level}${subject.block_section})...<br>`;
 
-    // Heuristic: Try to match subject's lecture/lab hours to optimal slots
     const targetDuration = subject.lab_hours > 0 ? 3 : 2; // labs prefer 3 hours, lectures prefer 2
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
-    // Nested loops looking for a clean, non-conflicting match: Teacher, Room, Day, Time
     for (let teacher of db.instructors) {
-      // Prioritize teachers matching designation or department
       for (let room of db.rooms) {
-        // Room logic matches type
         if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab
         if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB') continue; // Lectures prefer standard rooms
 
         for (let day of standardDays) {
           for (let slot of filteredSlots) {
 
-            // Generate Candidate Schedule
             const candidate = {
               id: 'temp_' + uniqueId(),
               instructor_id: teacher.id,
@@ -1188,7 +1238,6 @@ function runAutoScheduler() {
 
             const validation = validateSchedule(candidate);
             if (validation.valid) {
-              // Commit schedule
               candidate.id = uniqueId();
               db.schedules.push(candidate);
               isScheduled = true;
@@ -1210,7 +1259,6 @@ function runAutoScheduler() {
     }
   });
 
-  // Display summary stats
   document.getElementById('log-total-subjects').innerText = db.subjects.length;
   document.getElementById('log-scheduled').innerText = scheduledCount;
   document.getElementById('log-unscheduled').innerText = unscheduledCount;
@@ -1243,16 +1291,13 @@ function renderOfficialPrintout() {
   const teacher = db.instructors.find(t => t.id === teacherId);
   if (!teacher) return;
 
-  // Filter schedules matching this teacher
   const teacherSchedules = db.schedules.filter(s => s.instructor_id === teacher.id);
 
-  // Time conversion helper for 12 hours print formatting
   const printFormatTime = (timeStr) => {
     if (!timeStr) return '';
     const [hrs, mins] = timeStr.split(':').map(Number);
     const ampm = hrs >= 12 ? 'PM' : 'AM';
     let formattedHrs = hrs % 12 || 12;
-    // Format to match "8-11" or "12-2 PM" from image
     return `${formattedHrs}${mins > 0 ? ':' + String(mins).padStart(2, '0') : ''}`;
   };
 
@@ -1264,7 +1309,6 @@ function renderOfficialPrintout() {
     return `${s}-${e} ${ampm}`;
   };
 
-  // Compile individual teaching load records
   let tableRows = '';
   let totalLec = 0;
   let totalLab = 0;
@@ -1302,7 +1346,6 @@ function renderOfficialPrintout() {
     `;
   });
 
-  // Default rows if empty
   if (teacherSchedules.length === 0) {
     tableRows = `
       <tr>
@@ -1311,9 +1354,8 @@ function renderOfficialPrintout() {
     `;
   }
 
-  // Calculate administrative and other totals matching image boxes
   const collegeLoad = totalLec + totalLab;
-  const adminHrs = teacher.admin_load ? 40 : 0; // matching Gerardo Miciano's 40 hrs limit as program head
+  const adminHrs = teacher.admin_load ? 40 : 0;
 
   const htmlContent = `
     <!-- Top SIBT Official Header logo -->
@@ -1517,25 +1559,9 @@ function openPrintForFiltered() {
   renderOfficialPrintout();
 }
 
-// Manual database schema copy to clipboard helper
-function copySchema(elementId) {
-  const text = document.getElementById(elementId).innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    showToast("Schema copied to clipboard!");
-  }).catch(err => {
-    console.error("Could not copy schema:", err);
-  });
-}
-
 // Initialize on document load
 document.addEventListener('DOMContentLoaded', () => {
   loadDatabase();
-
-  // Seed sample data button listener
-  const seedBtn = document.getElementById('seedDataBtn');
-  if (seedBtn) {
-    seedBtn.addEventListener('click', resetToDemoData);
-  }
 
   // Pre-load logic and first rendering
   populateFormSelects();

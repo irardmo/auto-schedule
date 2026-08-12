@@ -23,9 +23,6 @@
           <div class="text-muted small" style="font-size: 0.75rem; margin-top: -3px;">Southwestern Institute of Business & Technology</div>
         </div>
       </a>
-      <button class="navbar-brand btn btn-outline-primary btn-sm ms-auto text-white no-print me-2 d-none d-md-block" id="seedDataBtn">
-        <i class="bi bi-database-fill-gear me-1"></i> Reset to Demo Data
-      </button>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -54,11 +51,6 @@
           <li class="nav-item">
             <a class="nav-link" id="tab-print" href="#" onclick="switchTab('print')">
               <i class="bi bi-printer me-1"></i> Teaching Load Printout
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" id="tab-schema" href="#" onclick="switchTab('schema')">
-              <i class="bi bi-database me-1"></i> Database Schema
             </a>
           </li>
         </ul>
@@ -721,164 +713,6 @@
       </div>
     </div>
 
-    <!-- ================= SCHEMA VIEWER TAB ================= -->
-    <div id="panel-schema" class="tab-panel d-none">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-dark text-white py-3">
-          <h5 class="mb-0 fw-bold"><i class="bi bi-database-check me-2"></i>Database Architecture Schema</h5>
-        </div>
-        <div class="card-body">
-          <p class="text-muted">This scheduling application uses a robust relational schema alongside a flexible JSON schema designed for full extensibility. The schema accounts for instructors, designations, loading limits, rooms, sections, subjects, and schedules.</p>
-
-          <ul class="nav nav-pills mb-3" id="schemaTabs" role="tablist">
-            <li class="nav-item">
-              <button class="nav-link active" id="pills-sql-tab" data-bs-toggle="pill" data-bs-target="#pills-sql" type="button">Relational SQL Schema</button>
-            </li>
-            <li class="nav-item">
-              <button class="nav-link" id="pills-json-tab" data-bs-toggle="pill" data-bs-target="#pills-json" type="button">JSON Database Schema</button>
-            </li>
-          </ul>
-
-          <div class="tab-content" id="schemaTabsContent">
-            <!-- Relational SQL Tab -->
-            <div class="tab-pane fade show active" id="pills-sql">
-              <div class="bg-dark text-light p-3 rounded position-relative">
-                <button class="btn btn-outline-light btn-sm position-absolute top-0 end-0 m-2" onclick="copySchema('sqlText')">Copy SQL</button>
-                <pre class="mb-0" id="sqlText" style="font-size: 0.85rem; max-height: 450px; overflow-y: auto;">
--- Relational SQLite / PostgreSQL Database Schema for SIBT Scheduling System
-
--- 1. Instructors Table (Stores instructor profiles and max unit rules)
-CREATE TABLE instructors (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    designation TEXT NOT NULL CHECK (designation IN ('Licensed Teacher', 'Regular Teacher', 'Admin', 'Director', 'Program Head')),
-    degree TEXT,
-    area TEXT DEFAULT 'ACADEMICS',
-    employee_no TEXT,
-    effectivity_date TEXT,
-    admin_load TEXT,
-    max_units INTEGER NOT NULL DEFAULT 24
-);
-
--- 2. Rooms Table
-CREATE TABLE rooms (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    room_type TEXT NOT NULL CHECK (room_type IN ('Both', 'Lecture', 'Laboratory'))
-);
-
--- 3. Subjects Table
-CREATE TABLE subjects (
-    id TEXT PRIMARY KEY,
-    title_and_code TEXT NOT NULL, -- Combined subject title and code, e.g. "Computer Programming 1 CC102"
-    course TEXT NOT NULL,        -- e.g. "BSIT"
-    year_level INTEGER NOT NULL CHECK (year_level BETWEEN 1 AND 4),
-    block_section TEXT NOT NULL, -- e.g. "1A"
-    units INTEGER NOT NULL,
-    lec_hours INTEGER NOT NULL DEFAULT 0,
-    lab_hours INTEGER NOT NULL DEFAULT 0
-);
-
--- 4. Schedules Table (Holds active assignments and connects entities with foreign keys)
-CREATE TABLE schedules (
-    id TEXT PRIMARY KEY,
-    instructor_id TEXT,
-    room_id TEXT,
-    day TEXT NOT NULL CHECK (day IN ('M', 'T', 'W', 'TH', 'F', 'S', 'MT', 'TTH', 'MWF', 'Monday-Friday')),
-    time_start TEXT NOT NULL, -- Format HH:MM
-    time_end TEXT NOT NULL,   -- Format HH:MM
-    subject_id TEXT,
-    FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE,
-    FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
-);
-                </pre>
-              </div>
-            </div>
-
-            <!-- JSON Document Tab -->
-            <div class="tab-pane fade" id="pills-json">
-              <div class="bg-dark text-light p-3 rounded position-relative">
-                <button class="btn btn-outline-light btn-sm position-absolute top-0 end-0 m-2" onclick="copySchema('jsonText')">Copy JSON</button>
-                <pre class="mb-0" id="jsonText" style="font-size: 0.85rem; max-height: 450px; overflow-y: auto;">
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "SIBTSchedulingDatabase",
-  "type": "object",
-  "properties": {
-    "instructors": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "name", "designation", "max_units"],
-        "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Admin", "Director", "Program Head"] },
-          "degree": { "type": ["string", "null"] },
-          "area": { "type": "string" },
-          "employee_no": { "type": ["string", "null"] },
-          "effectivity_date": { "type": "string" },
-          "admin_load": { "type": ["string", "null"] },
-          "max_units": { "type": "integer" }
-        }
-      }
-    },
-    "rooms": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "name", "room_type"],
-        "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory"] }
-        }
-      }
-    },
-    "subjects": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "title_and_code", "course", "year_level", "block_section", "units", "lec_hours", "lab_hours"],
-        "properties": {
-          "id": { "type": "string" },
-          "title_and_code": { "type": "string" },
-          "course": { "type": "string" },
-          "year_level": { "type": "integer", "minimum": 1, "maximum": 4 },
-          "block_section": { "type": "string" },
-          "units": { "type": "integer" },
-          "lec_hours": { "type": "integer" },
-          "lab_hours": { "type": "integer" }
-        }
-      }
-    },
-    "schedules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "instructor_id", "room_id", "day", "time_start", "time_end", "subject_id"],
-        "properties": {
-          "id": { "type": "string" },
-          "instructor_id": { "type": "string" },
-          "room_id": { "type": "string" },
-          "day": { "type": "string" },
-          "time_start": { "type": "string" },
-          "time_end": { "type": "string" },
-          "subject_id": { "type": "string" }
-        }
-      }
-    }
-  }
-}
-                </pre>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Footer -->
