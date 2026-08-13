@@ -312,7 +312,9 @@
 
                   <div class="col-md-2">
                     <label class="form-label fw-semibold">Block/Section <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="input-block" placeholder="e.g. 1A" required readonly>
+                    <select class="form-select" id="input-block" onchange="onBlockSelectChange()" required disabled>
+                      <option value="">Select Block...</option>
+                    </select>
                   </div>
 
                   <div class="col-md-4">

@@ -819,16 +819,48 @@ function calculateTimeEnd() {
   checkRealtimeConflict();
 }
 
-// Fill forms correctly on subject select
+// Fill forms correctly on subject select (decoupled unique subject title selection)
 function autofillSubjectDetails() {
-  const subId = document.getElementById('input-subject').value;
+  const subTitle = document.getElementById('input-subject').value;
+  const blockSel = document.getElementById('input-block');
+  if (!blockSel) return;
+
+  if (!subTitle) {
+    blockSel.innerHTML = '<option value="">Select Block...</option>';
+    blockSel.disabled = true;
+    document.getElementById('input-course').value = '';
+    document.getElementById('input-year').value = '';
+    document.getElementById('input-lec-hours').value = '2';
+    document.getElementById('input-lab-hours').value = '0';
+    document.getElementById('input-units').value = '3';
+    return;
+  }
+
+  // Find all matching subjects for this unique title
+  const matchingSubjects = db.subjects.filter(s => s.title_and_code === subTitle);
+  blockSel.innerHTML = '<option value="">Select Block...</option>';
+  matchingSubjects.forEach(sub => {
+    blockSel.innerHTML += `<option value="${sub.id}">Sec ${sub.course} ${sub.year_level}${sub.block_section}</option>`;
+  });
+  blockSel.disabled = false;
+
+  // Clear detail inputs until a block is selected
+  document.getElementById('input-course').value = '';
+  document.getElementById('input-year').value = '';
+  document.getElementById('input-lec-hours').value = '';
+  document.getElementById('input-lab-hours').value = '';
+  document.getElementById('input-units').value = '';
+}
+
+// Dynamically handle block selection change
+function onBlockSelectChange() {
+  const subId = document.getElementById('input-block').value;
   if (!subId) return;
 
   const sub = db.subjects.find(s => s.id === subId);
   if (sub) {
     document.getElementById('input-course').value = sub.course;
     document.getElementById('input-year').value = sub.year_level;
-    document.getElementById('input-block').value = sub.block_section;
     document.getElementById('input-lec-hours').value = sub.lec_hours;
     document.getElementById('input-lab-hours').value = sub.lab_hours;
     document.getElementById('input-units').value = sub.units;
@@ -862,7 +894,7 @@ function checkRealtimeConflict() {
   const day = document.getElementById('input-day').value;
   const timeStart = document.getElementById('input-time-start').value;
   const timeEnd = document.getElementById('input-time-end').value;
-  const subjectId = document.getElementById('input-subject').value;
+  const subjectId = document.getElementById('input-block').value; // Using input-block value as subjectId
   const editId = document.getElementById('edit-id').value;
 
   const monitor = document.getElementById('realtimeConflictCheck');
@@ -1003,12 +1035,19 @@ function populateFormSelects() {
     roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
   });
 
-  // Subject selector
+  // Subject selector (decoupled unique subject title list)
   const subSel = document.getElementById('input-subject');
-  subSel.innerHTML = '<option value="">Select Subject...</option>';
-  db.subjects.forEach(s => {
-    subSel.innerHTML += `<option value="${s.id}">${s.title_and_code} - Sec ${s.course} ${s.year_level}${s.block_section}</option>`;
-  });
+  if (subSel) {
+    const currentVal = subSel.value;
+    subSel.innerHTML = '<option value="">Select Subject...</option>';
+    const uniqueSubjectTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
+    uniqueSubjectTitles.forEach(title => {
+      subSel.innerHTML += `<option value="${title}">${title}</option>`;
+    });
+    if (currentVal && uniqueSubjectTitles.includes(currentVal)) {
+      subSel.value = currentVal;
+    }
+  }
 
   // Filters selectors on the schedule board page
   const filterTeacher = document.getElementById('filter-teacher');
@@ -1476,7 +1515,7 @@ document.getElementById('scheduleForm').addEventListener('submit', function(e) {
   const day = document.getElementById('input-day').value;
   const time_start = document.getElementById('input-time-start').value;
   const time_end = document.getElementById('input-time-end').value;
-  const subject_id = document.getElementById('input-subject').value;
+  const subject_id = document.getElementById('input-block').value; // Get unique subject ID from block selection
 
   const candidate = {
     id: id || uniqueId(),
@@ -1522,7 +1561,6 @@ function editSchedule(id) {
     document.getElementById('input-day').value = sch.day;
     document.getElementById('input-time-start').value = sch.time_start;
     document.getElementById('input-time-end').value = sch.time_end;
-    document.getElementById('input-subject').value = sch.subject_id;
 
     // Calculate duration choice manually based on hours
     const sMinutes = parseTimeToMinutes(sch.time_start);
@@ -1530,12 +1568,20 @@ function editSchedule(id) {
     const durHours = (eMinutes - sMinutes) / 60;
     document.getElementById('input-duration').value = String(durHours);
 
-    // Populate read-only values
+    // Populate decoupled subject select and dynamic block select
     const sub = db.subjects.find(s => s.id === sch.subject_id);
     if (sub) {
+      document.getElementById('input-subject').value = sub.title_and_code;
+
+      // Populate block list dynamically first
+      autofillSubjectDetails();
+
+      // Set the block selection to the exact subject ID
+      document.getElementById('input-block').value = sub.id;
+
+      // Populate fields
       document.getElementById('input-course').value = sub.course;
       document.getElementById('input-year').value = sub.year_level;
-      document.getElementById('input-block').value = sub.block_section;
       document.getElementById('input-lec-hours').value = sub.lec_hours;
       document.getElementById('input-lab-hours').value = sub.lab_hours;
       document.getElementById('input-units').value = sub.units;
@@ -1557,6 +1603,13 @@ function deleteSchedule(id) {
 function clearForm() {
   document.getElementById('scheduleForm').reset();
   document.getElementById('edit-id').value = "";
+
+  const blockSel = document.getElementById('input-block');
+  if (blockSel) {
+    blockSel.innerHTML = '<option value="">Select Block...</option>';
+    blockSel.disabled = true;
+  }
+
   document.getElementById('saveScheduleBtn').innerHTML = '<i class="bi bi-calendar-plus"></i> Add Schedule';
   checkRealtimeConflict();
 }
