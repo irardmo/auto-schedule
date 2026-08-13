@@ -875,15 +875,106 @@ function populateFormSelects() {
     });
   }
 
+  renderWaterfallTeachers();
+}
+
+// Waterfall / Batch Generate Teacher Search, Pagination and State
+let waterfallSelectedTeachers = new Set();
+let waterfallTeacherSearchQuery = '';
+let waterfallTeacherCurrentPage = 1;
+const waterfallTeacherPageSize = 20;
+
+function onWaterfallSearchChange() {
+  const searchInput = document.getElementById('waterfall-teacher-search');
+  if (searchInput) {
+    waterfallTeacherSearchQuery = searchInput.value.trim().toLowerCase();
+    waterfallTeacherCurrentPage = 1;
+    renderWaterfallTeachers();
+  }
+}
+
+function toggleWaterfallTeacherSelection(id, checked) {
+  if (checked) {
+    waterfallSelectedTeachers.add(id);
+  } else {
+    waterfallSelectedTeachers.delete(id);
+  }
+}
+
+function changeWaterfallPage(page) {
+  waterfallTeacherCurrentPage = page;
+  renderWaterfallTeachers();
+}
+
+function renderWaterfallPagination(totalPages) {
+  const paginationUl = document.getElementById('waterfall-teachers-pagination');
+  if (!paginationUl) return;
+
+  paginationUl.innerHTML = '';
+  if (totalPages <= 1) {
+    return;
+  }
+
+  // Previous button
+  const prevClass = waterfallTeacherCurrentPage === 1 ? 'disabled' : '';
+  paginationUl.innerHTML += `
+    <li class="page-item ${prevClass}">
+      <a class="page-link" href="#" onclick="event.preventDefault(); changeWaterfallPage(${waterfallTeacherCurrentPage - 1})">Prev</a>
+    </li>
+  `;
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const activeClass = i === waterfallTeacherCurrentPage ? 'active' : '';
+    paginationUl.innerHTML += `
+      <li class="page-item ${activeClass}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); changeWaterfallPage(${i})">${i}</a>
+      </li>
+    `;
+  }
+
+  // Next button
+  const nextClass = waterfallTeacherCurrentPage === totalPages ? 'disabled' : '';
+  paginationUl.innerHTML += `
+    <li class="page-item ${nextClass}">
+      <a class="page-link" href="#" onclick="event.preventDefault(); changeWaterfallPage(${waterfallTeacherCurrentPage + 1})">Next</a>
+    </li>
+  `;
+}
+
+function renderWaterfallTeachers() {
   const waterfallTeachersDiv = document.getElementById('waterfall-instructors-list');
-  if (waterfallTeachersDiv) {
-    waterfallTeachersDiv.innerHTML = '';
-    db.instructors.forEach(t => {
+  if (!waterfallTeachersDiv) return;
+
+  const filteredTeachers = db.instructors.filter(t => {
+    return t.name.toLowerCase().includes(waterfallTeacherSearchQuery) ||
+           t.designation.toLowerCase().includes(waterfallTeacherSearchQuery);
+  });
+
+  const totalItems = filteredTeachers.length;
+  const totalPages = Math.ceil(totalItems / waterfallTeacherPageSize) || 1;
+  if (waterfallTeacherCurrentPage > totalPages) {
+    waterfallTeacherCurrentPage = totalPages;
+  }
+  if (waterfallTeacherCurrentPage < 1) {
+    waterfallTeacherCurrentPage = 1;
+  }
+
+  const startIndex = (waterfallTeacherCurrentPage - 1) * waterfallTeacherPageSize;
+  const endIndex = Math.min(startIndex + waterfallTeacherPageSize, totalItems);
+  const pagedTeachers = filteredTeachers.slice(startIndex, endIndex);
+
+  waterfallTeachersDiv.innerHTML = '';
+  if (pagedTeachers.length === 0) {
+    waterfallTeachersDiv.innerHTML = '<div class="col-12 text-muted text-center py-2">No instructors found matching search.</div>';
+  } else {
+    pagedTeachers.forEach(t => {
+      const isChecked = waterfallSelectedTeachers.has(t.id) ? 'checked' : '';
       waterfallTeachersDiv.innerHTML += `
         <div class="col-md-6 col-12">
           <div class="form-check">
-            <input class="form-check-input waterfall-teacher-checkbox" type="checkbox" value="${t.id}" id="chk-wf-${t.id}">
-            <label class="form-check-label small fw-medium" for="chk-wf-${t.id}">
+            <input class="form-check-input waterfall-teacher-checkbox" type="checkbox" value="${t.id}" id="chk-wf-${t.id}" ${isChecked} onchange="toggleWaterfallTeacherSelection('${t.id}', this.checked)">
+            <label class="form-check-label small fw-medium text-truncate" for="chk-wf-${t.id}" style="max-width: 100%;">
               ${t.name} <span class="text-primary">(${getMaxUnitsForDesignation(t.designation)} max)</span>
             </label>
           </div>
@@ -891,6 +982,8 @@ function populateFormSelects() {
       `;
     });
   }
+
+  renderWaterfallPagination(totalPages);
 }
 
 function populatePrintTeachers() {
@@ -1592,7 +1685,7 @@ async function runWaterfallScheduler() {
   }
 
   // Find all participating teacher checkboxes
-  const selectedTeacherIds = Array.from(document.querySelectorAll('.waterfall-teacher-checkbox:checked')).map(cb => cb.value);
+  const selectedTeacherIds = Array.from(waterfallSelectedTeachers);
   if (selectedTeacherIds.length === 0) {
     showToast("Please select at least one participating teacher!", "danger");
     return;

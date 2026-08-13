@@ -403,7 +403,17 @@
                     </select>
                   </div>
                   <div class="col-12">
-                    <label class="form-label fw-semibold d-block">Select Participating Instructors <span class="text-danger">*</span></label>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                      <label class="form-label fw-semibold mb-0">Select Participating Instructors <span class="text-danger">*</span></label>
+                      <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <input type="text" id="waterfall-teacher-search" class="form-control form-control-sm" placeholder="Search teacher..." oninput="onWaterfallSearchChange()" style="max-width: 200px;">
+                        <nav aria-label="Waterfall Pagination" class="mb-0">
+                          <ul class="pagination pagination-sm mb-0" id="waterfall-teachers-pagination">
+                            <!-- Pagination dynamic -->
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
                     <div id="waterfall-instructors-list" class="row g-2 p-2 bg-light rounded" style="max-height: 180px; overflow-y: auto;">
                       <!-- Filled dynamically with checkboxes -->
                     </div>
