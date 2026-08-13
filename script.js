@@ -13,6 +13,83 @@ let selectedTeacherIds_manage = new Set();
 let selectedSubjectIds = new Set();
 let selectedRoomIds = new Set();
 
+let schedulesCurrentPage = 1;
+let instructorsCurrentPage = 1;
+let subjectsCurrentPage = 1;
+let roomsCurrentPage = 1;
+const GENERAL_PAGE_SIZE = 20;
+
+function renderPaginationControls(totalItems, currentPage, pageSize, navElId, infoElId, changePageFuncName) {
+  const navEl = document.getElementById(navElId);
+  const infoEl = document.getElementById(infoElId);
+  if (!navEl) return currentPage;
+
+  const totalPages = Math.ceil(totalItems / pageSize) || 1;
+  let adjustedPage = currentPage;
+  if (adjustedPage > totalPages) adjustedPage = totalPages;
+  if (adjustedPage < 1) adjustedPage = 1;
+
+  // Render info text
+  if (infoEl) {
+    const start = totalItems === 0 ? 0 : (adjustedPage - 1) * pageSize + 1;
+    const end = Math.min(adjustedPage * pageSize, totalItems);
+    infoEl.innerText = `Showing ${start} to ${end} of ${totalItems} entries`;
+  }
+
+  navEl.innerHTML = '';
+  if (totalPages <= 1) {
+    return adjustedPage;
+  }
+
+  // Prev Button
+  const prevDisabled = adjustedPage === 1 ? 'disabled' : '';
+  navEl.innerHTML += `
+    <li class="page-item ${prevDisabled}">
+      <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${adjustedPage - 1})">Previous</a>
+    </li>
+  `;
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const activeClass = i === adjustedPage ? 'active' : '';
+    navEl.innerHTML += `
+      <li class="page-item ${activeClass}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${i})">${i}</a>
+      </li>
+    `;
+  }
+
+  // Next Button
+  const nextDisabled = adjustedPage === totalPages ? 'disabled' : '';
+  navEl.innerHTML += `
+    <li class="page-item ${nextDisabled}">
+      <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${adjustedPage + 1})">Next</a>
+    </li>
+  `;
+
+  return adjustedPage;
+}
+
+function changeSchedulesPage(page) {
+  schedulesCurrentPage = page;
+  renderSchedulesTable();
+}
+
+function changeInstructorsPage(page) {
+  instructorsCurrentPage = page;
+  renderInstructorsTable();
+}
+
+function changeSubjectsPage(page) {
+  subjectsCurrentPage = page;
+  renderSubjectsTable();
+}
+
+function changeRoomsPage(page) {
+  roomsCurrentPage = page;
+  renderRoomsTable();
+}
+
 function updateBulkDeleteUI(type) {
   let selectedSet;
   let btnId, countId, checkAllId;
@@ -960,8 +1037,9 @@ function populateFormSelects() {
   const filterSubject = document.getElementById('filter-subject');
   if (filterSubject) {
     filterSubject.innerHTML = '<option value="">All Subjects</option>';
-    db.subjects.forEach(s => {
-      filterSubject.innerHTML += `<option value="${s.id}">${s.title_and_code} (${s.course} ${s.year_level}${s.block_section})</option>`;
+    const uniqueSubjectTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
+    uniqueSubjectTitles.forEach(title => {
+      filterSubject.innerHTML += `<option value="${title}">${title}</option>`;
     });
   }
 
@@ -1156,7 +1234,7 @@ function renderSchedulesTable() {
     const sub = db.subjects.find(s => s.id === sch.subject_id);
 
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
-    if (activeFilters.subject && sch.subject_id !== activeFilters.subject) return false;
+    if (activeFilters.subject && (!sub || sub.title_and_code !== activeFilters.subject)) return false;
     if (sub) {
       if (activeFilters.course && sub.course !== activeFilters.course) return false;
       if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
@@ -1184,7 +1262,19 @@ function renderSchedulesTable() {
     return parseTimeToMinutes(a.time_start) - parseTimeToMinutes(b.time_start);
   });
 
-  filtered.forEach(sch => {
+  // Page slice
+  schedulesCurrentPage = renderPaginationControls(
+    filtered.length,
+    schedulesCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'schedules-pagination',
+    'schedules-page-info',
+    'changeSchedulesPage'
+  );
+  const startIdx = (schedulesCurrentPage - 1) * GENERAL_PAGE_SIZE;
+  const pagedItems = filtered.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+
+  pagedItems.forEach(sch => {
     const teacher = db.instructors.find(t => t.id === sch.instructor_id);
     const room = db.rooms.find(r => r.id === sch.room_id);
     const subject = db.subjects.find(s => s.id === sch.subject_id);
@@ -1245,7 +1335,18 @@ function renderInstructorsTable() {
   if (checkAll) checkAll.checked = false;
   updateBulkDeleteUI('teachers');
 
-  db.instructors.forEach(t => {
+  instructorsCurrentPage = renderPaginationControls(
+    db.instructors.length,
+    instructorsCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'teachers-pagination',
+    'teachers-page-info',
+    'changeInstructorsPage'
+  );
+  const startIdx = (instructorsCurrentPage - 1) * GENERAL_PAGE_SIZE;
+  const pagedItems = db.instructors.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+
+  pagedItems.forEach(t => {
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-teachers" value="${t.id}" onchange="toggleItemSelection('teachers', '${t.id}', this.checked)"></td>
@@ -1279,7 +1380,18 @@ function renderSubjectsTable() {
   if (checkAll) checkAll.checked = false;
   updateBulkDeleteUI('subjects');
 
-  db.subjects.forEach(s => {
+  subjectsCurrentPage = renderPaginationControls(
+    db.subjects.length,
+    subjectsCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'subjects-pagination',
+    'subjects-page-info',
+    'changeSubjectsPage'
+  );
+  const startIdx = (subjectsCurrentPage - 1) * GENERAL_PAGE_SIZE;
+  const pagedItems = db.subjects.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+
+  pagedItems.forEach(s => {
     const typeBadge = s.is_major
       ? '<span class="badge bg-danger">Major</span>'
       : '<span class="badge bg-secondary">General</span>';
@@ -1318,7 +1430,18 @@ function renderRoomsTable() {
   if (checkAll) checkAll.checked = false;
   updateBulkDeleteUI('rooms');
 
-  db.rooms.forEach(r => {
+  roomsCurrentPage = renderPaginationControls(
+    db.rooms.length,
+    roomsCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'rooms-pagination',
+    'rooms-page-info',
+    'changeRoomsPage'
+  );
+  const startIdx = (roomsCurrentPage - 1) * GENERAL_PAGE_SIZE;
+  const pagedItems = db.rooms.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+
+  pagedItems.forEach(r => {
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-rooms" value="${r.id}" onchange="toggleItemSelection('rooms', '${r.id}', this.checked)"></td>
