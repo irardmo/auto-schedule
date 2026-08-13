@@ -8,6 +8,105 @@ let db = {
   schedules: []
 };
 
+let selectedScheduleIds = new Set();
+let selectedTeacherIds_manage = new Set();
+let selectedSubjectIds = new Set();
+let selectedRoomIds = new Set();
+
+function updateBulkDeleteUI(type) {
+  let selectedSet;
+  let btnId, countId, checkAllId;
+
+  if (type === 'schedules') {
+    selectedSet = selectedScheduleIds;
+    btnId = 'btn-bulk-delete-schedules';
+    countId = 'selected-schedules-count';
+    checkAllId = 'check-all-schedules';
+  } else if (type === 'teachers') {
+    selectedSet = selectedTeacherIds_manage;
+    btnId = 'btn-bulk-delete-teachers';
+    countId = 'selected-teachers-count';
+    checkAllId = 'check-all-teachers';
+  } else if (type === 'subjects') {
+    selectedSet = selectedSubjectIds;
+    btnId = 'btn-bulk-delete-subjects';
+    countId = 'selected-subjects-count';
+    checkAllId = 'check-all-subjects';
+  } else if (type === 'rooms') {
+    selectedSet = selectedRoomIds;
+    btnId = 'btn-bulk-delete-rooms';
+    countId = 'selected-rooms-count';
+    checkAllId = 'check-all-rooms';
+  }
+
+  const btn = document.getElementById(btnId);
+  const countSpan = document.getElementById(countId);
+
+  if (btn && countSpan) {
+    if (selectedSet.size > 0) {
+      btn.style.display = 'inline-flex';
+      countSpan.innerText = selectedSet.size;
+    } else {
+      btn.style.display = 'none';
+      countSpan.innerText = '0';
+    }
+  }
+}
+
+function toggleSelectAll(type, isChecked) {
+  let allCheckboxes = document.querySelectorAll(`.chk-bulk-${type}`);
+  let selectedSet;
+
+  if (type === 'schedules') selectedSet = selectedScheduleIds;
+  else if (type === 'teachers') selectedSet = selectedTeacherIds_manage;
+  else if (type === 'subjects') selectedSet = selectedSubjectIds;
+  else if (type === 'rooms') selectedSet = selectedRoomIds;
+
+  selectedSet.clear();
+
+  allCheckboxes.forEach(chk => {
+    chk.checked = isChecked;
+    if (isChecked) {
+      selectedSet.add(chk.value);
+    }
+  });
+
+  updateBulkDeleteUI(type);
+}
+
+function toggleItemSelection(type, id, isChecked) {
+  let selectedSet;
+  let checkAllId;
+
+  if (type === 'schedules') {
+    selectedSet = selectedScheduleIds;
+    checkAllId = 'check-all-schedules';
+  } else if (type === 'teachers') {
+    selectedSet = selectedTeacherIds_manage;
+    checkAllId = 'check-all-teachers';
+  } else if (type === 'subjects') {
+    selectedSet = selectedSubjectIds;
+    checkAllId = 'check-all-subjects';
+  } else if (type === 'rooms') {
+    selectedSet = selectedRoomIds;
+    checkAllId = 'check-all-rooms';
+  }
+
+  if (isChecked) {
+    selectedSet.add(id);
+  } else {
+    selectedSet.delete(id);
+  }
+
+  const checkAll = document.getElementById(checkAllId);
+  if (checkAll) {
+    const allCheckboxes = document.querySelectorAll(`.chk-bulk-${type}`);
+    checkAll.checked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(chk => chk.checked);
+  }
+
+  updateBulkDeleteUI(type);
+}
+
 // SIBT Demo Dataset matching instrcuctor.png & Program head.png
 const demoData = {
   instructors: [
@@ -857,6 +956,15 @@ function populateFormSelects() {
     filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
   });
 
+  // Subject filter
+  const filterSubject = document.getElementById('filter-subject');
+  if (filterSubject) {
+    filterSubject.innerHTML = '<option value="">All Subjects</option>';
+    db.subjects.forEach(s => {
+      filterSubject.innerHTML += `<option value="${s.id}">${s.title_and_code} (${s.course} ${s.year_level}${s.block_section})</option>`;
+    });
+  }
+
   // Waterfall / Batch Generate Selects Population
   const existingList = document.getElementById('existing-subjects-list');
   if (existingList) {
@@ -1008,6 +1116,7 @@ function renderAllViews() {
 let activeFilters = {
   teacher: "",
   course: "",
+  subject: "",
   year: "",
   block: ""
 };
@@ -1015,6 +1124,7 @@ let activeFilters = {
 function applyFilters() {
   activeFilters.teacher = document.getElementById('filter-teacher').value;
   activeFilters.course = document.getElementById('filter-course').value;
+  activeFilters.subject = document.getElementById('filter-subject').value;
   activeFilters.year = document.getElementById('filter-year').value;
   activeFilters.block = document.getElementById('filter-block').value;
   renderSchedulesTable();
@@ -1023,9 +1133,10 @@ function applyFilters() {
 function resetFilters() {
   document.getElementById('filter-teacher').value = "";
   document.getElementById('filter-course').value = "";
+  document.getElementById('filter-subject').value = "";
   document.getElementById('filter-year').value = "";
   document.getElementById('filter-block').value = "";
-  activeFilters = { teacher: "", course: "", year: "", block: "" };
+  activeFilters = { teacher: "", course: "", subject: "", year: "", block: "" };
   renderSchedulesTable();
 }
 
@@ -1034,11 +1145,18 @@ function renderSchedulesTable() {
   if (!listEl) return;
   listEl.innerHTML = '';
 
+  // Reset selections
+  selectedScheduleIds.clear();
+  const checkAllSchedules = document.getElementById('check-all-schedules');
+  if (checkAllSchedules) checkAllSchedules.checked = false;
+  updateBulkDeleteUI('schedules');
+
   let filtered = db.schedules.filter(sch => {
     const t = db.instructors.find(i => i.id === sch.instructor_id);
     const sub = db.subjects.find(s => s.id === sch.subject_id);
 
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
+    if (activeFilters.subject && sch.subject_id !== activeFilters.subject) return false;
     if (sub) {
       if (activeFilters.course && sub.course !== activeFilters.course) return false;
       if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
@@ -1091,6 +1209,7 @@ function renderSchedulesTable() {
 
     listEl.innerHTML += `
       <tr>
+        <td><input type="checkbox" class="form-check-input chk-bulk-schedules" value="${sch.id}" onchange="toggleItemSelection('schedules', '${sch.id}', this.checked)"></td>
         <td class="fw-bold text-dark">${tName}</td>
         <td><span class="badge bg-secondary py-1 px-2">${rName}</span></td>
         <td class="fw-bold text-primary">${sch.day}</td>
@@ -1121,9 +1240,15 @@ function renderInstructorsTable() {
   if (!table) return;
   table.innerHTML = '';
 
+  selectedTeacherIds_manage.clear();
+  const checkAll = document.getElementById('check-all-teachers');
+  if (checkAll) checkAll.checked = false;
+  updateBulkDeleteUI('teachers');
+
   db.instructors.forEach(t => {
     table.innerHTML += `
       <tr>
+        <td><input type="checkbox" class="form-check-input chk-bulk-teachers" value="${t.id}" onchange="toggleItemSelection('teachers', '${t.id}', this.checked)"></td>
         <td class="fw-bold">${t.name}</td>
         <td><span class="badge bg-light text-dark border">${t.designation}</span></td>
         <td>${t.degree || '-'}</td>
@@ -1149,6 +1274,11 @@ function renderSubjectsTable() {
   if (!table) return;
   table.innerHTML = '';
 
+  selectedSubjectIds.clear();
+  const checkAll = document.getElementById('check-all-subjects');
+  if (checkAll) checkAll.checked = false;
+  updateBulkDeleteUI('subjects');
+
   db.subjects.forEach(s => {
     const typeBadge = s.is_major
       ? '<span class="badge bg-danger">Major</span>'
@@ -1156,6 +1286,7 @@ function renderSubjectsTable() {
 
     table.innerHTML += `
       <tr>
+        <td><input type="checkbox" class="form-check-input chk-bulk-subjects" value="${s.id}" onchange="toggleItemSelection('subjects', '${s.id}', this.checked)"></td>
         <td class="fw-bold text-dark">${s.title_and_code}</td>
         <td>${s.course}</td>
         <td>${typeBadge}</td>
@@ -1182,9 +1313,15 @@ function renderRoomsTable() {
   if (!table) return;
   table.innerHTML = '';
 
+  selectedRoomIds.clear();
+  const checkAll = document.getElementById('check-all-rooms');
+  if (checkAll) checkAll.checked = false;
+  updateBulkDeleteUI('rooms');
+
   db.rooms.forEach(r => {
     table.innerHTML += `
       <tr>
+        <td><input type="checkbox" class="form-check-input chk-bulk-rooms" value="${r.id}" onchange="toggleItemSelection('rooms', '${r.id}', this.checked)"></td>
         <td class="fw-bold">${r.name}</td>
         <td>
           <span class="badge ${r.room_type === 'Laboratory' ? 'bg-primary' : r.room_type === 'Lecture' ? 'bg-success' : 'bg-warning'} text-white">
@@ -2220,6 +2357,50 @@ function openPrintForFiltered() {
   switchTab('print');
   document.getElementById('print-teacher-select').value = teacherId;
   renderOfficialPrintout();
+}
+
+// Bulk delete action methods
+function bulkDeleteSchedules() {
+  if (selectedScheduleIds.size === 0) return;
+  if (confirm(`Are you sure you want to delete ${selectedScheduleIds.size} selected schedule(s)?`)) {
+    db.schedules = db.schedules.filter(sch => !selectedScheduleIds.has(sch.id));
+    selectedScheduleIds.clear();
+    saveDatabase();
+    showToast("Selected schedules deleted successfully!");
+  }
+}
+
+function bulkDeleteTeachers() {
+  if (selectedTeacherIds_manage.size === 0) return;
+  if (confirm(`Are you sure you want to delete ${selectedTeacherIds_manage.size} selected instructor(s)? This will also delete their associated schedules.`)) {
+    db.instructors = db.instructors.filter(t => !selectedTeacherIds_manage.has(t.id));
+    db.schedules = db.schedules.filter(sch => !selectedTeacherIds_manage.has(sch.instructor_id));
+    selectedTeacherIds_manage.clear();
+    saveDatabase();
+    showToast("Selected instructors deleted successfully!", "danger");
+  }
+}
+
+function bulkDeleteSubjects() {
+  if (selectedSubjectIds.size === 0) return;
+  if (confirm(`Are you sure you want to delete ${selectedSubjectIds.size} selected subject(s)? This will also delete their associated schedules.`)) {
+    db.subjects = db.subjects.filter(s => !selectedSubjectIds.has(s.id));
+    db.schedules = db.schedules.filter(sch => !selectedSubjectIds.has(sch.subject_id));
+    selectedSubjectIds.clear();
+    saveDatabase();
+    showToast("Selected subjects deleted successfully!", "danger");
+  }
+}
+
+function bulkDeleteRooms() {
+  if (selectedRoomIds.size === 0) return;
+  if (confirm(`Are you sure you want to delete ${selectedRoomIds.size} selected room(s)? This will also delete their associated schedules.`)) {
+    db.rooms = db.rooms.filter(r => !selectedRoomIds.has(r.id));
+    db.schedules = db.schedules.filter(sch => !selectedRoomIds.has(sch.room_id));
+    selectedRoomIds.clear();
+    saveDatabase();
+    showToast("Selected rooms deleted successfully!", "danger");
+  }
 }
 
 // Initialize on document load

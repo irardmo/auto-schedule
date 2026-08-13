@@ -127,19 +127,25 @@
         </div>
         <div class="card-body">
           <form id="filterForm" class="row g-3">
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label class="form-label fw-semibold">Teacher</label>
               <select class="form-select" id="filter-teacher">
                 <option value="">All Teachers</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label class="form-label fw-semibold">Course/Department</label>
               <select class="form-select" id="filter-course">
                 <option value="">All Courses</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Subject/Subject Code</label>
+              <select class="form-select" id="filter-subject">
+                <option value="">All Subjects</option>
+              </select>
+            </div>
+            <div class="col-md-2">
               <label class="form-label fw-semibold">Year</label>
               <select class="form-select" id="filter-year">
                 <option value="">All Years</option>
@@ -149,7 +155,7 @@
                 <option value="4">4th Year</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label class="form-label fw-semibold">Block/Section</label>
               <select class="form-select" id="filter-block">
                 <option value="">All Blocks</option>
@@ -174,12 +180,18 @@
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
           <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-table me-2 text-primary"></i>Schedule Records</h5>
-          <span class="badge bg-secondary" id="filtered-count">Showing 0 records</span>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-schedules" onclick="bulkDeleteSchedules()" style="display: none;">
+              <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-schedules-count">0</span>)
+            </button>
+            <span class="badge bg-secondary" id="filtered-count">Showing 0 records</span>
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0" id="scheduleTable">
             <thead class="table-light text-uppercase fs-7 fw-bold">
               <tr>
+                <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-schedules" onchange="toggleSelectAll('schedules', this.checked)"></th>
                 <th>Teacher</th>
                 <th>Room</th>
                 <th>Day</th>
@@ -617,13 +629,17 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-light">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Instructors Database List</h6>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-teachers" onclick="bulkDeleteTeachers()" style="display: none;">
+                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-teachers-count">0</span>)
+                </button>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                   <thead class="table-light fs-7">
                     <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-teachers" onchange="toggleSelectAll('teachers', this.checked)"></th>
                       <th>Name</th>
                       <th>Designation</th>
                       <th>Degree</th>
@@ -700,13 +716,17 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-light">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Subjects Database List</h6>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-subjects" onclick="bulkDeleteSubjects()" style="display: none;">
+                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-subjects-count">0</span>)
+                </button>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                   <thead class="table-light fs-7">
                     <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-subjects" onchange="toggleSelectAll('subjects', this.checked)"></th>
                       <th>Subject Code & Title</th>
                       <th>Course</th>
                       <th>Type</th>
@@ -757,13 +777,17 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-light">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 fw-bold">Rooms Database List</h6>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-rooms" onclick="bulkDeleteRooms()" style="display: none;">
+                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-rooms-count">0</span>)
+                </button>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                   <thead class="table-light fs-7">
                     <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-rooms" onchange="toggleSelectAll('rooms', this.checked)"></th>
                       <th>Room Name</th>
                       <th>Room Type</th>
                       <th class="text-end">Actions</th>
