@@ -1509,24 +1509,40 @@ function runAutoScheduler() {
   // Define Standard Time slots and days available for schedule blocks
   // Adding more evening/afternoon slots for High School Room constraints if needed
   const standardTimeSlots = [
+    // 2 Hour blocks
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
-    { start: "12:00", end: "14:00", dur: 2 },
-    { start: "14:00", end: "16:00", dur: 2 },
+    { start: "13:00", end: "15:00", dur: 2 },
+    { start: "15:00", end: "17:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
-    { start: "17:00", end: "19:00", dur: 2 }, // Perfect for HS Mon-Thu evening slots
+
     // 3 Hour blocks
     { start: "08:00", end: "11:00", dur: 3 },
-    { start: "12:00", end: "15:00", dur: 3 },
-    { start: "15:00", end: "18:00", dur: 3 },
-    { start: "16:00", end: "19:00", dur: 3 }, // Perfect for HS Mon-Wed slots
-    // 1 and 1.5 Hour Blocks
+    { start: "09:00", end: "12:00", dur: 3 },
+    { start: "13:00", end: "16:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 },
+
+    // 1.5 Hour blocks
+    { start: "07:30", end: "09:00", dur: 1.5 },
+    { start: "09:00", end: "10:30", dur: 1.5 },
+    { start: "10:30", end: "12:00", dur: 1.5 },
+    { start: "13:00", end: "14:30", dur: 1.5 },
+    { start: "14:30", end: "16:00", dur: 1.5 },
+    { start: "16:00", end: "17:30", dur: 1.5 },
+    { start: "17:30", end: "19:00", dur: 1.5 },
+
+    // 1 Hour blocks
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
     { start: "10:00", end: "11:00", dur: 1 },
     { start: "11:00", end: "12:00", dur: 1 },
-    { start: "13:00", end: "14:30", dur: 1.5 },
-    { start: "14:30", end: "16:00", dur: 1.5 }
+    { start: "13:00", end: "14:00", dur: 1 },
+    { start: "14:00", end: "15:00", dur: 1 },
+    { start: "15:00", end: "16:00", dur: 1 },
+    { start: "16:00", end: "17:00", dur: 1 },
+    { start: "17:00", end: "18:00", dur: 1 },
+    { start: "18:00", end: "19:00", dur: 1 }
   ];
 
   const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
@@ -1612,6 +1628,18 @@ function runAutoScheduler() {
         if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab/CrimLab
         if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
 
+        // For auto-scheduler (which finds any room): if the subject is general (non-lab and non-major),
+        // do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
+        if (subject.lab_hours === 0 && !subject.is_major) {
+          const rNameUpper = room.name.toUpperCase();
+          const isComLab = rNameUpper.includes('COMLAB');
+          const isCrimLab = rNameUpper.includes('CRIMLAB');
+          const isSpecial = isSpecialRoom(room.name);
+          if (isComLab || isCrimLab || isSpecial) {
+            continue;
+          }
+        }
+
         for (let day of sortedDays) {
           for (let slot of sortedSlots) {
 
@@ -1668,10 +1696,9 @@ function runAutoScheduler() {
 // --- WATERFALL SUBJECT SHARING ENGINE ---
 async function runWaterfallScheduler() {
   const subjectTitle = document.getElementById('batch-subject').value.trim();
-  const course = document.getElementById('batch-course').value.trim();
+  const courseInput = document.getElementById('batch-course').value.trim();
   const yearLevel = parseInt(document.getElementById('batch-year').value, 10);
-  const numSections = parseInt(document.getElementById('batch-sections-count').value, 10) || 1;
-  const units = parseInt(document.getElementById('batch-units').value, 10) || 3;
+  const units = parseInt(document.getElementById('batch-units').value, 10) || 2;
   const lec_hours = parseInt(document.getElementById('batch-lec-hours').value, 10) || 0;
   const lab_hours = parseInt(document.getElementById('batch-lab-hours').value, 10) || 0;
 
@@ -1679,8 +1706,29 @@ async function runWaterfallScheduler() {
   const logContainer = document.getElementById('autoSchedulerResults');
   const consoleEl = document.getElementById('schedulerConsole');
 
-  if (!subjectTitle || !course) {
+  if (!subjectTitle || !courseInput) {
     showToast("Please enter Subject Title and Course/Department!", "danger");
+    return;
+  }
+
+  // Parse courseInput: support multiple comma-separated courses with optional colon section count
+  // e.g. "bsit:4, bscs:2" or "bsit, bscs"
+  const defaultSections = parseInt(document.getElementById('batch-sections-count').value, 10) || 10;
+  const courseParts = courseInput.split(',').map(part => part.trim()).filter(Boolean);
+
+  const coursesToProcess = [];
+  courseParts.forEach(part => {
+    if (part.includes(':')) {
+      const [cName, sCountStr] = part.split(':').map(p => p.trim());
+      const sCount = parseInt(sCountStr, 10) || defaultSections;
+      coursesToProcess.push({ courseName: cName.toUpperCase(), sections: sCount });
+    } else {
+      coursesToProcess.push({ courseName: part.toUpperCase(), sections: defaultSections });
+    }
+  });
+
+  if (coursesToProcess.length === 0) {
+    showToast("Please enter at least one valid Course/Department!", "danger");
     return;
   }
 
@@ -1692,41 +1740,47 @@ async function runWaterfallScheduler() {
   }
 
   logContainer.classList.remove('d-none');
-  consoleEl.innerHTML = `Starting Waterfall Batch Auto-Generator for: <strong>${subjectTitle}</strong> (${course})...<br>`;
+  const courseSummary = coursesToProcess.map(c => `${c.courseName} (${c.sections} sections)`).join(', ');
+  consoleEl.innerHTML = `Starting Waterfall Batch Auto-Generator for: <strong>${subjectTitle}</strong> [${courseSummary}]...<br>`;
 
   // Dynamically add subjects/sections to the database if they don't exist yet, or just collect them
-  // We'll create distinct section codes like A, B, C, D... etc based on numSections
+  // We'll create distinct section codes like A, B, C, D... etc based on sections count per course
   const createdSubjects = [];
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  for (let i = 0; i < numSections; i++) {
-    const sectionLetter = alphabet[i] || String(i + 1);
-    const sectionCode = `${yearLevel}${sectionLetter}`;
+  coursesToProcess.forEach(item => {
+    const cName = item.courseName;
+    const sCount = item.sections;
 
-    // Look if already exists in db.subjects to prevent duplicate creation
-    let existingSub = db.subjects.find(s =>
-      s.title_and_code === subjectTitle &&
-      s.course === course &&
-      s.year_level === yearLevel &&
-      s.block_section === sectionCode
-    );
+    for (let i = 0; i < sCount; i++) {
+      const sectionLetter = alphabet[i] || String(i + 1);
+      const sectionCode = `${yearLevel}${sectionLetter}`;
 
-    if (!existingSub) {
-      existingSub = {
-        id: 's_batch_' + uniqueId(),
-        title_and_code: subjectTitle,
-        course: course,
-        year_level: yearLevel,
-        block_section: sectionCode,
-        units: units,
-        lec_hours: lec_hours,
-        lab_hours: lab_hours,
-        is_major: (subjectTitle.toUpperCase().includes('CC') || subjectTitle.toUpperCase().includes('IM') || subjectTitle.toUpperCase().includes('PF') || subjectTitle.toUpperCase().includes('PROGRAMMING')) ? 1 : 0
-      };
-      db.subjects.push(existingSub);
+      // Look if already exists in db.subjects to prevent duplicate creation
+      let existingSub = db.subjects.find(s =>
+        s.title_and_code === subjectTitle &&
+        s.course === cName &&
+        s.year_level === yearLevel &&
+        s.block_section === sectionCode
+      );
+
+      if (!existingSub) {
+        existingSub = {
+          id: 's_batch_' + uniqueId(),
+          title_and_code: subjectTitle,
+          course: cName,
+          year_level: yearLevel,
+          block_section: sectionCode,
+          units: units,
+          lec_hours: lec_hours,
+          lab_hours: lab_hours,
+          is_major: (subjectTitle.toUpperCase().includes('CC') || subjectTitle.toUpperCase().includes('IM') || subjectTitle.toUpperCase().includes('PF') || subjectTitle.toUpperCase().includes('PROGRAMMING')) ? 1 : 0
+        };
+        db.subjects.push(existingSub);
+      }
+      createdSubjects.push(existingSub);
     }
-    createdSubjects.push(existingSub);
-  }
+  });
 
   // Persist the newly created batch subjects to database
   await saveDatabase();
@@ -1743,42 +1797,34 @@ async function runWaterfallScheduler() {
 
   consoleEl.innerHTML += `Found <strong class="text-primary">${subjectsToSchedule.length} unscheduled sections</strong> to split-load among <strong class="text-primary">${selectedTeacherIds.length} teachers</strong>.<br>`;
 
-  // 1st Year: 3 Units means 3 hours duration.
-  // Higher Years (2, 3, 4): 3 Units means 2 hours duration.
-  let targetDuration = 2;
-  if (units === 3) {
-    if (yearLevel === 1) {
-      targetDuration = 3;
-    } else {
-      targetDuration = 2;
-    }
-  } else {
-    targetDuration = lec_hours + lab_hours || units;
-  }
+  // Read target duration from batch-hours dropdown as requested
+  const targetDuration = parseFloat(document.getElementById('batch-hours').value) || 1.5;
 
   consoleEl.innerHTML += `Duration configured to: <strong>${targetDuration} Hour(s)</strong> per block (Year Level: ${yearLevel}, Units: ${units}).<br>`;
 
   // Build standard list of timeslots, heavily prioritized to minimize empty daily gaps (compress schedules for a day with only lunch break).
-  // Standard compression timeslots list starting sequentially:
-  // Mon-Sat:
-  // AM Block 1: 08:00 - 10:00 (2h) or 08:00 - 11:00 (3h)
-  // AM Block 2: 10:00 - 12:00 (2h) (follows AM Block 1 perfectly)
-  // LUNCH BREAK: 12:00 - 13:00 / 12:00 - 14:00
-  // PM Block 1: 13:00 - 15:00 (2h) or 13:00 - 16:00 (3h)
-  // PM Block 2: 15:00 - 17:00 (2h) (follows PM Block 1 perfectly)
-  // Evening Block: 17:00 - 19:00 (2h) (follows PM Block 2 perfectly)
   const standardTimeSlots = [
-    // 3 Hour blocks (ideal for 1st year 3 units)
+    // 3 Hour blocks
     { start: "08:00", end: "11:00", dur: 3 },
-    { start: "13:00", end: "16:00", dur: 3 }, // Perfect PM block starting post-lunch
-    { start: "16:00", end: "19:00", dur: 3 }, // Evening block
+    { start: "13:00", end: "16:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 },
 
     // 2 Hour blocks
     { start: "08:00", end: "10:00", dur: 2 },
-    { start: "10:00", end: "12:00", dur: 2 }, // Back-to-back with 8-10, stops at lunch 12
-    { start: "13:00", end: "15:00", dur: 2 }, // Starts right after lunch at 1
-    { start: "15:00", end: "17:00", dur: 2 }, // Back-to-back with 1-3 PM
-    { start: "17:00", end: "19:00", dur: 2 }, // Back-to-back with 3-5 PM
+    { start: "10:00", end: "12:00", dur: 2 },
+    { start: "13:00", end: "15:00", dur: 2 },
+    { start: "15:00", end: "17:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 },
+    { start: "16:00", end: "18:00", dur: 2 },
+
+    // 1.5 Hour blocks
+    { start: "07:30", end: "09:00", dur: 1.5 },
+    { start: "09:00", end: "10:30", dur: 1.5 },
+    { start: "10:30", end: "12:00", dur: 1.5 },
+    { start: "13:00", end: "14:30", dur: 1.5 },
+    { start: "14:30", end: "16:00", dur: 1.5 },
+    { start: "16:00", end: "17:30", dur: 1.5 },
+    { start: "17:30", end: "19:00", dur: 1.5 },
 
     // 1 Hour blocks
     { start: "08:00", end: "09:00", dur: 1 },
@@ -1842,6 +1888,17 @@ async function runWaterfallScheduler() {
       for (let room of sortedRooms) {
         if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue;
         if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
+
+        // If 'Any' room is selected, do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
+        if (!preferredRoomId) {
+          const rNameUpper = room.name.toUpperCase();
+          const isComLab = rNameUpper.includes('COMLAB');
+          const isCrimLab = rNameUpper.includes('CRIMLAB');
+          const isSpecial = isSpecialRoom(room.name);
+          if (isComLab || isCrimLab || isSpecial) {
+            continue;
+          }
+        }
 
         for (let day of sortedDays) {
           for (let slot of sortedSlots) {

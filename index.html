@@ -357,45 +357,57 @@
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="batch-subject" placeholder="e.g. Physical Education PE 101" list="existing-subjects-list" required>
+                    <input type="text" class="form-control" id="batch-subject" placeholder="Physical Education PE 101" list="existing-subjects-list" required>
                     <datalist id="existing-subjects-list">
                       <!-- Filled dynamically -->
                     </datalist>
                   </div>
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="batch-course" placeholder="e.g. BSIT" required>
+                    <input type="text" class="form-control" id="batch-course" placeholder="bsit" required>
+                    <small class="text-muted" style="font-size: 0.75rem;">Support multiple courses (e.g. <code>bsit:4, bscs:2</code> or <code>bsit, bscs</code>)</small>
                   </div>
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
                     <select class="form-select" id="batch-year">
-                      <option value="1">1st Year (3 Units = 3 Hours duration)</option>
-                      <option value="2">2nd Year (3 Units = 2 Hours duration)</option>
-                      <option value="3">3rd Year (3 Units = 2 Hours duration)</option>
-                      <option value="4">4th Year (3 Units = 2 Hours duration)</option>
+                      <option value="1" selected>1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Hours<span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-hours">
+                      <option value="1">1</option>
+                      <option value="1.5" selected>1.5</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
                     </select>
                   </div>
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Number of Sections <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="3" required>
+                    <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="10" required>
                   </div>
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
                     <select class="form-select" id="batch-units">
-                      <option value="3" selected>3 Units</option>
-                      <option value="2">2 Units</option>
                       <option value="1">1 Unit</option>
+                      <option value="2" selected>2 Units</option>
+                      <option value="3">3 Units</option>
+                      <option value="4">4 Units</option>
+                      <option value="5">5 Units</option>
                     </select>
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold">Lecture Hours</label>
+                    <label class="form-label fw-semibold">Lecture</label>
                     <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold">Lab Hours</label>
+                    <label class="form-label fw-semibold">Lab</label>
                     <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-12">
                     <label class="form-label fw-semibold">Preferred Room (Optional)</label>
                     <select class="form-select" id="waterfall-room">
                       <option value="">Any available room</option>
