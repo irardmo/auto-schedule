@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SIBTSchedulingDatabase",
+  "description": "JSON Schema for Southwestern Institute of Business and Technology auto scheduling data storage.",
+  "type": "object",
+  "properties": {
+    "instructors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "designation", "max_units"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Part-time", "Part-time Teacher", "Admin", "Director", "Program Head"] },
+          "degree": { "type": ["string", "null"] },
+          "area": { "type": "string" },
+          "employee_no": { "type": ["string", "null"] },
+          "effectivity_date": { "type": "string" },
+          "admin_load": { "type": ["string", "null"] },
+          "max_units": { "type": "integer" }
+        }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "room_type"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory"] }
+        }
+      }
+    },
+    "subjects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title_and_code", "course", "year_level", "block_section", "units", "lec_hours", "lab_hours", "is_major"],
+        "properties": {
+          "id": { "type": "string" },
+          "title_and_code": { "type": "string" },
+          "course": { "type": "string" },
+          "year_level": { "type": "integer", "minimum": 1, "maximum": 4 },
+          "block_section": { "type": "string" },
+          "units": { "type": "integer" },
+          "lec_hours": { "type": "integer" },
+          "lab_hours": { "type": "integer" },
+          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "schedules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "instructor_id", "room_id", "day", "time_start", "time_end", "subject_id"],
+        "properties": {
+          "id": { "type": "string" },
+          "instructor_id": { "type": "string" },
+          "room_id": { "type": "string" },
+          "day": { "type": "string" },
+          "time_start": { "type": "string" },
+          "time_end": { "type": "string" },
+          "subject_id": { "type": "string" }
+        }
+      }
+    }
+  }
+}
