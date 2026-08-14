@@ -1915,6 +1915,8 @@ function runAutoScheduler() {
       return calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id);
     });
 
+    let conflictsEncountered = new Set();
+
     for (let teacher of sortedTeachers) {
       const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
 
@@ -1974,6 +1976,8 @@ function runAutoScheduler() {
               scheduledCount++;
               consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Assigned:</span> ${teacher.name} inside ${room.name} on ${day} (${slot.start}-${slot.end})<br>`;
               break;
+            } else {
+              validation.errors.forEach(err => conflictsEncountered.add(err));
             }
           }
           if (isScheduled) break;
@@ -1986,6 +1990,12 @@ function runAutoScheduler() {
     if (!isScheduled) {
       unscheduledCount++;
       consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Failed:</span> No conflict-free slots found for ${subject.title_and_code}.<br>`;
+      if (conflictsEncountered.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
     }
   });
 
@@ -2157,6 +2167,7 @@ async function runWaterfallScheduler() {
 
   for (let subject of subjectsToSchedule) {
     let isScheduled = false;
+    let conflictsEncountered = new Set();
 
     // Waterfall logic: Sort participating teachers dynamically for each section by their current workload unit counts (ascending)
     const participatingTeachers = db.instructors
@@ -2234,6 +2245,8 @@ async function runWaterfallScheduler() {
               successfullyScheduled++;
               consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Waterfall Assigned:</span> ${teacher.name} (${calculateTeacherTotalUnits(teacher.id)} units) -> Room: ${room.name} on ${day} (${slot.start}-${slot.end})<br>`;
               break;
+            } else {
+              validation.errors.forEach(err => conflictsEncountered.add(err));
             }
           }
           if (isScheduled) break;
@@ -2245,6 +2258,12 @@ async function runWaterfallScheduler() {
 
     if (!isScheduled) {
       consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Waterfall Failed:</span> Could not find valid conflict-free slot for this section among chosen instructors.<br>`;
+      if (conflictsEncountered.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
     }
   }
 
