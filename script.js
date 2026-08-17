@@ -191,7 +191,8 @@ const demoData = {
       id: "t1",
       name: "KENT LIWANAGAN",
       designation: "Regular Teacher", // Limit: 24 units
-      degree: "College Faculty",
+      degree: "BSIT",
+      master_degree: "MSIT",
       area: "ACADEMICS",
       employee_no: "0105",
       effectivity_date: "July 13, 2026",
@@ -203,6 +204,7 @@ const demoData = {
       name: "GERARDO MICIANO",
       designation: "Program Head", // Limit: 18 units
       degree: "BSIT",
+      master_degree: "MSIT",
       area: "ADMINISTRATION",
       employee_no: "0321",
       effectivity_date: "June 23, 2026",
@@ -213,7 +215,8 @@ const demoData = {
       id: "t3",
       name: "CAREN ROSE L TOJEDO, LPT., MAED.",
       designation: "Director", // Limit: 15 units
-      degree: "Dean of Academics",
+      degree: "BSED, LPT",
+      master_degree: "MAED",
       area: "ACADEMICS",
       employee_no: "0001",
       effectivity_date: "June 01, 2026",
@@ -224,7 +227,8 @@ const demoData = {
       id: "t4",
       name: "MAILA M MORALES, LPT., CHRA",
       designation: "Admin", // Limit: 9 units
-      degree: "HRD Director",
+      degree: "BSBA, LPT, CHRA",
+      master_degree: "MBA",
       area: "ADMINISTRATION",
       employee_no: "0002",
       effectivity_date: "July 01, 2026",
@@ -1392,6 +1396,7 @@ function renderInstructorsTable() {
         <td class="fw-bold">${t.name}</td>
         <td><span class="badge bg-light text-dark border">${t.designation}</span></td>
         <td>${t.degree || '-'}</td>
+        <td>${t.master_degree || '-'}</td>
         <td>${t.area || '-'}</td>
         <td>${t.employee_no || '-'}</td>
         <td class="text-center fw-semibold text-primary">${t.max_units}</td>
@@ -1710,8 +1715,9 @@ function importInstructorsCSV(e) {
         const adminLoad = idxAdminLoad !== -1 && row[idxAdminLoad] ? row[idxAdminLoad].trim() : '';
 
         // Combine degree/credentials
-        const degreeParts = [edu, prc ? (prc.toUpperCase().includes('LICENSE') || prc.toUpperCase().includes('LPT') ? prc : `PRC: ${prc}`) : '', masteral].filter(Boolean);
+        const degreeParts = [edu, prc ? (prc.toUpperCase().includes('LICENSE') || prc.toUpperCase().includes('LPT') ? prc : `PRC: ${prc}`) : ''].filter(Boolean);
         const degreeStr = degreeParts.join(', ');
+        const masterDegreeStr = masteral;
 
         // Determine designation
         let designation = "Regular Teacher";
@@ -1734,6 +1740,7 @@ function importInstructorsCSV(e) {
           existing.name = name;
           existing.designation = designation;
           existing.degree = degreeStr || existing.degree;
+          existing.master_degree = masterDegreeStr || existing.master_degree;
           existing.area = area || existing.area;
           existing.employee_no = rawEmpNo || existing.employee_no;
           existing.effectivity_date = effectivity || existing.effectivity_date;
@@ -1745,6 +1752,7 @@ function importInstructorsCSV(e) {
             name,
             designation,
             degree: degreeStr,
+            master_degree: masterDegreeStr || '',
             area,
             employee_no: rawEmpNo,
             effectivity_date: effectivity,
@@ -1773,6 +1781,7 @@ function saveTeacher(e) {
   const name = document.getElementById('teacher-name').value;
   const designation = document.getElementById('teacher-designation').value;
   const degree = document.getElementById('teacher-degree').value;
+  const master_degree = document.getElementById('teacher-master-degree') ? document.getElementById('teacher-master-degree').value : '';
   const area = document.getElementById('teacher-area').value;
   const employee_no = document.getElementById('teacher-emp-no').value;
   const effectivity_date = document.getElementById('teacher-effectivity').value;
@@ -1784,6 +1793,7 @@ function saveTeacher(e) {
     name,
     designation,
     degree,
+    master_degree,
     area,
     employee_no,
     effectivity_date,
@@ -1809,11 +1819,14 @@ function editTeacher(id) {
     document.getElementById('teacher-id').value = t.id;
     document.getElementById('teacher-name').value = t.name;
     document.getElementById('teacher-designation').value = t.designation;
-    document.getElementById('teacher-degree').value = t.degree;
-    document.getElementById('teacher-area').value = t.area;
-    document.getElementById('teacher-emp-no').value = t.employee_no;
-    document.getElementById('teacher-effectivity').value = t.effectivity_date;
-    document.getElementById('teacher-admin-load').value = t.admin_load;
+    document.getElementById('teacher-degree').value = t.degree || '';
+    if (document.getElementById('teacher-master-degree')) {
+      document.getElementById('teacher-master-degree').value = t.master_degree || '';
+    }
+    document.getElementById('teacher-area').value = t.area || 'ACADEMICS';
+    document.getElementById('teacher-emp-no').value = t.employee_no || '';
+    document.getElementById('teacher-effectivity').value = t.effectivity_date || 'July 13, 2026';
+    document.getElementById('teacher-admin-load').value = t.admin_load || '';
     updateDesignationHint();
   }
 }
@@ -1830,6 +1843,9 @@ function deleteTeacher(id) {
 function clearTeacherForm() {
   document.getElementById('teacherForm').reset();
   document.getElementById('teacher-id').value = "";
+  if (document.getElementById('teacher-master-degree')) {
+    document.getElementById('teacher-master-degree').value = "";
+  }
   document.getElementById('teacher-area').value = "ACADEMICS";
   document.getElementById('teacher-effectivity').value = "July 13, 2026";
   updateDesignationHint();
@@ -2529,6 +2545,7 @@ function renderOfficialPrintout() {
         <div class="d-flex"><span class="fw-bold" style="width: 110px;">NAME:</span> <span class="border-bottom border-dark flex-grow-1 fw-bold">${teacher.name}</span></div>
         <div class="d-flex mt-2"><span class="fw-bold" style="width: 110px;">DESIGNATION:</span> <span class="border-bottom border-dark flex-grow-1">${teacher.designation}</span></div>
         <div class="d-flex mt-2"><span class="fw-bold" style="width: 110px;">DEGREE:</span> <span class="border-bottom border-dark flex-grow-1">${teacher.degree || 'College Instructor'}</span></div>
+        ${teacher.master_degree ? `<div class="d-flex mt-2"><span class="fw-bold" style="width: 110px;">MASTERAL:</span> <span class="border-bottom border-dark flex-grow-1">${teacher.master_degree}</span></div>` : ''}
       </div>
       <div class="col-6">
         <div class="d-flex"><span class="fw-bold" style="width: 150px;">AREA:</span> <span class="border-bottom border-dark flex-grow-1">${teacher.area || 'ACADEMICS'}</span></div>

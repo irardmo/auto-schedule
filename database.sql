@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS instructors (
     name VARCHAR(255) NOT NULL,
     designation VARCHAR(100) NOT NULL, -- e.g., 'Licensed Teacher', 'Regular Teacher', 'Admin', 'Director', 'Program Head'
     degree VARCHAR(255),
+    master_degree VARCHAR(255),
     area VARCHAR(100) DEFAULT 'ACADEMICS',
     employee_no VARCHAR(50),
     effectivity_date VARCHAR(100),
@@ -54,11 +55,11 @@ CREATE TABLE IF NOT EXISTS schedules (
 
 -- ==================== SIBT SEED DATA ====================
 
-INSERT IGNORE INTO instructors (id, name, designation, degree, area, employee_no, effectivity_date, admin_load, max_units) VALUES
-('t1', 'KENT LIWANAGAN', 'Regular Teacher', 'College Faculty', 'ACADEMICS', '0105', 'July 13, 2026', '', 24),
-('t2', 'GERARDO MICIANO', 'Program Head', 'BSIT', 'ADMINISTRATION', '0321', 'June 23, 2026', 'CIT Program Head', 18),
-('t3', 'CAREN ROSE L TOJEDO, LPT., MAED.', 'Director', 'Dean of Academics', 'ACADEMICS', '0001', 'June 01, 2026', 'Dean of Academics', 15),
-('t4', 'MAILA M MORALES, LPT., CHRA', 'Admin', 'HRD Director', 'ADMINISTRATION', '0002', 'July 01, 2026', 'HRD Director', 9);
+INSERT IGNORE INTO instructors (id, name, designation, degree, master_degree, area, employee_no, effectivity_date, admin_load, max_units) VALUES
+('t1', 'KENT LIWANAGAN', 'Regular Teacher', 'BSIT', 'MSIT', 'ACADEMICS', '0105', 'July 13, 2026', '', 24),
+('t2', 'GERARDO MICIANO', 'Program Head', 'BSIT', 'MSIT', 'ADMINISTRATION', '0321', 'June 23, 2026', 'CIT Program Head', 18),
+('t3', 'CAREN ROSE L TOJEDO, LPT., MAED.', 'Director', 'BSED, LPT', 'MAED', 'ACADEMICS', '0001', 'June 01, 2026', 'Dean of Academics', 15),
+('t4', 'MAILA M MORALES, LPT., CHRA', 'Admin', 'BSBA, LPT, CHRA', 'MBA', 'ADMINISTRATION', '0002', 'July 01, 2026', 'HRD Director', 9);
 
 INSERT IGNORE INTO rooms (id, name, room_type) VALUES
 ('r1', 'COMLAB', 'Laboratory'),

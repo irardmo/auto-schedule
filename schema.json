@@ -14,6 +14,7 @@
           "name": { "type": "string" },
           "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Part-time", "Part-time Teacher", "Admin", "Director", "Program Head"] },
           "degree": { "type": ["string", "null"] },
+          "master_degree": { "type": ["string", "null"] },
           "area": { "type": "string" },
           "employee_no": { "type": ["string", "null"] },
           "effectivity_date": { "type": "string" },

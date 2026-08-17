@@ -29,6 +29,7 @@ try {
         name VARCHAR(255) NOT NULL,
         designation VARCHAR(100) NOT NULL,
         degree VARCHAR(255),
+        master_degree VARCHAR(255),
         area VARCHAR(100) DEFAULT 'ACADEMICS',
         employee_no VARCHAR(50),
         effectivity_date VARCHAR(100),

@@ -6,6 +6,7 @@ CREATE TABLE instructors (
     name TEXT NOT NULL,
     designation TEXT NOT NULL CHECK (designation IN ('Licensed Teacher', 'Regular Teacher', 'Part-time', 'Part-time Teacher', 'Admin', 'Director', 'Program Head')),
     degree TEXT,
+    master_degree TEXT,
     area TEXT DEFAULT 'ACADEMICS',
     employee_no TEXT,
     effectivity_date TEXT,
