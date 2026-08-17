@@ -639,11 +639,29 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold">Instructors Database List</h6>
-                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-teachers" onclick="bulkDeleteTeachers()" style="display: none;">
-                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-teachers-count">0</span>)
-                </button>
+              <div class="card-header bg-white py-3 border-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <h6 class="mb-0 fw-bold">Instructors Database List</h6>
+                  <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-teachers" onclick="bulkDeleteTeachers()" style="display: none;">
+                    <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-teachers-count">0</span>)
+                  </button>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="file" id="csv-upload-teachers" accept=".csv" onchange="importInstructorsCSV(event)" style="display: none;">
+                  <label for="csv-upload-teachers" class="btn btn-outline-success btn-sm mb-0">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Upload Instructor CSV
+                  </label>
+                  <button type="button" class="btn btn-link btn-sm text-decoration-none p-0" data-bs-toggle="collapse" data-bs-target="#csvFormatHelp" title="View CSV Format Guide">
+                    <i class="bi bi-question-circle-fill text-muted fs-5"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="collapse bg-light border-bottom p-3" id="csvFormatHelp">
+                <div class="small text-muted">
+                  <strong class="text-dark">Expected CSV Column Headers:</strong><br>
+                  <code>NAME</code>, <code>EMPLOYEE #</code>, <code>DESIGNATION</code>, <code>EDUCATIONAL ATTAINMENT</code>, <code>PRC LICENSE</code>, <code>MASTERAL DEGREE</code> (Optional: <code>AREA</code>, <code>EFFECTIVITY DATE</code>, <code>ADMIN LOAD</code>)<br>
+                  <em>Designation values automatically map max unit limits (e.g. Licensed Teacher: 27 units, Regular Teacher: 24 units, Part-time: 12 units, Admin: 9 units, Director: 15 units, Program Head: 18 units).</em>
+                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">

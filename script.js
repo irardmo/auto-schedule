@@ -1614,6 +1614,158 @@ function clearForm() {
   checkRealtimeConflict();
 }
 
+// CSV PARSER HELPER
+function parseCSV(text) {
+  const lines = [];
+  let row = [];
+  let inQuotes = false;
+  let currentVal = '';
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentVal += '"';
+        i++; // skip escaped quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      row.push(currentVal.trim());
+      currentVal = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') i++;
+      row.push(currentVal.trim());
+      if (row.some(field => field.length > 0)) {
+        lines.push(row);
+      }
+      row = [];
+      currentVal = '';
+    } else {
+      currentVal += char;
+    }
+  }
+
+  if (currentVal || row.length > 0) {
+    row.push(currentVal.trim());
+    if (row.some(field => field.length > 0)) {
+      lines.push(row);
+    }
+  }
+
+  return lines;
+}
+
+// INSTRUCTOR CSV UPLOAD IMPLEMENTATION
+function importInstructorsCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const content = evt.target.result;
+      const rows = parseCSV(content);
+      if (rows.length < 2) {
+        showToast("CSV file is empty or missing data rows!", "danger");
+        return;
+      }
+
+      const headers = rows[0].map(h => h.toUpperCase().replace(/[^A-Z0-9#\s]/g, '').trim());
+
+      const findColIndex = (keywords) => {
+        return headers.findIndex(h => keywords.some(k => h.includes(k)));
+      };
+
+      const idxName = findColIndex(['NAME']);
+      const idxEmpNo = findColIndex(['EMPLOYEE #', 'EMPLOYEE NO', 'EMPLOYEE NUMBER', 'EMP NO', 'EMPLOYEE']);
+      const idxDesignation = findColIndex(['DESIGNATION', 'ROLE', 'POSITION']);
+      const idxEduAttainment = findColIndex(['EDUCATIONAL ATTAINMENT', 'EDUCATION', 'ATTAINMENT']);
+      const idxPrcLicense = findColIndex(['PRC LICENSE', 'LICENSE', 'PRC']);
+      const idxMasteral = findColIndex(['MASTERAL DEGREE', 'MASTER DEGREE', 'MASTERS', 'MASTERAL']);
+      const idxArea = findColIndex(['AREA', 'DEPARTMENT']);
+      const idxEffectivity = findColIndex(['EFFECTIVITY DATE', 'EFFECTIVITY']);
+      const idxAdminLoad = findColIndex(['ADMIN LOAD', 'ADMINISTRATIVE LOAD', 'ADMIN']);
+
+      if (idxName === -1) {
+        showToast("CSV file must contain a 'NAME' column!", "danger");
+        return;
+      }
+
+      let addedCount = 0;
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const name = idxName !== -1 && row[idxName] ? row[idxName].trim() : '';
+        if (!name) continue;
+
+        const rawEmpNo = idxEmpNo !== -1 && row[idxEmpNo] ? row[idxEmpNo].trim() : '';
+        const rawDes = idxDesignation !== -1 && row[idxDesignation] ? row[idxDesignation].trim() : '';
+        const edu = idxEduAttainment !== -1 && row[idxEduAttainment] ? row[idxEduAttainment].trim() : '';
+        const prc = idxPrcLicense !== -1 && row[idxPrcLicense] ? row[idxPrcLicense].trim() : '';
+        const masteral = idxMasteral !== -1 && row[idxMasteral] ? row[idxMasteral].trim() : '';
+        const area = idxArea !== -1 && row[idxArea] ? row[idxArea].trim() : 'ACADEMICS';
+        const effectivity = idxEffectivity !== -1 && row[idxEffectivity] ? row[idxEffectivity].trim() : 'July 13, 2026';
+        const adminLoad = idxAdminLoad !== -1 && row[idxAdminLoad] ? row[idxAdminLoad].trim() : '';
+
+        // Combine degree/credentials
+        const degreeParts = [edu, prc ? (prc.toUpperCase().includes('LICENSE') || prc.toUpperCase().includes('LPT') ? prc : `PRC: ${prc}`) : '', masteral].filter(Boolean);
+        const degreeStr = degreeParts.join(', ');
+
+        // Determine designation
+        let designation = "Regular Teacher";
+        const desUpper = rawDes.toUpperCase();
+        if (desUpper.includes('LICENSED')) designation = "Licensed Teacher";
+        else if (desUpper.includes('REGULAR')) designation = "Regular Teacher";
+        else if (desUpper.includes('PART')) designation = "Part-time";
+        else if (desUpper.includes('ADMIN')) designation = "Admin";
+        else if (desUpper.includes('DIRECTOR')) designation = "Director";
+        else if (desUpper.includes('PROGRAM') || desUpper.includes('HEAD')) designation = "Program Head";
+        else if (prc && !prc.toUpperCase().includes('NO') && !prc.toUpperCase().includes('NONE')) {
+          designation = "Licensed Teacher";
+        }
+
+        const max_units = getMaxUnitsForDesignation(designation);
+
+        // Check if teacher already exists by employee number or name
+        let existing = db.instructors.find(t => (rawEmpNo && t.employee_no === rawEmpNo) || t.name.toUpperCase() === name.toUpperCase());
+        if (existing) {
+          existing.name = name;
+          existing.designation = designation;
+          existing.degree = degreeStr || existing.degree;
+          existing.area = area || existing.area;
+          existing.employee_no = rawEmpNo || existing.employee_no;
+          existing.effectivity_date = effectivity || existing.effectivity_date;
+          existing.admin_load = adminLoad || existing.admin_load;
+          existing.max_units = max_units;
+        } else {
+          db.instructors.push({
+            id: uniqueId(),
+            name,
+            designation,
+            degree: degreeStr,
+            area,
+            employee_no: rawEmpNo,
+            effectivity_date: effectivity,
+            admin_load: adminLoad,
+            max_units
+          });
+        }
+        addedCount++;
+      }
+
+      saveDatabase();
+      e.target.value = ''; // Reset input
+      showToast(`Successfully imported/updated ${addedCount} instructor records from CSV!`, "success");
+    } catch (err) {
+      console.error("Error parsing CSV:", err);
+      showToast("Failed to parse CSV file. Please check file format.", "danger");
+    }
+  };
+  reader.readAsText(file);
+}
+
 // INSTRUCTORS
 function saveTeacher(e) {
   e.preventDefault();
