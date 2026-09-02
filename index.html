@@ -467,12 +467,23 @@
       <div class="row">
         <div class="col-12">
           <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-light">
+            <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center flex-wrap gap-2">
               <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Custom Batch Generator & Auto-Scheduler</h5>
+              <ul class="nav nav-pills card-header-pills" id="batchGeneratorTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active fw-semibold btn-sm" id="batch-multi-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-multi-teacher-pane" type="button" role="tab"><i class="bi bi-people-fill me-1"></i> Multiple Teachers (Waterfall)</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold btn-sm" id="batch-single-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-single-teacher-pane" type="button" role="tab"><i class="bi bi-person-badge-fill me-1"></i> Single Teacher (Multi-Course & Subject)</button>
+                </li>
+              </ul>
             </div>
             <div class="card-body">
-              <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
-              <form id="waterfallForm" onsubmit="event.preventDefault();">
+              <div class="tab-content" id="batchGeneratorTabContent">
+                <!-- TAB 1: MULTIPLE TEACHERS (WATERFALL) -->
+                <div class="tab-pane fade show active" id="batch-multi-teacher-pane" role="tabpanel">
+                  <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
+                  <form id="waterfallForm" onsubmit="event.preventDefault();">
                 <div class="row g-3">
                   <div class="col-md-6">
                     <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
@@ -556,6 +567,77 @@
                   </div>
                 </div>
               </form>
+                </div>
+
+                <!-- TAB 2: SINGLE TEACHER (MULTI-COURSE & MULTI-SUBJECT) -->
+                <div class="tab-pane fade" id="batch-single-teacher-pane" role="tabpanel">
+                  <p class="text-muted small">Select a single instructor, along with multiple courses and multiple subjects. The engine will assign and auto-generate conflict-free room and time assignments for all chosen subject-course combinations to that single teacher, optimizing daily compression and respecting workload unit limits.</p>
+                  <form id="singleTeacherBatchForm" onsubmit="event.preventDefault();">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Select Instructor <span class="text-danger">*</span></label>
+                        <select class="form-select" id="st-teacher-select" required>
+                          <option value="">Select Teacher...</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                        <select class="form-select" id="st-year-select">
+                          <option value="1" selected>1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Select Courses <span class="text-danger">*</span></label>
+                        <div class="p-2 border rounded bg-light" style="max-height: 140px; overflow-y: auto;" id="st-courses-checkboxes">
+                          <!-- Dynamically populated with course checkboxes e.g. BSIT, BSCS, BSHM, BSCRIM -->
+                        </div>
+                        <small class="text-muted" style="font-size: 0.75rem;">Check all courses this teacher will handle.</small>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Select Subjects <span class="text-danger">*</span></label>
+                        <div class="p-2 border rounded bg-light" style="max-height: 140px; overflow-y: auto;" id="st-subjects-checkboxes">
+                          <!-- Dynamically populated with subject checkboxes -->
+                        </div>
+                        <small class="text-muted" style="font-size: 0.75rem;">Check all subjects to schedule for this teacher.</small>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Hours per Class<span class="text-danger">*</span></label>
+                        <select class="form-select" id="st-hours-select">
+                          <option value="1">1 Hour</option>
+                          <option value="1.5">1.5 Hours</option>
+                          <option value="2" selected>2 Hours</option>
+                          <option value="3">3 Hours</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Block / Section Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="st-block-section" value="1A" placeholder="e.g. 1A" required>
+                      </div>
+
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Preferred Room (Optional)</label>
+                        <select class="form-select" id="st-room-select">
+                          <option value="">Any available room</option>
+                          <!-- Filled dynamically -->
+                        </select>
+                      </div>
+
+                      <div class="col-12 d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-success fw-bold px-4" onclick="runSingleTeacherScheduler()">
+                          <i class="bi bi-play-circle-fill me-1"></i> Auto-Generate Schedule for Single Teacher
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
         </div>

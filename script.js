@@ -1,3 +1,255 @@
+
+// Populate Single Teacher Batch Generator Controls
+function populateSingleTeacherControls() {
+  const teacherSel = document.getElementById('st-teacher-select');
+  if (teacherSel) {
+    const curVal = teacherSel.value;
+    teacherSel.innerHTML = '<option value="">Select Teacher...</option>';
+    db.instructors.forEach(t => {
+      teacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+    });
+    if (curVal) teacherSel.value = curVal;
+  }
+
+  const roomSel = document.getElementById('st-room-select');
+  if (roomSel) {
+    const curVal = roomSel.value;
+    roomSel.innerHTML = '<option value="">Any available room</option>';
+    db.rooms.forEach(r => {
+      roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
+    });
+    if (curVal) roomSel.value = curVal;
+  }
+
+  const coursesContainer = document.getElementById('st-courses-checkboxes');
+  if (coursesContainer) {
+    const defaultCourses = ['BSIT', 'BSCS', 'BSHM', 'BSCRIM', 'BSBA'];
+    const dbCourses = [...new Set(db.subjects.map(s => s.course.toUpperCase()))];
+    const allCourses = [...new Set([...defaultCourses, ...dbCourses])];
+
+    coursesContainer.innerHTML = allCourses.map(c => `
+      <div class="form-check form-check-inline me-3 mb-1">
+        <input class="form-check-input st-course-cb" type="checkbox" value="${c}" id="st_course_${c}" checked>
+        <label class="form-check-label small fw-semibold" for="st_course_${c}">${c}</label>
+      </div>
+    `).join('');
+  }
+
+  const subjectsContainer = document.getElementById('st-subjects-checkboxes');
+  if (subjectsContainer) {
+    const uniqueTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
+    if (uniqueTitles.length === 0) {
+      subjectsContainer.innerHTML = '<span class="text-muted small">No subjects in database. Add subjects first.</span>';
+    } else {
+      subjectsContainer.innerHTML = uniqueTitles.map((title, idx) => `
+        <div class="form-check mb-1">
+          <input class="form-check-input st-subject-cb" type="checkbox" value="${title}" id="st_sub_${idx}" ${idx < 4 ? 'checked' : ''}>
+          <label class="form-check-label small" for="st_sub_${idx}">${title}</label>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+
+// --- SINGLE TEACHER MULTI-COURSE & MULTI-SUBJECT AUTO-SCHEDULER ENGINE ---
+async function runSingleTeacherScheduler() {
+  const teacherId = document.getElementById('st-teacher-select').value;
+  if (!teacherId) {
+    showToast('Please select an instructor first.', 'danger');
+    return;
+  }
+
+  const instructor = db.instructors.find(t => t.id === teacherId);
+  if (!instructor) {
+    showToast('Instructor not found.', 'danger');
+    return;
+  }
+
+  const yearLevel = parseInt(document.getElementById('st-year-select').value, 10) || 1;
+  const hoursNum = parseFloat(document.getElementById('st-hours-select').value) || 2;
+  const blockSection = document.getElementById('st-block-section').value.trim() || '1A';
+  const preferredRoomId = document.getElementById('st-room-select').value;
+
+  // Selected courses
+  const selectedCourses = Array.from(document.querySelectorAll('.st-course-cb:checked')).map(cb => cb.value.toUpperCase());
+  if (selectedCourses.length === 0) {
+    showToast('Please select at least one course.', 'danger');
+    return;
+  }
+
+  // Selected subjects
+  const selectedSubjectTitles = Array.from(document.querySelectorAll('.st-subject-cb:checked')).map(cb => cb.value);
+  if (selectedSubjectTitles.length === 0) {
+    showToast('Please select at least one subject.', 'danger');
+    return;
+  }
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `[${new Date().toLocaleTimeString()}] Initializing Single Teacher Auto-Scheduler for ${instructor.name}...<br>`;
+
+  const log = (msg) => {
+    if (consoleEl) {
+      consoleEl.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+  };
+
+  const isProgramHead = (instructor.designation || '').toUpperCase().includes('PROGRAM HEAD');
+  const isPartTime = (instructor.designation || '').toUpperCase().includes('PART-TIME') || (instructor.designation || '').toUpperCase().includes('PARTTIME');
+
+  // Days to try
+  const daysOrder = isPartTime ? ['S', 'F', 'TH', 'W', 'T', 'M'] : ['M', 'T', 'W', 'TH', 'F', 'S'];
+
+  // Valid time slots based on hoursNum
+  let timeSlots = [];
+  if (hoursNum === 1) {
+    timeSlots = [
+      { start: '08:00', end: '09:00' }, { start: '09:00', end: '10:00' }, { start: '10:00', end: '11:00' },
+      { start: '11:00', end: '12:00' }, { start: '13:00', end: '14:00' }, { start: '14:00', end: '15:00' },
+      { start: '15:00', end: '16:00' }, { start: '16:00', end: '17:00' }, { start: '17:00', end: '18:00' }, { start: '18:00', end: '19:00' }
+    ];
+  } else if (hoursNum === 1.5) {
+    timeSlots = [
+      { start: '07:30', end: '09:00' }, { start: '09:00', end: '10:30' }, { start: '10:30', end: '12:00' },
+      { start: '13:00', end: '14:30' }, { start: '14:30', end: '16:00' }, { start: '16:00', end: '17:30' }, { start: '17:30', end: '19:00' }
+    ];
+  } else if (hoursNum === 3) {
+    timeSlots = [
+      { start: '08:00', end: '11:00' }, { start: '09:00', end: '12:00' },
+      { start: '13:00', end: '16:00' }, { start: '14:00', end: '17:00' }, { start: '16:00', end: '19:00' }
+    ];
+  } else {
+    // 2 hours default
+    timeSlots = [
+      { start: '08:00', end: '10:00' }, { start: '10:00', end: '12:00' },
+      { start: '13:00', end: '15:00' }, { start: '15:00', end: '17:00' }, { start: '17:00', end: '19:00' }
+    ];
+  }
+
+  let scheduledCount = 0;
+  let failedCount = 0;
+
+  // Loop through all selected courses and selected subjects
+  for (const courseCode of selectedCourses) {
+    for (const subTitle of selectedSubjectTitles) {
+      log(`Attempting schedule for Course: ${courseCode} | Subject: ${subTitle}`);
+
+      // Check if subject exists or create inline
+      let subject = db.subjects.find(s => s.title_and_code.toLowerCase() === subTitle.toLowerCase() && s.course.toUpperCase() === courseCode && s.year_level === yearLevel && s.block_section === blockSection);
+
+      if (!subject) {
+        // Try finding subject by title
+        const existingSub = db.subjects.find(s => s.title_and_code.toLowerCase() === subTitle.toLowerCase());
+        const units = existingSub ? existingSub.units : (hoursNum >= 3 ? 3 : 2);
+        const lec = existingSub ? existingSub.lec_hours : Math.ceil(hoursNum);
+        const lab = existingSub ? existingSub.lab_hours : 0;
+        const isMajor = existingSub ? existingSub.is_major : 0;
+
+        subject = {
+          id: uniqueId(),
+          title_and_code: subTitle,
+          course: courseCode,
+          year_level: yearLevel,
+          block_section: blockSection,
+          units: units,
+          lec_hours: lec,
+          lab_hours: lab,
+          is_major: isMajor,
+          curriculum_type: 'new'
+        };
+        db.subjects.push(subject);
+      }
+
+      // Check teacher load limit
+      const currentLoad = calculateTeacherWorkload(instructor.id);
+      const maxLimit = getMaxUnitsForDesignation(instructor.designation);
+
+      if (currentLoad + subject.units > maxLimit + 2) {
+        log(`<span class="text-warning">Skipping ${subject.title_and_code} (${courseCode}): Instructor ${instructor.name} load limit reached (${currentLoad}/${maxLimit} units).</span>`);
+        failedCount++;
+        continue;
+      }
+
+      // Determine available rooms
+      let roomsToTry = [];
+      if (preferredRoomId) {
+        roomsToTry = db.rooms.filter(r => r.id === preferredRoomId);
+      } else {
+        roomsToTry = db.rooms.filter(r => {
+          const type = (r.room_type || '').toLowerCase();
+          const isLabRoom = type.includes('lab');
+          const isSpecialRoom = ['LIBRARY 1', 'LIBRARY 2', 'TBL ROOM'].includes((r.name || '').toUpperCase());
+          if (isSpecialRoom) return false;
+          if (subject.is_major === 1) return isLabRoom || type.includes('both');
+          return !isLabRoom;
+        });
+        if (roomsToTry.length === 0) roomsToTry = [...db.rooms];
+      }
+
+      let scheduled = false;
+
+      // Try scheduling across days, slots, and rooms
+      for (const day of daysOrder) {
+        if (scheduled) break;
+
+        // Program head blocking rules
+        if (isProgramHead && day === 'S') continue;
+
+        for (const slot of timeSlots) {
+          if (scheduled) break;
+
+          // Check evening restriction for Program Head
+          if (isProgramHead && parseTimeToMinutes(slot.start) >= 960) continue;
+
+          // Check teacher conflict
+          const teacherConflict = checkTeacherScheduleConflict(instructor.id, day, slot.start, slot.end);
+          if (teacherConflict) continue;
+
+          // Check section conflict
+          const sectionConflict = checkSectionScheduleConflict(courseCode, yearLevel, blockSection, day, slot.start, slot.end);
+          if (sectionConflict) continue;
+
+          for (const rm of roomsToTry) {
+            // Check High School room constraints
+            if (isHighSchoolRoom(rm.name) && !hsRoomTimeAllowed(day, slot.start, slot.end)) continue;
+
+            const roomConflict = checkRoomScheduleConflict(rm.id, day, slot.start, slot.end);
+            if (roomConflict) continue;
+
+            // Success! Create schedule entry
+            const newSched = {
+              id: uniqueId(),
+              instructor_id: instructor.id,
+              room_id: rm.id,
+              day: day,
+              time_start: slot.start,
+              time_end: slot.end,
+              subject_id: subject.id
+            };
+            db.schedules.push(newSched);
+            scheduled = true;
+            scheduledCount++;
+            log(`<span class="text-success">✔ Assigned ${subject.title_and_code} (${courseCode}) to ${instructor.name} on ${day} ${slot.start}-${slot.end} in ${rm.name}.</span>`);
+            break;
+          }
+        }
+      }
+
+      if (!scheduled) {
+        log(`<span class="text-danger">✖ Could not find conflict-free slot for ${subject.title_and_code} (${courseCode}).</span>`);
+        failedCount++;
+      }
+    }
+  }
+
+  saveDatabase();
+  renderAllViews();
+  showToast(`Single Teacher Auto-Scheduler complete! ${scheduledCount} scheduled, ${failedCount} unscheduled.`, scheduledCount > 0 ? 'success' : 'warning');
+}
+
 // Southwestern Institute of Business and Technology (SIBT) Scheduling Logic Engine
 
 // Initialize Database structure
