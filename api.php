@@ -53,7 +53,8 @@ try {
         units INT NOT NULL,
         lec_hours INT NOT NULL DEFAULT 0,
         lab_hours INT NOT NULL DEFAULT 0,
-        is_major INT NOT NULL DEFAULT 0
+        is_major INT NOT NULL DEFAULT 0,
+        curriculum_type VARCHAR(20) DEFAULT 'new'
     ) ENGINE=InnoDB;");
 
     // Create Schedules
@@ -121,13 +122,14 @@ switch ($action) {
                 }
 
                 if (isset($data['subjects']) && is_array($data['subjects'])) {
-                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['subjects'] as $sub) {
                         $stmt->execute([
                             $sub['id'], $sub['title_and_code'], $sub['course'], 
                             $sub['year_level'], $sub['block_section'], 
                             $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
-                            $sub['is_major'] ?? 0
+                            $sub['is_major'] ?? 0,
+                            $sub['curriculum_type'] ?? 'new'
                         ]);
                     }
                 }

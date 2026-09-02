@@ -295,9 +295,16 @@
 
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Subject / Code <span class="text-danger">*</span></label>
-                    <select class="form-select" id="input-subject" onchange="autofillSubjectDetails()" required>
-                      <option value="">Select Subject...</option>
-                    </select>
+                    <div class="input-group">
+                      <select class="form-select" id="filter-input-curriculum" style="max-width: 110px;" onchange="populateSubjectDropdowns()">
+                        <option value="">All Curr</option>
+                        <option value="new" selected>New</option>
+                        <option value="old">Old</option>
+                      </select>
+                      <select class="form-select" id="input-subject" onchange="autofillSubjectDetails()" required>
+                        <option value="">Select Subject...</option>
+                      </select>
+                    </div>
                   </div>
 
                   <div class="col-md-4">
@@ -366,8 +373,98 @@
 
     <!-- ================= AUTO-GENERATOR TAB ================= -->
     <div id="panel-auto" class="tab-panel d-none">
-      <!-- Full Width Custom Batch Generator & Auto-Scheduler Card (Edge-to-Edge) -->
       <div class="row mb-4">
+        <!-- Instructions Panel -->
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white py-3">
+              <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill me-2"></i>Auto-Schedule Generator</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-text text-muted">
+                The SIBT Intelligent Auto-Scheduler automatically compiles conflict-free timetables. It maps courses, rooms, teachers, days, and times using advanced heuristics that strictly enforce:
+              </p>
+              <ul class="text-muted small ps-3">
+                <li class="mb-1"><strong>Teacher Availability:</strong> Preventing double-bookings.</li>
+                <li class="mb-1"><strong>Teacher Load Limits:</strong> Licensed (27 units), Non-licensed (24 units), Admin (9 units), Director (15 units), Program Head (18 units).</li>
+                <li class="mb-1"><strong>Room Compatibility:</strong> Laboratory courses automatically match lab/ComLab rooms, and lecture courses fit appropriately.</li>
+                <li class="mb-1"><strong>Section/Block Schedule:</strong> Student batches (like BSIT 1A) aren't double-booked.</li>
+                <li class="mb-1"><strong>Optimal Durations:</strong> Assigns time blocks based on standard durations (1, 1.5, 2, or 3 hours).</li>
+              </ul>
+              <div class="alert alert-info mt-3 small">
+                <i class="bi bi-info-circle-fill me-1"></i> Pre-populate teachers, rooms, and subjects in the <strong>Manage Data</strong> tab before running!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controller Panel -->
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Generate Schedule</h5>
+            </div>
+            <div class="card-body text-center py-4">
+              <div class="mb-4">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Scheduler" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 140px; object-fit: cover;">
+                <h4 class="fw-bold">Ready to Auto-Generate?</h4>
+                <p class="text-muted">This process will run the scheduling engine on all subjects and classes currently defined in the system. It automatically schedules them conflict-free.</p>
+              </div>
+
+              <div class="row g-2 justify-content-center mb-4">
+                <div class="col-auto">
+                  <div class="form-check form-switch text-start">
+                    <input class="form-check-input" type="checkbox" id="overwriteSchedules" checked>
+                    <label class="form-check-input-label fw-medium" for="overwriteSchedules">Clear existing schedules first</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 col-md-8 mx-auto">
+                <button type="button" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm" id="btnRunScheduler" onclick="runAutoScheduler()">
+                  <i class="bi bi-play-circle-fill me-2"></i> Run Auto-Scheduler Engine
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Box / Result Box -->
+          <div class="card border-0 shadow-sm d-none" id="autoSchedulerResults">
+            <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold"><i class="bi bi-terminal me-2"></i>Execution Logs & Statistics</h6>
+              <span class="badge" id="schedulerStatusBadge">Success</span>
+            </div>
+            <div class="card-body">
+              <div class="row text-center mb-3">
+                <div class="col-4">
+                  <div class="p-2 border rounded">
+                    <span class="text-muted d-block small">Total Subjects</span>
+                    <strong class="fs-5" id="log-total-subjects">0</strong>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-2 border rounded bg-success bg-opacity-10 text-success">
+                    <span class="d-block small">Scheduled</span>
+                    <strong class="fs-5" id="log-scheduled">0</strong>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-2 border rounded bg-danger bg-opacity-10 text-danger">
+                    <span class="d-block small">Unscheduled</span>
+                    <strong class="fs-5" id="log-unscheduled">0</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;" id="schedulerConsole">
+                <!-- Log entries -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Width Custom Batch Generator & Auto-Scheduler Card (Edge-to-Edge) -->
+      <div class="row">
         <div class="col-12">
           <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3 border-light">
@@ -459,96 +556,6 @@
                   </div>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <!-- Instructions Panel -->
-        <div class="col-lg-5">
-          <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-primary text-white py-3">
-              <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill me-2"></i>Auto-Schedule Generator</h5>
-            </div>
-            <div class="card-body">
-              <p class="card-text text-muted">
-                The SIBT Intelligent Auto-Scheduler automatically compiles conflict-free timetables. It maps courses, rooms, teachers, days, and times using advanced heuristics that strictly enforce:
-              </p>
-              <ul class="text-muted small ps-3">
-                <li class="mb-1"><strong>Teacher Availability:</strong> Preventing double-bookings.</li>
-                <li class="mb-1"><strong>Teacher Load Limits:</strong> Licensed (27 units), Non-licensed (24 units), Admin (9 units), Director (15 units), Program Head (18 units).</li>
-                <li class="mb-1"><strong>Room Compatibility:</strong> Laboratory courses automatically match lab/ComLab rooms, and lecture courses fit appropriately.</li>
-                <li class="mb-1"><strong>Section/Block Schedule:</strong> Student batches (like BSIT 1A) aren't double-booked.</li>
-                <li class="mb-1"><strong>Optimal Durations:</strong> Assigns time blocks based on standard durations (1, 1.5, 2, or 3 hours).</li>
-              </ul>
-              <div class="alert alert-info mt-3 small">
-                <i class="bi bi-info-circle-fill me-1"></i> Pre-populate teachers, rooms, and subjects in the <strong>Manage Data</strong> tab before running!
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Controller Panel -->
-        <div class="col-lg-7">
-          <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-white py-3 border-light">
-              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Generate Schedule</h5>
-            </div>
-            <div class="card-body text-center py-4">
-              <div class="mb-4">
-                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Scheduler" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 140px; object-fit: cover;">
-                <h4 class="fw-bold">Ready to Auto-Generate?</h4>
-                <p class="text-muted">This process will run the scheduling engine on all subjects and classes currently defined in the system. It automatically schedules them conflict-free.</p>
-              </div>
-
-              <div class="row g-2 justify-content-center mb-4">
-                <div class="col-auto">
-                  <div class="form-check form-switch text-start">
-                    <input class="form-check-input" type="checkbox" id="overwriteSchedules" checked>
-                    <label class="form-check-input-label fw-medium" for="overwriteSchedules">Clear existing schedules first</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-grid gap-2 col-md-8 mx-auto">
-                <button type="button" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm" id="btnRunScheduler" onclick="runAutoScheduler()">
-                  <i class="bi bi-play-circle-fill me-2"></i> Run Auto-Scheduler Engine
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Log Box / Result Box -->
-          <div class="card border-0 shadow-sm d-none" id="autoSchedulerResults">
-            <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
-              <h6 class="mb-0 fw-bold"><i class="bi bi-terminal me-2"></i>Execution Logs & Statistics</h6>
-              <span class="badge" id="schedulerStatusBadge">Success</span>
-            </div>
-            <div class="card-body">
-              <div class="row text-center mb-3">
-                <div class="col-4">
-                  <div class="p-2 border rounded">
-                    <span class="text-muted d-block small">Total Subjects</span>
-                    <strong class="fs-5" id="log-total-subjects">0</strong>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="p-2 border rounded bg-success bg-opacity-10 text-success">
-                    <span class="d-block small">Scheduled</span>
-                    <strong class="fs-5" id="log-scheduled">0</strong>
-                  </div>
-                </div>
-                <div class="col-4">
-                  <div class="p-2 border rounded bg-danger bg-opacity-10 text-danger">
-                    <span class="d-block small">Unscheduled</span>
-                    <strong class="fs-5" id="log-unscheduled">0</strong>
-                  </div>
-                </div>
-              </div>
-              <div class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;" id="schedulerConsole">
-                <!-- Log entries -->
-              </div>
             </div>
           </div>
         </div>
@@ -695,6 +702,35 @@
 
           <!-- SUBJECTS MANAGEMENT PANEL -->
           <div id="manage-subjects" class="manage-panel d-none">
+            <!-- Curriculum Subject File Upload Card -->
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-body bg-light rounded p-3">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                  <div>
+                    <h6 class="mb-1 text-primary fw-bold"><i class="bi bi-file-earmark-word me-2"></i>Upload Subject (Curriculum)</h6>
+                    <small class="text-muted">Import subjects from curriculum files (.docx, .xlsx, .xls, .csv, .txt) for New or Old Curriculum.</small>
+                  </div>
+                  <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <div class="d-flex gap-3 align-items-center bg-white px-3 py-1 border rounded">
+                      <span class="fw-semibold small text-dark me-1">Curriculum:</span>
+                      <div class="form-check form-check-inline mb-0">
+                        <input class="form-check-input" type="radio" name="curriculumTypeRadio" id="curriculumTypeNew" value="new" checked>
+                        <label class="form-check-label small fw-bold text-success" for="curriculumTypeNew">New Curriculum</label>
+                      </div>
+                      <div class="form-check form-check-inline mb-0">
+                        <input class="form-check-input" type="radio" name="curriculumTypeRadio" id="curriculumTypeOld" value="old">
+                        <label class="form-check-label small fw-bold text-secondary" for="curriculumTypeOld">Old Curriculum</label>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="file" id="curriculumFileInput" accept=".docx,.xlsx,.xls,.csv,.txt" class="form-control form-control-sm" style="max-width: 250px;">
+                      <button type="button" class="btn btn-sm btn-outline-primary fw-bold text-nowrap" onclick="handleCurriculumUpload()"><i class="bi bi-upload me-1"></i> Upload Curriculum</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="card border-0 shadow-sm mb-4">
               <div class="card-header bg-white py-3 border-light">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-bookmark-plus-fill me-2 text-primary"></i>Add / Edit Subject</h5>
@@ -736,8 +772,15 @@
                       <label class="form-label fw-semibold">Laboratory Hours <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="subject-lab" min="0" max="20" value="2" required>
                     </div>
-                    <div class="col-md-12">
-                      <div class="form-check form-switch mt-2">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Curriculum <span class="text-danger">*</span></label>
+                      <select class="form-select" id="subject-curriculum-type">
+                        <option value="new" selected>New Curriculum</option>
+                        <option value="old">Old Curriculum</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-check form-switch mt-4">
                         <input class="form-check-input" type="checkbox" id="subject-is-major">
                         <label class="form-check-label fw-semibold" for="subject-is-major">Is Major Subject (Prioritizes COMLAB / CRIMLAB rooms)</label>
                       </div>
@@ -752,8 +795,15 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold">Subjects Database List</h6>
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                  <h6 class="mb-0 fw-bold">Subjects Database List</h6>
+                  <select class="form-select form-select-sm" id="filter-manage-curriculum" onchange="renderSubjectsTable()" style="max-width: 170px;">
+                    <option value="">All Curricula</option>
+                    <option value="new">New Curriculum</option>
+                    <option value="old">Old Curriculum</option>
+                  </select>
+                </div>
                 <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-subjects" onclick="bulkDeleteSubjects()" style="display: none;">
                   <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-subjects-count">0</span>)
                 </button>
@@ -766,6 +816,7 @@
                       <th>Subject Code & Title</th>
                       <th>Course</th>
                       <th>Type</th>
+                      <th>Curriculum</th>
                       <th>Year</th>
                       <th>Block/Section</th>
                       <th class="text-center">Units</th>
@@ -921,6 +972,10 @@
       </div>
     </div>
   </div>
+
+  <!-- Mammoth.js for docx parsing & SheetJS for xlsx parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <!-- Bootstrap 5 JavaScript Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

@@ -48,7 +48,8 @@
           "units": { "type": "integer" },
           "lec_hours": { "type": "integer" },
           "lab_hours": { "type": "integer" },
-          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 }
+          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 },
+          "curriculum_type": { "type": "string", "enum": ["new", "old"] }
         }
       }
     },
