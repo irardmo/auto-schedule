@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS subjects (
     units INT NOT NULL,
     lec_hours INT NOT NULL DEFAULT 0,
     lab_hours INT NOT NULL DEFAULT 0,
-    is_major INT NOT NULL DEFAULT 0
+    is_major INT NOT NULL DEFAULT 0,
+    curriculum_type VARCHAR(20) DEFAULT 'new'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 4. Schedules Table
