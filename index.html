@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Scheduler & Teaching Load System - SIBT</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+  <!-- Navigation Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm no-print">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-calendar-event-fill me-2 text-primary"></i>
+        <div>
+          <span class="fw-bold tracking-tight">SIBT Auto-Scheduler</span>
+          <div class="text-muted small" style="font-size: 0.75rem; margin-top: -3px;">Southwestern Institute of Business & Technology</div>
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto fw-medium">
+          <li class="nav-item">
+            <a class="nav-link active" id="tab-board" href="#" onclick="switchTab('board')">
+              <i class="bi bi-grid-3x3-gap me-1"></i> Schedule Board
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab-manual" href="#" onclick="switchTab('manual')">
+              <i class="bi bi-calendar-plus me-1"></i> Input Schedule
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab-auto" href="#" onclick="switchTab('auto')">
+              <i class="bi bi-cpu me-1"></i> Auto-Generate
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab-manage" href="#" onclick="switchTab('manage')">
+              <i class="bi bi-sliders me-1"></i> Manage Data
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="tab-print" href="#" onclick="switchTab('print')">
+              <i class="bi bi-printer me-1"></i> Teaching Load Printout
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-4 no-print">
+    <!-- Quick Stats Cards -->
+    <div id="statsRow" class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 me-3">
+              <i class="bi bi-person-workspace fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-0 small">Instructors</h6>
+              <h4 class="fw-bold mb-0" id="stat-instructors">0</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 me-3">
+              <i class="bi bi-book fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-0 small">Subjects</h6>
+              <h4 class="fw-bold mb-0" id="stat-subjects">0</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-info bg-opacity-10 text-info p-3 rounded-3 me-3">
+              <i class="bi bi-door-closed fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-0 small">Rooms</h6>
+              <h4 class="fw-bold mb-0" id="stat-rooms">0</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-body d-flex align-items-center">
+            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3 me-3">
+              <i class="bi bi-calendar-check fs-3"></i>
+            </div>
+            <div>
+              <h6 class="text-muted mb-0 small">Schedules</h6>
+              <h4 class="fw-bold mb-0" id="stat-schedules">0</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Container for Conflicts/Warnings -->
+    <div id="globalAlerts" class="mb-4"></div>
+
+    <!-- ================= SCHEDULE BOARD TAB ================= -->
+    <div id="panel-board" class="tab-panel">
+      <!-- Teaching Load Filter Box matching Screenshot design -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-light">
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-funnel-fill me-2 text-primary"></i>Teaching Load Filters</h5>
+        </div>
+        <div class="card-body">
+          <form id="filterForm" class="row g-3">
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">Teacher</label>
+              <select class="form-select" id="filter-teacher">
+                <option value="">All Teachers</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">Course/Department</label>
+              <select class="form-select" id="filter-course">
+                <option value="">All Courses</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Subject/Subject Code</label>
+              <select class="form-select" id="filter-subject">
+                <option value="">All Subjects</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">Year</label>
+              <select class="form-select" id="filter-year">
+                <option value="">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">Block/Section</label>
+              <select class="form-select" id="filter-block">
+                <option value="">All Blocks</option>
+              </select>
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-primary px-4" onclick="applyFilters()">
+                <i class="bi bi-filter"></i> Filter
+              </button>
+              <button type="button" class="btn btn-secondary px-4" onclick="resetFilters()">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset
+              </button>
+              <button type="button" class="btn btn-success px-4" onclick="openPrintForFiltered()">
+                <i class="bi bi-printer"></i> Print Assigned View
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Schedule Table -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-table me-2 text-primary"></i>Schedule Records</h5>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-schedules" onclick="bulkDeleteSchedules()" style="display: none;">
+              <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-schedules-count">0</span>)
+            </button>
+            <span class="badge bg-secondary" id="filtered-count">Showing 0 records</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" id="scheduleTable">
+            <thead class="table-light text-uppercase fs-7 fw-bold">
+              <tr>
+                <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-schedules" onchange="toggleSelectAll('schedules', this.checked)"></th>
+                <th>Teacher</th>
+                <th>Room</th>
+                <th>Day</th>
+                <th>Time Start</th>
+                <th>Time End</th>
+                <th>Year</th>
+                <th>Block/Section</th>
+                <th>Subject</th>
+                <th>Course</th>
+                <th class="text-center">Lec Hrs</th>
+                <th class="text-center">Lab Hrs</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleList">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer bg-white border-top-0 d-flex flex-wrap justify-content-between align-items-center py-3 no-print">
+          <small class="text-muted" id="schedules-page-info">Showing page 1 of 1</small>
+          <nav aria-label="Schedules pagination">
+            <ul class="pagination pagination-sm mb-0" id="schedules-pagination">
+              <!-- Dynamic -->
+            </ul>
+          </nav>
+        </div>
+        <div id="noSchedulesMsg" class="text-center py-5 bg-white rounded-bottom" style="display: none;">
+          <i class="bi bi-calendar2-x fs-1 text-muted d-block mb-3"></i>
+          <p class="text-muted">No schedules found. Go to <strong>Input Schedule</strong> or <strong>Auto-Generate</strong> to create some!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MANUAL INPUT TAB ================= -->
+    <div id="panel-manual" class="tab-panel d-none">
+      <div class="row">
+        <!-- Input Form Card -->
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-plus-circle-fill me-2 text-primary"></i>Input Schedule</h5>
+            </div>
+            <div class="card-body">
+              <form id="scheduleForm" oninput="checkRealtimeConflict()">
+                <div class="row g-3">
+                  <!-- Hidden inputs for editing -->
+                  <input type="hidden" id="edit-id" value="">
+
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Teacher <span class="text-danger">*</span></label>
+                    <select class="form-select" id="input-teacher" required>
+                      <option value="">Select Teacher...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Room <span class="text-danger">*</span></label>
+                    <select class="form-select" id="input-room" required>
+                      <option value="">Select Room...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Day <span class="text-danger">*</span></label>
+                    <select class="form-select" id="input-day" required>
+                      <option value="">Select Day...</option>
+                      <option value="M">Monday (M)</option>
+                      <option value="T">Tuesday (T)</option>
+                      <option value="W">Wednesday (W)</option>
+                      <option value="TH">Thursday (TH)</option>
+                      <option value="F">Friday (F)</option>
+                      <option value="S">Saturday (S)</option>
+                      <option value="MT">Monday/Tuesday (MT)</option>
+                      <option value="TTH">Tuesday/Thursday (TTH)</option>
+                      <option value="MWF">Monday/Wednesday/Friday (MWF)</option>
+                      <option value="Monday-Friday">Monday-Friday (Admin)</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Time Start <span class="text-danger">*</span></label>
+                    <input type="time" class="form-control" id="input-time-start" required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Duration & Time End <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                      <select class="form-select" id="input-duration" style="max-width: 120px;" onchange="calculateTimeEnd()">
+                        <option value="1">1 hour</option>
+                        <option value="1.5">1.5 hours</option>
+                        <option value="2" selected>2 hours</option>
+                        <option value="3">3 hours</option>
+                        <option value="4">4 hours</option>
+                        <option value="9">9 hours (Admin)</option>
+                      </select>
+                      <input type="time" class="form-control" id="input-time-end" required readonly>
+                    </div>
+                    <small class="text-muted">Auto-calculated based on duration</small>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Subject / Code <span class="text-danger">*</span></label>
+                    <select class="form-select" id="input-subject" onchange="autofillSubjectDetails()" required>
+                      <option value="">Select Subject...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Course/Department <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="input-course" placeholder="e.g. BSIT" required readonly>
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label fw-semibold">Year <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="input-year" placeholder="1-4" min="1" max="4" required readonly>
+                  </div>
+
+                  <div class="col-md-2">
+                    <label class="form-label fw-semibold">Block/Section <span class="text-danger">*</span></label>
+                    <select class="form-select" id="input-block" onchange="onBlockSelectChange()" required disabled>
+                      <option value="">Select Block...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lecture Hours</label>
+                    <input type="number" class="form-control" id="input-lec-hours" min="0" max="10" value="2" readonly>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lab Hours</label>
+                    <input type="number" class="form-control" id="input-lab-hours" min="0" max="10" value="0" readonly>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Units</label>
+                    <input type="number" class="form-control" id="input-units" min="0" max="10" value="3" readonly>
+                  </div>
+
+                  <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary px-4" onclick="clearForm()">
+                      <i class="bi bi-x-circle"></i> Cancel / Clear
+                    </button>
+                    <button type="submit" class="btn btn-primary px-5" id="saveScheduleBtn">
+                      <i class="bi bi-calendar-plus"></i> Add Schedule
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Validation Sidebar -->
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm h-100 mb-4">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shield-check me-2 text-primary"></i>Conflict Check Monitor</h5>
+            </div>
+            <div class="card-body">
+              <div id="realtimeConflictCheck" class="text-center py-4">
+                <i class="bi bi-check-circle-fill text-success display-4 d-block mb-3"></i>
+                <h6 class="fw-bold text-success">Form is empty or valid</h6>
+                <p class="text-muted small">Fill out the schedule form to check for teacher, room, or section overlaps and load limit issues in real time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= AUTO-GENERATOR TAB ================= -->
+    <div id="panel-auto" class="tab-panel d-none">
+      <!-- Full Width Custom Batch Generator & Auto-Scheduler Card (Edge-to-Edge) -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Custom Batch Generator & Auto-Scheduler</h5>
+            </div>
+            <div class="card-body">
+              <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
+              <form id="waterfallForm" onsubmit="event.preventDefault();">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="batch-subject" placeholder="Physical Education PE 101" list="existing-subjects-list" required>
+                    <datalist id="existing-subjects-list">
+                      <!-- Filled dynamically -->
+                    </datalist>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="batch-course" placeholder="bsit" required>
+                    <small class="text-muted" style="font-size: 0.75rem;">Support multiple courses (e.g. <code>bsit:4, bscs:2</code> or <code>bsit, bscs</code>)</small>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-year">
+                      <option value="1" selected>1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Hours<span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-hours">
+                      <option value="1">1</option>
+                      <option value="1.5" selected>1.5</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Number of Sections <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="10" required>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
+                    <select class="form-select" id="batch-units">
+                      <option value="1">1 Unit</option>
+                      <option value="2" selected>2 Units</option>
+                      <option value="3">3 Units</option>
+                      <option value="4">4 Units</option>
+                      <option value="5">5 Units</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lecture</label>
+                    <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lab</label>
+                    <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label fw-semibold">Preferred Room (Optional)</label>
+                    <select class="form-select" id="waterfall-room">
+                      <option value="">Any available room</option>
+                      <!-- Filled dynamically -->
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                      <label class="form-label fw-semibold mb-0">Select Participating Instructors <span class="text-danger">*</span></label>
+                      <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <input type="text" id="waterfall-teacher-search" class="form-control form-control-sm" placeholder="Search teacher..." oninput="onWaterfallSearchChange()" style="max-width: 200px;">
+                        <nav aria-label="Waterfall Pagination" class="mb-0">
+                          <ul class="pagination pagination-sm mb-0" id="waterfall-teachers-pagination">
+                            <!-- Pagination dynamic -->
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
+                    <div id="waterfall-instructors-list" class="row g-2 p-2 bg-light rounded" style="max-height: 180px; overflow-y: auto;">
+                      <!-- Filled dynamically with checkboxes -->
+                    </div>
+                  </div>
+                  <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                      <i class="bi bi-lightning-fill"></i> Auto-Generate Rooms, Times & Schedules
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Instructions Panel -->
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white py-3">
+              <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill me-2"></i>Auto-Schedule Generator</h5>
+            </div>
+            <div class="card-body">
+              <p class="card-text text-muted">
+                The SIBT Intelligent Auto-Scheduler automatically compiles conflict-free timetables. It maps courses, rooms, teachers, days, and times using advanced heuristics that strictly enforce:
+              </p>
+              <ul class="text-muted small ps-3">
+                <li class="mb-1"><strong>Teacher Availability:</strong> Preventing double-bookings.</li>
+                <li class="mb-1"><strong>Teacher Load Limits:</strong> Licensed (27 units), Non-licensed (24 units), Admin (9 units), Director (15 units), Program Head (18 units).</li>
+                <li class="mb-1"><strong>Room Compatibility:</strong> Laboratory courses automatically match lab/ComLab rooms, and lecture courses fit appropriately.</li>
+                <li class="mb-1"><strong>Section/Block Schedule:</strong> Student batches (like BSIT 1A) aren't double-booked.</li>
+                <li class="mb-1"><strong>Optimal Durations:</strong> Assigns time blocks based on standard durations (1, 1.5, 2, or 3 hours).</li>
+              </ul>
+              <div class="alert alert-info mt-3 small">
+                <i class="bi bi-info-circle-fill me-1"></i> Pre-populate teachers, rooms, and subjects in the <strong>Manage Data</strong> tab before running!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controller Panel -->
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Generate Schedule</h5>
+            </div>
+            <div class="card-body text-center py-4">
+              <div class="mb-4">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Scheduler" class="img-fluid rounded mb-3 shadow-sm" style="max-height: 140px; object-fit: cover;">
+                <h4 class="fw-bold">Ready to Auto-Generate?</h4>
+                <p class="text-muted">This process will run the scheduling engine on all subjects and classes currently defined in the system. It automatically schedules them conflict-free.</p>
+              </div>
+
+              <div class="row g-2 justify-content-center mb-4">
+                <div class="col-auto">
+                  <div class="form-check form-switch text-start">
+                    <input class="form-check-input" type="checkbox" id="overwriteSchedules" checked>
+                    <label class="form-check-input-label fw-medium" for="overwriteSchedules">Clear existing schedules first</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 col-md-8 mx-auto">
+                <button type="button" class="btn btn-primary btn-lg py-3 fw-bold shadow-sm" id="btnRunScheduler" onclick="runAutoScheduler()">
+                  <i class="bi bi-play-circle-fill me-2"></i> Run Auto-Scheduler Engine
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Log Box / Result Box -->
+          <div class="card border-0 shadow-sm d-none" id="autoSchedulerResults">
+            <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+              <h6 class="mb-0 fw-bold"><i class="bi bi-terminal me-2"></i>Execution Logs & Statistics</h6>
+              <span class="badge" id="schedulerStatusBadge">Success</span>
+            </div>
+            <div class="card-body">
+              <div class="row text-center mb-3">
+                <div class="col-4">
+                  <div class="p-2 border rounded">
+                    <span class="text-muted d-block small">Total Subjects</span>
+                    <strong class="fs-5" id="log-total-subjects">0</strong>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-2 border rounded bg-success bg-opacity-10 text-success">
+                    <span class="d-block small">Scheduled</span>
+                    <strong class="fs-5" id="log-scheduled">0</strong>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="p-2 border rounded bg-danger bg-opacity-10 text-danger">
+                    <span class="d-block small">Unscheduled</span>
+                    <strong class="fs-5" id="log-unscheduled">0</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;" id="schedulerConsole">
+                <!-- Log entries -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MANAGE DATA TAB ================= -->
+    <div id="panel-manage" class="tab-panel d-none">
+      <div class="row">
+        <!-- Left Column: Data Management Submenus -->
+        <div class="col-md-3">
+          <div class="list-group shadow-sm" id="manageSubTabs">
+            <button class="list-group-item list-group-item-action active fw-medium" onclick="switchManageSubTab('teachers')">
+              <i class="bi bi-people me-2"></i> Instructors
+            </button>
+            <button class="list-group-item list-group-item-action fw-medium" onclick="switchManageSubTab('subjects')">
+              <i class="bi bi-book-half me-2"></i> Subjects & Sections
+            </button>
+            <button class="list-group-item list-group-item-action fw-medium" onclick="switchManageSubTab('rooms')">
+              <i class="bi bi-door-closed me-2"></i> Rooms
+            </button>
+          </div>
+          <div class="card border-0 shadow-sm mt-4 p-3 bg-light-blue text-center">
+            <h6 class="fw-bold mb-2">Need a Quick Start?</h6>
+            <p class="small text-muted mb-3">You can populate the system with actual sample data from SIBT instantly!</p>
+            <button class="btn btn-outline-primary btn-sm w-100" onclick="resetToDemoData()">
+              <i class="bi bi-cloud-download"></i> Seed SIBT Sample Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Subtab forms and lists -->
+        <div class="col-md-9">
+
+          <!-- TEACHERS MANAGEMENT PANEL -->
+          <div id="manage-teachers" class="manage-panel">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2 text-primary"></i>Add / Edit Instructor</h5>
+              </div>
+              <div class="card-body">
+                <form id="teacherForm" onsubmit="saveTeacher(event)">
+                  <input type="hidden" id="teacher-id" value="">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="teacher-name" placeholder="e.g. KENT LIWANAGAN" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Designation / Role <span class="text-danger">*</span></label>
+                      <select class="form-select" id="teacher-designation" onchange="updateDesignationHint()" required>
+                        <option value="Licensed Teacher">Licensed Teacher (Limit: 27 units)</option>
+                        <option value="Regular Teacher">Regular Teacher (Limit: 24 units)</option>
+                        <option value="Part-time">Part-time Teacher (Limit: 12 units)</option>
+                        <option value="Admin">Admin (Limit: 9 units)</option>
+                        <option value="Director">Director (Limit: 15 units)</option>
+                        <option value="Program Head">Program Head (Limit: 18 units)</option>
+                      </select>
+                      <small class="text-muted" id="designation-hint">Licensed Teacher can teach up to 27 units.</small>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Degree</label>
+                      <input type="text" class="form-control" id="teacher-degree" placeholder="e.g. BSIT, LPT, MAED">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Area / Department</label>
+                      <input type="text" class="form-control" id="teacher-area" placeholder="e.g. ACADEMICS, ADMINISTRATION" value="ACADEMICS">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Employee No.</label>
+                      <input type="text" class="form-control" id="teacher-emp-no" placeholder="e.g. 0321">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Effectivity Date</label>
+                      <input type="text" class="form-control" id="teacher-effectivity" placeholder="e.g. July 13, 2026" value="July 13, 2026">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Administrative Load (if any)</label>
+                      <input type="text" class="form-control" id="teacher-admin-load" placeholder="e.g. CIT Program Head">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="clearTeacherForm()">Clear</button>
+                      <button type="submit" class="btn btn-primary btn-sm px-4">Save Instructor</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3 border-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <h6 class="mb-0 fw-bold">Instructors Database List</h6>
+                  <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-teachers" onclick="bulkDeleteTeachers()" style="display: none;">
+                    <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-teachers-count">0</span>)
+                  </button>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="file" id="csv-upload-teachers" accept=".csv" onchange="importInstructorsCSV(event)" style="display: none;">
+                  <label for="csv-upload-teachers" class="btn btn-outline-success btn-sm mb-0">
+                    <i class="bi bi-file-earmark-excel me-1"></i> Upload Instructor CSV
+                  </label>
+                  <button type="button" class="btn btn-link btn-sm text-decoration-none p-0" data-bs-toggle="collapse" data-bs-target="#csvFormatHelp" title="View CSV Format Guide">
+                    <i class="bi bi-question-circle-fill text-muted fs-5"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="collapse bg-light border-bottom p-3" id="csvFormatHelp">
+                <div class="small text-muted">
+                  <strong class="text-dark">Expected CSV Column Headers:</strong><br>
+                  <code>NAME</code>, <code>EMPLOYEE #</code>, <code>DESIGNATION</code>, <code>EDUCATIONAL ATTAINMENT</code>, <code>PRC LICENSE</code>, <code>MASTERAL DEGREE</code> (Optional: <code>AREA</code>, <code>EFFECTIVITY DATE</code>, <code>ADMIN LOAD</code>)<br>
+                  <em>Designation values automatically map max unit limits (e.g. Licensed Teacher: 27 units, Regular Teacher: 24 units, Part-time: 12 units, Admin: 9 units, Director: 15 units, Program Head: 18 units).</em>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light fs-7">
+                    <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-teachers" onchange="toggleSelectAll('teachers', this.checked)"></th>
+                      <th>Name</th>
+                      <th>Designation</th>
+                      <th>Degree</th>
+                      <th>Area</th>
+                      <th>Emp No.</th>
+                      <th class="text-center">Limit (Units)</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teachersListTable">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer bg-white border-top-0 d-flex flex-wrap justify-content-between align-items-center py-3">
+                <small class="text-muted" id="teachers-page-info">Showing page 1 of 1</small>
+                <nav aria-label="Instructors pagination">
+                  <ul class="pagination pagination-sm mb-0" id="teachers-pagination">
+                    <!-- Dynamic -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBJECTS MANAGEMENT PANEL -->
+          <div id="manage-subjects" class="manage-panel d-none">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-white py-3 border-light">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-bookmark-plus-fill me-2 text-primary"></i>Add / Edit Subject</h5>
+              </div>
+              <div class="card-body">
+                <form id="subjectForm" onsubmit="saveSubject(event)">
+                  <input type="hidden" id="subject-id" value="">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Subject Title & Code <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="subject-title" placeholder="e.g. Computer Programming 1 CC102" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Course / Dept <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="subject-course-val" placeholder="e.g. BSIT" required>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                      <select class="form-select" id="subject-year" required>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Block / Section <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="subject-block" placeholder="e.g. 1A" required>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="subject-units" min="1" max="10" value="3" required>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Lecture Hours <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="subject-lec" min="0" max="20" value="2" required>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">Laboratory Hours <span class="text-danger">*</span></label>
+                      <input type="number" class="form-control" id="subject-lab" min="0" max="20" value="2" required>
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" id="subject-is-major">
+                        <label class="form-check-label fw-semibold" for="subject-is-major">Is Major Subject (Prioritizes COMLAB / CRIMLAB rooms)</label>
+                      </div>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="clearSubjectForm()">Clear</button>
+                      <button type="submit" class="btn btn-primary btn-sm px-4">Save Subject</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">Subjects Database List</h6>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-subjects" onclick="bulkDeleteSubjects()" style="display: none;">
+                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-subjects-count">0</span>)
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light fs-7">
+                    <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-subjects" onchange="toggleSelectAll('subjects', this.checked)"></th>
+                      <th>Subject Code & Title</th>
+                      <th>Course</th>
+                      <th>Type</th>
+                      <th>Year</th>
+                      <th>Block/Section</th>
+                      <th class="text-center">Units</th>
+                      <th class="text-center">Lec/Lab</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="subjectsListTable">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer bg-white border-top-0 d-flex flex-wrap justify-content-between align-items-center py-3">
+                <small class="text-muted" id="subjects-page-info">Showing page 1 of 1</small>
+                <nav aria-label="Subjects pagination">
+                  <ul class="pagination pagination-sm mb-0" id="subjects-pagination">
+                    <!-- Dynamic -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROOMS MANAGEMENT PANEL -->
+          <div id="manage-rooms" class="manage-panel d-none">
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-header bg-white py-3 border-light">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-door-open-fill me-2 text-primary"></i>Add / Edit Room</h5>
+              </div>
+              <div class="card-body">
+                <form id="roomForm" onsubmit="saveRoom(event)">
+                  <input type="hidden" id="room-id" value="">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Room Name <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control" id="room-name" placeholder="e.g. COMLAB, W- ComLab, HS-101" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold">Room Type <span class="text-danger">*</span></label>
+                      <select class="form-select" id="room-type" required>
+                        <option value="Both">Both (Lecture & Lab)</option>
+                        <option value="Laboratory">Laboratory Room Only</option>
+                        <option value="Lecture">Lecture Room Only</option>
+                      </select>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2">
+                      <button type="button" class="btn btn-secondary btn-sm" onclick="clearRoomForm()">Clear</button>
+                      <button type="submit" class="btn btn-primary btn-sm px-4">Save Room</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold">Rooms Database List</h6>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-bulk-delete-rooms" onclick="bulkDeleteRooms()" style="display: none;">
+                  <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-rooms-count">0</span>)
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light fs-7">
+                    <tr>
+                      <th style="width: 40px;"><input type="checkbox" class="form-check-input" id="check-all-rooms" onchange="toggleSelectAll('rooms', this.checked)"></th>
+                      <th>Room Name</th>
+                      <th>Room Type</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="roomsListTable">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer bg-white border-top-0 d-flex flex-wrap justify-content-between align-items-center py-3">
+                <small class="text-muted" id="rooms-page-info">Showing page 1 of 1</small>
+                <nav aria-label="Rooms pagination">
+                  <ul class="pagination pagination-sm mb-0" id="rooms-pagination">
+                    <!-- Dynamic -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TEACHING LOAD PRINTOUT TAB ================= -->
+    <div id="panel-print" class="tab-panel d-none">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-printer-fill me-2 text-primary"></i>Generate Official SIBT Teaching Assignment Form</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">Select an instructor to populate and preview their official Southwestern Institute of Business and Technology, Inc. Teaching Assignment Printout Form.</p>
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Select Instructor</label>
+              <select class="form-select form-select-lg" id="print-teacher-select" onchange="renderOfficialPrintout()">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+            <div class="col-md-6 d-flex gap-2">
+              <button class="btn btn-primary btn-lg flex-fill" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Assignment Form
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview Box -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light py-2">
+          <small class="text-muted fw-bold text-uppercase">Page Layout Preview (Scroll to see full printout form below)</small>
+        </div>
+        <div class="card-body bg-secondary bg-opacity-10 d-flex justify-content-center py-4">
+          <!-- Actual Printable Document Wrapper -->
+          <div id="printout-container" class="bg-white p-5 shadow-lg position-relative" style="width: 210mm; min-height: 297mm; font-family: Arial, Helvetica, sans-serif; box-sizing: border-box;">
+            <!-- To be rendered dynamically by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer bg-white py-3 border-top mt-auto no-print">
+    <div class="container text-center">
+      <span class="text-muted small">© 2026 Southwestern Institute of Business and Technology, Inc. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- ================= PRINT VIEW CONTAINER ================= -->
+  <!-- This is completely hidden in normal screen view, and rendered perfectly in window.print() -->
+  <div id="print-sheet" class="d-none print-only-sheet">
+    <!-- Will be filled programmatically with identical content of the chosen printout -->
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3 no-print">
+    <div id="actionToast" class="toast align-items-center text-white bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMsg">
+          Success!
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JavaScript Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core Logic Script -->
+  <script src="script.js"></script>
+</body>
+</html>
