@@ -14,7 +14,6 @@
           "name": { "type": "string" },
           "designation": { "type": "string", "enum": ["Licensed Teacher", "Regular Teacher", "Part-time", "Part-time Teacher", "Admin", "Director", "Program Head"] },
           "degree": { "type": ["string", "null"] },
-          "master_degree": { "type": ["string", "null"] },
           "area": { "type": "string" },
           "employee_no": { "type": ["string", "null"] },
           "effectivity_date": { "type": "string" },
@@ -31,7 +30,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory"] }
+          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory", "Special Room"] }
         }
       }
     },
@@ -49,7 +48,8 @@
           "units": { "type": "integer" },
           "lec_hours": { "type": "integer" },
           "lab_hours": { "type": "integer" },
-          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 }
+          "is_major": { "type": "integer", "minimum": 0, "maximum": 1 },
+          "curriculum_type": { "type": "string", "enum": ["new", "old"] }
         }
       }
     },
