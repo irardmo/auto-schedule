@@ -474,7 +474,7 @@
                   <button class="nav-link active fw-semibold btn-sm" id="batch-multi-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-multi-teacher-pane" type="button" role="tab"><i class="bi bi-people-fill me-1"></i> Multiple Teachers (Waterfall)</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                  <button class="nav-link fw-semibold btn-sm" id="batch-single-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-single-teacher-pane" type="button" role="tab"><i class="bi bi-person-badge-fill me-1"></i> Single Teacher (Multi-Course & Subject)</button>
+                  <button class="nav-link fw-semibold btn-sm" id="batch-single-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-single-teacher-pane" type="button" role="tab" onclick="populateSingleTeacherControls()"><i class="bi bi-person-badge-fill me-1"></i> Single Teacher (Multi-Course & Subject)</button>
                 </li>
                 <li class="nav-item" role="presentation">
                   <button class="nav-link fw-semibold btn-sm" id="batch-section-tab" data-bs-toggle="tab" data-bs-target="#batch-section-pane" type="button" role="tab" onclick="onPerSectionTabClick()"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Per-Section Generator</button>
@@ -808,22 +808,6 @@
                     <i class="bi bi-trash-fill"></i> Delete Selected (<span id="selected-teachers-count">0</span>)
                   </button>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                  <input type="file" id="csv-upload-teachers" accept=".csv" onchange="importInstructorsCSV(event)" style="display: none;">
-                  <label for="csv-upload-teachers" class="btn btn-outline-success btn-sm mb-0">
-                    <i class="bi bi-file-earmark-excel me-1"></i> Upload Instructor CSV
-                  </label>
-                  <button type="button" class="btn btn-link btn-sm text-decoration-none p-0" data-bs-toggle="collapse" data-bs-target="#csvFormatHelp" title="View CSV Format Guide">
-                    <i class="bi bi-question-circle-fill text-muted fs-5"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="collapse bg-light border-bottom p-3" id="csvFormatHelp">
-                <div class="small text-muted">
-                  <strong class="text-dark">Expected CSV Column Headers:</strong><br>
-                  <code>NAME</code>, <code>EMPLOYEE #</code>, <code>DESIGNATION</code>, <code>EDUCATIONAL ATTAINMENT</code>, <code>PRC LICENSE</code>, <code>MASTERAL DEGREE</code> (Optional: <code>AREA</code>, <code>EFFECTIVITY DATE</code>, <code>ADMIN LOAD</code>)<br>
-                  <em>Designation values automatically map max unit limits (e.g. Licensed Teacher: 27 units, Regular Teacher: 24 units, Part-time: 12 units, Admin: 9 units, Director: 15 units, Program Head: 18 units).</em>
-                </div>
               </div>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -857,35 +841,6 @@
 
           <!-- SUBJECTS MANAGEMENT PANEL -->
           <div id="manage-subjects" class="manage-panel d-none">
-            <!-- Curriculum Subject File Upload Card -->
-            <div class="card border-0 shadow-sm mb-4">
-              <div class="card-body bg-light rounded p-3">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                  <div>
-                    <h6 class="mb-1 text-primary fw-bold"><i class="bi bi-file-earmark-word me-2"></i>Upload Subject (Curriculum)</h6>
-                    <small class="text-muted">Import subjects from curriculum files (.docx, .xlsx, .xls, .csv, .txt) for New or Old Curriculum.</small>
-                  </div>
-                  <div class="d-flex align-items-center gap-3 flex-wrap">
-                    <div class="d-flex gap-3 align-items-center bg-white px-3 py-1 border rounded">
-                      <span class="fw-semibold small text-dark me-1">Curriculum:</span>
-                      <div class="form-check form-check-inline mb-0">
-                        <input class="form-check-input" type="radio" name="curriculumTypeRadio" id="curriculumTypeNew" value="new" checked>
-                        <label class="form-check-label small fw-bold text-success" for="curriculumTypeNew">New Curriculum</label>
-                      </div>
-                      <div class="form-check form-check-inline mb-0">
-                        <input class="form-check-input" type="radio" name="curriculumTypeRadio" id="curriculumTypeOld" value="old">
-                        <label class="form-check-label small fw-bold text-secondary" for="curriculumTypeOld">Old Curriculum</label>
-                      </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                      <input type="file" id="curriculumFileInput" accept=".docx,.xlsx,.xls,.csv,.txt" class="form-control form-control-sm" style="max-width: 250px;">
-                      <button type="button" class="btn btn-sm btn-outline-primary fw-bold text-nowrap" onclick="handleCurriculumUpload()"><i class="bi bi-upload me-1"></i> Upload Curriculum</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div class="card border-0 shadow-sm mb-4">
               <div class="card-header bg-white py-3 border-light">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-bookmark-plus-fill me-2 text-primary"></i>Add / Edit Subject</h5>
