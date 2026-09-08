@@ -18,18 +18,17 @@ $password = "";
 try {
     $conn = new PDO("mysql:host={$host}", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    
     // Create database and tables automatically if they do not exist
     $conn->exec("CREATE DATABASE IF NOT EXISTS `{$db_name}` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;");
     $conn->exec("USE `{$db_name}`;");
-
+    
     // Create Instructors
     $conn->exec("CREATE TABLE IF NOT EXISTS instructors (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         designation VARCHAR(100) NOT NULL,
         degree VARCHAR(255),
-        master_degree VARCHAR(255),
         area VARCHAR(100) DEFAULT 'ACADEMICS',
         employee_no VARCHAR(50),
         effectivity_date VARCHAR(100),
@@ -54,8 +53,10 @@ try {
         units INT NOT NULL,
         lec_hours INT NOT NULL DEFAULT 0,
         lab_hours INT NOT NULL DEFAULT 0,
-        is_major INT NOT NULL DEFAULT 0
+        is_major INT NOT NULL DEFAULT 0,
+        curriculum_type VARCHAR(20) DEFAULT 'new'
     ) ENGINE=InnoDB;");
+
 
     // Create Schedules
     $conn->exec("CREATE TABLE IF NOT EXISTS schedules (
@@ -71,75 +72,7 @@ try {
         FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
 
-    // Auto-seed table if instructors are completely empty
-    $check = $conn->query("SELECT COUNT(*) FROM instructors")->fetchColumn();
-    if ($check == 0) {
-        $conn->exec("INSERT INTO instructors (id, name, designation, degree, area, employee_no, effectivity_date, admin_load, max_units) VALUES
-        ('t1', 'KENT LIWANAGAN', 'Regular Teacher', 'College Faculty', 'ACADEMICS', '0105', 'July 13, 2026', '', 24),
-        ('t2', 'GERARDO MICIANO', 'Program Head', 'BSIT', 'ADMINISTRATION', '0321', 'June 23, 2026', 'CIT Program Head', 18),
-        ('t3', 'CAREN ROSE L TOJEDO, LPT., MAED.', 'Director', 'Dean of Academics', 'ACADEMICS', '0001', 'June 01, 2026', 'Dean of Academics', 15),
-        ('t4', 'MAILA M MORALES, LPT., CHRA', 'Admin', 'HRD Director', 'ADMINISTRATION', '0002', 'July 01, 2026', 'HRD Director', 9);");
-
-        $conn->exec("INSERT INTO rooms (id, name, room_type) VALUES
-        ('r1', 'COMLAB', 'Laboratory'),
-        ('r2', 'W- ComLab', 'Laboratory'),
-        ('r3', 'T-COMLAB', 'Laboratory'),
-        ('r4', 'TH-COMLAB', 'Laboratory'),
-        ('r5', 'HS-101', 'Lecture'),
-        ('r6', 'TH-203', 'Lecture'),
-        ('r7', 'T-204', 'Lecture'),
-        ('r8', 'CRIMLAB', 'Laboratory'),
-        ('r9', '205', 'Lecture'),
-        ('r10', '206', 'Lecture'),
-        ('r11', '207', 'Lecture'),
-        ('r12', '208', 'Lecture'),
-        ('r13', 'HS102', 'Lecture'),
-        ('r14', 'HS103', 'Lecture'),
-        ('r15', 'HS104', 'Lecture'),
-        ('r16', 'HS105', 'Lecture'),
-        ('r17', 'HS106', 'Lecture'),
-        ('r18', 'HS107', 'Lecture'),
-        ('r19', 'HS108', 'Lecture'),
-        ('r20', 'HS109', 'Lecture'),
-        ('r21', 'HS110', 'Lecture'),
-        ('r22', 'Library 1', 'Both'),
-        ('r23', 'Library 2', 'Both'),
-        ('r24', 'TBL Room', 'Both');");
-
-        $conn->exec("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES
-        ('s1', 'Computer Programming 1 CC102', 'BSIT', 1, '1A', 3, 2, 2, 1),
-        ('s2', 'SYSTEM ADMIN AND MAINTENANCE SA 101', 'BSIT', 3, '3', 3, 2, 2, 1),
-        ('s3', 'Social and Professional Issues SP 101', 'BSIT', 3, '3', 3, 3, 0, 0),
-        ('s4', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2A', 3, 2, 2, 1),
-        ('s5', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
-        ('s6', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2A', 3, 2, 2, 1),
-        ('s7', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, '2B', 3, 2, 2, 1),
-        ('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, '1A', 3, 3, 0, 0),
-        ('s9', 'Physical Education PE 101', 'BSIT', 1, '1A', 2, 2, 0, 0),
-        ('s10', 'Physical Education PE 101', 'BSIT', 1, '1B', 2, 2, 0, 0),
-        ('s11', 'Physical Education PE 101', 'BSIT', 2, '2A', 2, 2, 0, 0),
-        ('s12', 'Physical Education PE 101', 'BSIT', 2, '2B', 2, 2, 0, 0),
-        ('s13', 'Physical Education PE 101', 'BSIT', 3, '3A', 2, 2, 0, 0),
-        ('s14', 'Physical Education PE 101', 'BSIT', 3, '3B', 2, 2, 0, 0);");
-
-        $conn->exec("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
-        ('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
-        ('sch2', 't1', 'r1', 'S', '12:00', '14:00', 's2'),
-        ('sch3', 't1', 'r5', 'F', '15:00', '17:00', 's3'),
-        ('sch4', 't2', 'r6', 'TTH', '08:00', '09:00', 's4'),
-        ('sch5', 't2', 'r7', 'TTH', '09:00', '10:00', 's5'),
-        ('sch6', 't2', 'r6', 'TTH', '10:00', '11:00', 's6'),
-        ('sch7', 't2', 'r7', 'TTH', '11:00', '12:00', 's7'),
-        ('sch8', 't2', 'r1', 'M', '09:00', '10:00', 's8');");
-    }
-
-} catch(PDOException $e) {
-    echo json_encode(["status" => "error", "message" => "Database connection failed: " . $e->getMessage()]);
-    exit();
-}
-
-$action = isset($_GET['action']) ? $_GET['action'] : '';
-
+    
 // Process API Request routing
 switch ($action) {
     case 'get_all':
@@ -174,9 +107,9 @@ switch ($action) {
                     $stmt = $conn->prepare("INSERT INTO instructors (id, name, designation, degree, area, employee_no, effectivity_date, admin_load, max_units) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['instructors'] as $ins) {
                         $stmt->execute([
-                            $ins['id'], $ins['name'], $ins['designation'],
-                            $ins['degree'] ?? '', $ins['area'] ?? 'ACADEMICS',
-                            $ins['employee_no'] ?? '', $ins['effectivity_date'] ?? '',
+                            $ins['id'], $ins['name'], $ins['designation'], 
+                            $ins['degree'] ?? '', $ins['area'] ?? 'ACADEMICS', 
+                            $ins['employee_no'] ?? '', $ins['effectivity_date'] ?? '', 
                             $ins['admin_load'] ?? '', $ins['max_units'] ?? 24
                         ]);
                     }
@@ -193,8 +126,8 @@ switch ($action) {
                     $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['subjects'] as $sub) {
                         $stmt->execute([
-                            $sub['id'], $sub['title_and_code'], $sub['course'],
-                            $sub['year_level'], $sub['block_section'],
+                            $sub['id'], $sub['title_and_code'], $sub['course'], 
+                            $sub['year_level'], $sub['block_section'], 
                             $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
                             $sub['is_major'] ?? 0
                         ]);
@@ -205,7 +138,7 @@ switch ($action) {
                     $stmt = $conn->prepare("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['schedules'] as $sch) {
                         $stmt->execute([
-                            $sch['id'], $sch['instructor_id'], $sch['room_id'],
+                            $sch['id'], $sch['instructor_id'], $sch['room_id'], 
                             $sch['day'], $sch['time_start'], $sch['time_end'], $sch['subject_id']
                         ]);
                     }
