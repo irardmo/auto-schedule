@@ -1,3 +1,14 @@
+
+function getFilteredStandardDays(selectedSetting) {
+  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  if (!selectedSetting || selectedSetting === 'all') return allDays;
+  const count = parseInt(selectedSetting, 10);
+  if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
+  if (count === 2) return ["MT", "TTH"];
+  if (count === 3) return ["MWF"];
+  return allDays;
+}
+
 // Southwestern Institute of Business and Technology (SIBT) Scheduling Logic Engine
 
 // Initialize Database structure
@@ -234,184 +245,1635 @@ const demoData = {
   ],
   rooms: [
     { id: "r1", name: "COMLAB", room_type: "Laboratory" },
-    { id: "r2", name: "W- ComLab", room_type: "Laboratory" },
-    { id: "r3", name: "T-COMLAB", room_type: "Laboratory" },
-    { id: "r4", name: "TH-COMLAB", room_type: "Laboratory" },
-    { id: "r5", name: "HS-101", room_type: "Lecture" },
-    { id: "r6", name: "TH-203", room_type: "Lecture" },
-    { id: "r7", name: "T-204", room_type: "Lecture" },
-    { id: "r8", name: "CRIMLAB", room_type: "Laboratory" },
-    { id: "r9", name: "205", room_type: "Lecture" },
-    { id: "r10", name: "206", room_type: "Lecture" },
-    { id: "r11", name: "207", room_type: "Lecture" },
-    { id: "r12", name: "208", room_type: "Lecture" },
-    { id: "r13", name: "HS102", room_type: "Lecture" },
-    { id: "r14", name: "HS103", room_type: "Lecture" },
-    { id: "r15", name: "HS104", room_type: "Lecture" },
-    { id: "r16", name: "HS105", room_type: "Lecture" },
-    { id: "r17", name: "HS106", room_type: "Lecture" },
-    { id: "r18", name: "HS107", room_type: "Lecture" },
-    { id: "r19", name: "HS108", room_type: "Lecture" },
-    { id: "r20", name: "HS109", room_type: "Lecture" },
-    { id: "r21", name: "HS110", room_type: "Lecture" },
-    { id: "r22", name: "Library 1", room_type: "Both" },
-    { id: "r23", name: "Library 2", room_type: "Both" },
-    { id: "r24", name: "TBL Room", room_type: "Both" }
+    { id: "r2", name: "CRIMLAB", room_type: "Laboratory" },
+    { id: "r3", name: "203", room_type: "Lecture" },
+    { id: "r4", name: "204", room_type: "Lecture" },
+    { id: "r5", name: "205", room_type: "Lecture" },
+    { id: "r6", name: "206", room_type: "Lecture" },
+    { id: "r7", name: "207", room_type: "Lecture" },
+    { id: "r8", name: "208", room_type: "Lecture" },
+    { id: "r9", name: "HS-101", room_type: "Lecture" },
+    { id: "r10", name: "HS-102", room_type: "Lecture" },
+    { id: "r11", name: "HS-103", room_type: "Lecture" },
+    { id: "r12", name: "HS-104", room_type: "Lecture" },
+    { id: "r13", name: "HS-105", room_type: "Lecture" },
+    { id: "r14", name: "HS-106", room_type: "Lecture" },
+    { id: "r15", name: "HS-107", room_type: "Lecture" },
+    { id: "r16", name: "HS-108", room_type: "Lecture" },
+    { id: "r17", name: "HS-109", room_type: "Lecture" },
+    { id: "r18", name: "HS110", room_type: "Lecture" },
+    { id: "r19", name: "Library 1", room_type: "Special Room" },
+    { id: "r20", name: "Library 2", room_type: "Special Room" },
+    { id: "r21", name: "TBL Room", room_type: "Special Room" }
   ],
   subjects: [
-    {
-      id: "s1",
-      title_and_code: "Computer Programming 1 CC102",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+{
+        "id": "s1",
+        "title_and_code": "Computer Programming 1 CC 102",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s2",
-      title_and_code: "SYSTEM ADMIN AND MAINTENANCE SA 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+        "id": "s1b",
+        "title_and_code": "Introduction to Computing CC 101",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s3",
-      title_and_code: "Social and Professional Issues SP 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3",
-      units: 3,
-      lec_hours: 3,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s2",
+        "title_and_code": "SYSTEM ADMIN AND MAINTENANCE SA 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s4",
-      title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+        "id": "s3",
+        "title_and_code": "Social and Professional Issues SP 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s5",
-      title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+        "id": "s4",
+        "title_and_code": "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s6",
-      title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+        "id": "s5",
+        "title_and_code": "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2B",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s7",
-      title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
+        "id": "s6",
+        "title_and_code": "OBJECT ORIENTED PROGRAMMING PF 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s8",
-      title_and_code: "National Service Training Program 1 NSTP 1",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 3,
-      lec_hours: 3,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s7",
+        "title_and_code": "OBJECT ORIENTED PROGRAMMING PF 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2B",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     },
     {
-      id: "s9",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s8",
+        "title_and_code": "National Service Training Program 1 NSTP 1",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s10",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s9",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s11",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s10",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1B",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s12",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s11",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s13",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s12",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2B",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
     },
     {
-      id: "s14",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
+        "id": "s13",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "s14",
+        "title_and_code": "Physical Education PE 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3B",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "s15",
+        "title_and_code": "Information Assurance & Security IAS 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "s16",
+        "title_and_code": "Web Systems and Technologies WS 101",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "s17",
+        "title_and_code": "Capstone Project 1 CAP 101",
+        "course": "BSIT",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "s18",
+        "title_and_code": "Capstone Project 2 CAP 102",
+        "course": "BSIT",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "so1",
+        "title_and_code": "Basic Computer Concepts & Logic Formulation IT 101",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so2",
+        "title_and_code": "Computer Programming C++ IT 102",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so3",
+        "title_and_code": "Visual Basic Programming IT 201",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so4",
+        "title_and_code": "Database Management System FoxPro/SQL IT 202",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so5",
+        "title_and_code": "Operating Systems & Utility Software IT 203",
+        "course": "BSIT",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so6",
+        "title_and_code": "Computer Hardware & Networking Fundamentals IT 301",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so7",
+        "title_and_code": "Systems Analysis and Design SAD IT 302",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so8",
+        "title_and_code": "Web Page Development HTML/CSS IT 303",
+        "course": "BSIT",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so9",
+        "title_and_code": "Software Engineering & IT Management IT 401",
+        "course": "BSIT",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so10",
+        "title_and_code": "IT Practicum / OJT 480 Hours IT 402",
+        "course": "BSIT",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so11",
+        "title_and_code": "Old Physical Education 1 Physical Fitness PE 1",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so12",
+        "title_and_code": "Old Physical Education 2 Rhythmic Activities PE 2",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "so13",
+        "title_and_code": "Old NSTP 1 Civic Welfare Training NSTP 1",
+        "course": "BSIT",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_n1",
+        "title_and_code": "Understanding the Self GE 101",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n2",
+        "title_and_code": "Child and Adolescent Learners EED 101",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n3",
+        "title_and_code": "Teaching Math in Primary Grades EED 102",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n4",
+        "title_and_code": "Good Manners and Right Conduct GMRC 101",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n5",
+        "title_and_code": "Physical Education 1 PE 101",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n6",
+        "title_and_code": "NSTP 1 Civic Welfare Training NSTP 1",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n7",
+        "title_and_code": "Teaching Science in Elementary Grades EED 103",
+        "course": "BEED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n8",
+        "title_and_code": "Teaching Social Studies in Elementary EED 104",
+        "course": "BEED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n9",
+        "title_and_code": "Technology for Teaching and Learning 1 TTL 101",
+        "course": "BEED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n10",
+        "title_and_code": "Assessment in Learning 1 ASL 101",
+        "course": "BEED",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n11",
+        "title_and_code": "Field Study 1 Observation of Teaching FS 101",
+        "course": "BEED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 3,
+        "lec_hours": 1,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_n12",
+        "title_and_code": "Teaching Internship / Practice Teaching INT 101",
+        "course": "BEED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "beed_o1",
+        "title_and_code": "Child & Adolescent Development EED 1",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_o2",
+        "title_and_code": "Principles of Teaching 1 EED 2",
+        "course": "BEED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_o3",
+        "title_and_code": "Educational Technology 1 ET 1",
+        "course": "BEED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_o4",
+        "title_and_code": "Curriculum Development EED 3",
+        "course": "BEED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_o5",
+        "title_and_code": "Assessment of Student Learning 1 ASL 1",
+        "course": "BEED",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "beed_o6",
+        "title_and_code": "Old Practice Teaching EED 4",
+        "course": "BEED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsed_n1",
+        "title_and_code": "Understanding the Self GE 101",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n2",
+        "title_and_code": "Basic English Grammar GE 102",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n3",
+        "title_and_code": "Introduction to Linguistics EL 100",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n4",
+        "title_and_code": "Language, Culture and Society EL 101",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n5",
+        "title_and_code": "Structures of English EL 102",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n6",
+        "title_and_code": "Teaching and Assessment of Grammar EL 103",
+        "course": "BSED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n7",
+        "title_and_code": "Mythology and Folklore EL 104",
+        "course": "BSED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n8",
+        "title_and_code": "Technology for Teaching and Learning 2 TTL 102",
+        "course": "BSED",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n9",
+        "title_and_code": "Field Study 2 FS 102",
+        "course": "BSED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 3,
+        "lec_hours": 1,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_n10",
+        "title_and_code": "Teaching Internship BSED INT 101",
+        "course": "BSED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsed_o1",
+        "title_and_code": "Old Principles of Teaching SED 1",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsed_o2",
+        "title_and_code": "Developmental Reading SED 2",
+        "course": "BSED",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsed_o3",
+        "title_and_code": "Educational Technology 2 ET 2",
+        "course": "BSED",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsed_o4",
+        "title_and_code": "Campus Journalism SED 3",
+        "course": "BSED",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsed_o5",
+        "title_and_code": "Old Secondary Practice Teaching SED 4",
+        "course": "BSED",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsca_n1",
+        "title_and_code": "Fundamentals of Customs Admin CUA 101",
+        "course": "BSCA",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_n2",
+        "title_and_code": "Customs Tariff and Classification CUA 102",
+        "course": "BSCA",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_n3",
+        "title_and_code": "Customs Clearance and Procedure CUA 103",
+        "course": "BSCA",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_n4",
+        "title_and_code": "Warehouse Operations Mgt SCM 102",
+        "course": "BSCA",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_n5",
+        "title_and_code": "Border Control and Security CUA 104",
+        "course": "BSCA",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_n6",
+        "title_and_code": "Customs Practicum / Internship CUA 105",
+        "course": "BSCA",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "bsca_o1",
+        "title_and_code": "Old Customs Laws and Tariff CUA 1",
+        "course": "BSCA",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsca_o2",
+        "title_and_code": "Old Customs Documentation CUA 2",
+        "course": "BSCA",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsca_o3",
+        "title_and_code": "Old International Trade & Cargo CUA 3",
+        "course": "BSCA",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "bsca_o4",
+        "title_and_code": "Old Customs Practicum CUA 4",
+        "course": "BSCA",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "crim_n1",
+        "title_and_code": "Law Enforcement Organization LEA 1",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 4,
+        "lec_hours": 4,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n2",
+        "title_and_code": "Character Formation 1 CRIM 101",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n3",
+        "title_and_code": "Human Behavior and Criminology CRIM 3",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n4",
+        "title_and_code": "Fundamentals of Criminal Investigation CDI 1",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 4,
+        "lec_hours": 4,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n5",
+        "title_and_code": "Forensic Photography FORENSIC 1",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n6",
+        "title_and_code": "Personal Identification Techniques FORENSIC 2",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n7",
+        "title_and_code": "Traffic Management and Accident Investigation CDI 4",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n8",
+        "title_and_code": "Fundamentals of Marksmanship PATHFIT 4",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 2,
+        "lec_hours": 2,
+        "lab_hours": 0,
+        "is_major": 0,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n9",
+        "title_and_code": "Criminological Research CRIM 102",
+        "course": "BSCRIM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_n10",
+        "title_and_code": "Criminology Internship / OJT CRIM INT",
+        "course": "BSCRIM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "crim_o1",
+        "title_and_code": "Introduction to Criminology CRIM 1",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "crim_o2",
+        "title_and_code": "Police Organization and Administration LEA 101",
+        "course": "BSCRIM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "crim_o3",
+        "title_and_code": "Old Criminal Investigation CDI 101",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "crim_o4",
+        "title_and_code": "Old Forensic Photography FORENSIC 101",
+        "course": "BSCRIM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "crim_o5",
+        "title_and_code": "Old Criminology Internship CRIM 102",
+        "course": "BSCRIM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hm_n1",
+        "title_and_code": "Kitchen Essentials and Basic Food Preparation HPC 101",
+        "course": "BSHM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_n2",
+        "title_and_code": "Food and Beverage Service Operations HPC 102",
+        "course": "BSHM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_n3",
+        "title_and_code": "Front Office Operations HPC 103",
+        "course": "BSHM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_n4",
+        "title_and_code": "Housekeeping Operations HPC 104",
+        "course": "BSHM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_n5",
+        "title_and_code": "Culinary Fundamentals HPC 121",
+        "course": "BSHM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_n6",
+        "title_and_code": "Hospitality Internship 600 Hours BSHM INT",
+        "course": "BSHM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hm_o1",
+        "title_and_code": "Introduction to Hospitality Industry HM 1",
+        "course": "BSHM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hm_o2",
+        "title_and_code": "Old Food and Beverage Service HM 2",
+        "course": "BSHM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hm_o3",
+        "title_and_code": "Old Front Office Management HM 3",
+        "course": "BSHM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 1,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hm_o4",
+        "title_and_code": "Old Hospitality Practicum HM 4",
+        "course": "BSHM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "fm_n1",
+        "title_and_code": "Financial Management PROF COR FM 1",
+        "course": "BSBA-FM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_n2",
+        "title_and_code": "Basic Microeconomics BUS CORE 111",
+        "course": "BSBA-FM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_n3",
+        "title_and_code": "Business Law Obligations and Contracts BUS CORE 112",
+        "course": "BSBA-FM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_n4",
+        "title_and_code": "Investment and Portfolio Management PROF COR FM 2",
+        "course": "BSBA-FM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_n5",
+        "title_and_code": "Monetary Policy and Central Banking FM ELEC 1",
+        "course": "BSBA-FM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_n6",
+        "title_and_code": "Financial Management Internship INT 600",
+        "course": "BSBA-FM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "fm_o1",
+        "title_and_code": "Basic Microeconomics BUS 101",
+        "course": "BSBA-FM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "fm_o2",
+        "title_and_code": "Old Financial Management FM 101",
+        "course": "BSBA-FM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "fm_o3",
+        "title_and_code": "Old Credit and Collection FM 102",
+        "course": "BSBA-FM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "fm_o4",
+        "title_and_code": "Old FM Internship FM 103",
+        "course": "BSBA-FM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hrdm_n1",
+        "title_and_code": "Human Resource Management MGT 1",
+        "course": "BSBA-HRDM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n2",
+        "title_and_code": "Administrative and Office Management HRM 1",
+        "course": "BSBA-HRDM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n3",
+        "title_and_code": "Labor Law and Legislation HRM 2",
+        "course": "BSBA-HRDM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n4",
+        "title_and_code": "Recruitment and Selection HRM 3",
+        "course": "BSBA-HRDM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n5",
+        "title_and_code": "Training and Development HRM 4",
+        "course": "BSBA-HRDM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n6",
+        "title_and_code": "Compensation and Benefits HRM 5",
+        "course": "BSBA-HRDM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_n7",
+        "title_and_code": "HRDM Internship 600 Hours HRM INT",
+        "course": "BSBA-HRDM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "hrdm_o1",
+        "title_and_code": "Principles of Management MGT 101",
+        "course": "BSBA-HRDM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hrdm_o2",
+        "title_and_code": "Human Behavior in Organization MGT 102",
+        "course": "BSBA-HRDM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hrdm_o3",
+        "title_and_code": "Old Recruitment and Selection HRDM 101",
+        "course": "BSBA-HRDM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "hrdm_o4",
+        "title_and_code": "Old HRDM Practicum HRDM 102",
+        "course": "BSBA-HRDM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "mm_n1",
+        "title_and_code": "Principles of Marketing PROF COR MM 1",
+        "course": "BSBA-MM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_n2",
+        "title_and_code": "Professional Salesmanship PROF COR MM 2",
+        "course": "BSBA-MM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_n3",
+        "title_and_code": "Distribution Management PROF COR MM 3",
+        "course": "BSBA-MM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_n4",
+        "title_and_code": "Advertising and Sales Promotion MM 124",
+        "course": "BSBA-MM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_n5",
+        "title_and_code": "Retail Management MM 125",
+        "course": "BSBA-MM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_n6",
+        "title_and_code": "Marketing Internship 600 Hours MM INT",
+        "course": "BSBA-MM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "mm_o1",
+        "title_and_code": "Old Principles of Marketing MM 101",
+        "course": "BSBA-MM",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "mm_o2",
+        "title_and_code": "Old Consumer Behavior MM 102",
+        "course": "BSBA-MM",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "mm_o3",
+        "title_and_code": "Old Marketing Research MM 103",
+        "course": "BSBA-MM",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "mm_o4",
+        "title_and_code": "Old Marketing Internship MM 104",
+        "course": "BSBA-MM",
+        "year_level": 4,
+        "block_section": "4A",
+        "units": 6,
+        "lec_hours": 0,
+        "lab_hours": 6,
+        "is_major": 1,
+        "curriculum_type": "old"
+    },
+    {
+        "id": "scs1",
+        "title_and_code": "Discrete Mathematics CS 101",
+        "course": "BSCS",
+        "year_level": 1,
+        "block_section": "1A",
+        "units": 3,
+        "lec_hours": 3,
+        "lab_hours": 0,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "scs2",
+        "title_and_code": "Data Structures & Algorithms CS 102",
+        "course": "BSCS",
+        "year_level": 2,
+        "block_section": "2A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
+    },
+    {
+        "id": "scs3",
+        "title_and_code": "Artificial Intelligence CS 201",
+        "course": "BSCS",
+        "year_level": 3,
+        "block_section": "3A",
+        "units": 3,
+        "lec_hours": 2,
+        "lab_hours": 2,
+        "is_major": 1,
+        "curriculum_type": "new"
     }
   ],
   schedules: [
@@ -998,14 +2460,43 @@ function uniqueId() {
   return 'id_' + Math.random().toString(36).substr(2, 9);
 }
 
-// TOAST NOTIFICATIONS
+// GLOBAL ALERTS & TOAST NOTIFICATIONS
+function showGlobalAlert(title, message, type = "success") {
+  const container = document.getElementById('globalAlerts');
+  if (!container) return;
+
+  const alertId = 'alert_' + Date.now();
+  const alertBg = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
+  const alertIcon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+
+  container.innerHTML = `
+    <div id="${alertId}" class="alert ${alertBg} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+      <i class="bi ${alertIcon} fs-4 me-3"></i>
+      <div>
+        <strong class="d-block mb-1">${title}</strong>
+        <span>${message}</span>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `;
+
+  // Auto dismiss after 10 seconds
+  setTimeout(() => {
+    const el = document.getElementById(alertId);
+    if (el) {
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+      if (bsAlert) bsAlert.close();
+    }
+  }, 10000);
+}
+
 function showToast(message, type = "success") {
   const toastEl = document.getElementById('actionToast');
   const msgEl = document.getElementById('toastMsg');
   if (!toastEl || !msgEl) return;
 
   msgEl.innerText = message;
-  toastEl.className = `toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : 'bg-danger'}`;
+  toastEl.className = `toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : (type === 'warning' ? 'bg-warning text-dark' : 'bg-danger')}`;
   
   const toast = new bootstrap.Toast(toastEl);
   toast.show();
@@ -1023,10 +2514,20 @@ function updateStats() {
 function populateFormSelects() {
   // Teacher selector
   const teacherSel = document.getElementById('input-teacher');
-  teacherSel.innerHTML = '<option value="">Select Teacher...</option>';
-  db.instructors.forEach(t => {
-    teacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
-  });
+  if (teacherSel) {
+    teacherSel.innerHTML = '<option value="">Select Teacher...</option>';
+    db.instructors.forEach(t => {
+      teacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+    });
+  }
+
+  const singleTeacherSel = document.getElementById('single-mode-teacher');
+  if (singleTeacherSel) {
+    singleTeacherSel.innerHTML = '<option value="">Choose teacher...</option>';
+    db.instructors.forEach(t => {
+      singleTeacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+    });
+  }
 
   // Room selector
   const roomSel = document.getElementById('input-room');
@@ -1086,9 +2587,10 @@ function populateFormSelects() {
   const existingList = document.getElementById('existing-subjects-list');
   if (existingList) {
     existingList.innerHTML = '';
-    const uniqueTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
-    uniqueTitles.forEach(title => {
-      existingList.innerHTML += `<option value="${title}">`;
+    // Suggest subjects from both New and Old curriculums
+    db.subjects.forEach(s => {
+      const cLabel = s.curriculum_type ? s.curriculum_type.toUpperCase() + ' Curriculum' : 'NEW Curriculum';
+      existingList.innerHTML += `<option value="${s.title_and_code}">[${cLabel} - ${s.course}] ${s.title_and_code}</option>`;
     });
   }
 
@@ -1101,6 +2603,7 @@ function populateFormSelects() {
   }
 
   renderWaterfallTeachers();
+  loadSectionSubjects();
 }
 
 // Waterfall / Batch Generate Teacher Search, Pagination and State
@@ -1533,17 +3036,25 @@ document.getElementById('scheduleForm').addEventListener('submit', function(e) {
     return;
   }
 
+  if (validation.warnings && validation.warnings.length > 0) {
+    showToast(validation.warnings[0], "warning");
+  }
+
   if (id) {
     // Edit existing schedule
     const index = db.schedules.findIndex(s => s.id === id);
     if (index !== -1) {
       db.schedules[index] = candidate;
-      showToast("Schedule updated successfully!");
+      if (!validation.warnings || validation.warnings.length === 0) {
+        showToast("Schedule updated successfully!");
+      }
     }
   } else {
     // Add new schedule
     db.schedules.push(candidate);
-    showToast("New schedule created successfully!");
+    if (!validation.warnings || validation.warnings.length === 0) {
+      showToast("New schedule created successfully!");
+    }
   }
 
   saveDatabase();
@@ -1974,7 +3485,8 @@ function runAutoScheduler() {
   // Define Standard Time slots and days available for schedule blocks
   // Adding more evening/afternoon slots for High School Room constraints if needed
   const standardTimeSlots = [
-    // 2 Hour blocks
+    // 2 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
     { start: "13:00", end: "15:00", dur: 2 },
@@ -1982,13 +3494,15 @@ function runAutoScheduler() {
     { start: "17:00", end: "19:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
     
-    // 3 Hour blocks
+    // 3 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "10:00", dur: 3 },
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "09:00", end: "12:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
     
-    // 1.5 Hour blocks
+    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:30", dur: 1.5 },
     { start: "07:30", end: "09:00", dur: 1.5 },
     { start: "09:00", end: "10:30", dur: 1.5 },
     { start: "10:30", end: "12:00", dur: 1.5 },
@@ -1997,7 +3511,8 @@ function runAutoScheduler() {
     { start: "16:00", end: "17:30", dur: 1.5 },
     { start: "17:30", end: "19:00", dur: 1.5 },
     
-    // 1 Hour blocks
+    // 1 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:00", dur: 1 },
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
     { start: "10:00", end: "11:00", dur: 1 },
@@ -2010,7 +3525,8 @@ function runAutoScheduler() {
     { start: "18:00", end: "19:00", dur: 1 }
   ];
 
-  const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const autoDaysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(autoDaysSetting);
 
   let scheduledCount = 0;
   let unscheduledCount = 0;
@@ -2165,7 +3681,15 @@ function runAutoScheduler() {
   }
 
   saveDatabase();
-  showToast(`Auto-Scheduler finished. ${scheduledCount} successfully scheduled, ${unscheduledCount} failed.`);
+
+  const isSuccess = unscheduledCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Auto-Scheduler Engine Completed Successfully!' : 'Auto-Scheduler Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${db.subjects.length} subjects.` + 
+    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled conflict-free. Check the execution logs for details.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // --- WATERFALL SUBJECT SHARING ENGINE ---
@@ -2279,12 +3803,14 @@ async function runWaterfallScheduler() {
 
   // Build standard list of timeslots, heavily prioritized to minimize empty daily gaps (compress schedules for a day with only lunch break).
   const standardTimeSlots = [
-    // 3 Hour blocks
+    // 3 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "10:00", dur: 3 },
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
     
-    // 2 Hour blocks
+    // 2 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
     { start: "13:00", end: "15:00", dur: 2 },
@@ -2292,7 +3818,8 @@ async function runWaterfallScheduler() {
     { start: "17:00", end: "19:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
 
-    // 1.5 Hour blocks
+    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:30", dur: 1.5 },
     { start: "07:30", end: "09:00", dur: 1.5 },
     { start: "09:00", end: "10:30", dur: 1.5 },
     { start: "10:30", end: "12:00", dur: 1.5 },
@@ -2301,7 +3828,8 @@ async function runWaterfallScheduler() {
     { start: "16:00", end: "17:30", dur: 1.5 },
     { start: "17:30", end: "19:00", dur: 1.5 },
     
-    // 1 Hour blocks
+    // 1 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:00", dur: 1 },
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
     { start: "10:00", end: "11:00", dur: 1 },
@@ -2314,7 +3842,8 @@ async function runWaterfallScheduler() {
     { start: "18:00", end: "19:00", dur: 1 }
   ];
 
-  const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const batchDaysSetting = document.getElementById("batch-days-count") ? document.getElementById("batch-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(batchDaysSetting);
   let successfullyScheduled = 0;
 
   for (let subject of subjectsToSchedule) {
@@ -2420,7 +3949,16 @@ async function runWaterfallScheduler() {
   }
 
   await saveDatabase();
-  showToast(`Waterfall Allocation complete. Successfully scheduled ${successfullyScheduled}/${subjectsToSchedule.length} sections!`);
+
+  const failedCount = subjectsToSchedule.length - successfullyScheduled;
+  const isSuccess = failedCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Batch Generator Completed Successfully!' : 'Batch Generator Finished with Conflicts';
+  const alertMsg = `Successfully scheduled ${successfullyScheduled} out of ${subjectsToSchedule.length} section(s).` + 
+    (!isSuccess ? ` ${failedCount} section(s) encountered conflicts (teacher load/availability, room, or section overlap). See execution logs below for conflict breakdown.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // --- PRINT LAYOUT GENERATOR (Matching the Image) ---
@@ -2748,6 +4286,362 @@ function bulkDeleteRooms() {
     saveDatabase();
     showToast("Selected rooms deleted successfully!", "danger");
   }
+}
+
+// Per-Section Generator Logic
+function loadSectionSubjects() {
+  const courseEl = document.getElementById('section-course');
+  const yearEl = document.getElementById('section-year');
+  const blockEl = document.getElementById('section-block');
+  const curriculumEl = document.getElementById('section-curriculum');
+  const listEl = document.getElementById('section-subjects-list');
+  const countEl = document.getElementById('section-subject-count');
+
+  if (!courseEl || !yearEl || !listEl) return;
+
+  const course = courseEl.value;
+  const year = parseInt(yearEl.value, 10);
+  const block = blockEl ? blockEl.value : '';
+  const curriculum = curriculumEl ? curriculumEl.value : 'all';
+
+  // Filter subjects matching Course, Year, and Curriculum
+  let matching = db.subjects.filter(s => {
+    if (s.course.toUpperCase() !== course.toUpperCase()) return false;
+    if (parseInt(s.year_level, 10) !== year) return false;
+    if (curriculum !== 'all') {
+      const cType = s.curriculum_type || 'new';
+      if (cType !== curriculum) return false;
+    }
+    return true;
+  });
+
+  if (countEl) countEl.innerText = `${matching.length} Subject${matching.length !== 1 ? 's' : ''} Found`;
+
+  if (matching.length === 0) {
+    listEl.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
+    return;
+  }
+
+  // Teacher dropdown options
+  let teacherOpts = '<option value="">Auto-Assign / Any Teacher</option>';
+  db.instructors.forEach(t => {
+    teacherOpts += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+  });
+
+  let html = '';
+  matching.forEach(s => {
+    const curBadge = (s.curriculum_type === 'old') ? '<span class="badge bg-warning text-dark">Old</span>' : '<span class="badge bg-primary">New</span>';
+    html += `
+      <tr>
+        <td class="fw-semibold">${s.title_and_code}</td>
+        <td>${curBadge} ${s.is_major ? '<span class="badge bg-info text-dark">Major</span>' : ''}</td>
+        <td class="text-center fw-bold">${s.units}</td>
+        <td class="text-center">${s.lec_hours}/${s.lab_hours}</td>
+        <td>
+          <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
+            ${teacherOpts}
+          </select>
+        </td>
+      </tr>
+    `;
+  });
+
+  listEl.innerHTML = html;
+}
+
+// --- SINGLE TEACHER MULTI-SECTION ENGINE ---
+async function runSingleTeacherScheduler() {
+  const subjectTitle = document.getElementById('single-subject').value.trim();
+  const courseInput = document.getElementById('single-course').value.trim();
+  const yearLevel = parseInt(document.getElementById('single-year').value, 10) || 1;
+  const sectionsCount = parseInt(document.getElementById('single-sections').value, 10) || 3;
+  const teacherId = document.getElementById('single-mode-teacher').value;
+  const daysSetting = document.getElementById('single-days-count') ? document.getElementById('single-days-count').value : "all";
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+
+  if (!subjectTitle || !courseInput || !teacherId) {
+    showToast("Please fill in Subject Title, Course, and select an Instructor!", "danger");
+    return;
+  }
+
+  const teacher = db.instructors.find(t => t.id === teacherId);
+  if (!teacher) {
+    showToast("Selected teacher not found!", "danger");
+    return;
+  }
+
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `Starting Single Teacher Generator for <strong>${teacher.name}</strong>: <strong>${subjectTitle}</strong> (${courseInput.toUpperCase()} - ${sectionsCount} sections)...<br>`;
+
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const createdSubjects = [];
+
+  for (let i = 0; i < sectionsCount; i++) {
+    const sectionLetter = alphabet[i] || String(i + 1);
+    const sectionCode = `${yearLevel}${sectionLetter}`;
+
+    let existingSub = db.subjects.find(s => 
+      s.title_and_code.toLowerCase() === subjectTitle.toLowerCase() && 
+      s.course.toLowerCase() === courseInput.toLowerCase() && 
+      s.year_level === yearLevel && 
+      s.block_section === sectionCode
+    );
+
+    if (!existingSub) {
+      existingSub = {
+        id: 's_single_' + uniqueId(),
+        title_and_code: subjectTitle,
+        course: courseInput.toUpperCase(),
+        year_level: yearLevel,
+        block_section: sectionCode,
+        units: 3,
+        lec_hours: 2,
+        lab_hours: 0,
+        is_major: 0
+      };
+      db.subjects.push(existingSub);
+    }
+    createdSubjects.push(existingSub);
+  }
+
+  await saveDatabase();
+
+  const standardDays = getFilteredStandardDays(daysSetting);
+  const timeslots = [
+    { start: "07:00", end: "09:00" },
+    { start: "08:00", end: "10:00" },
+    { start: "10:00", end: "12:00" },
+    { start: "13:00", end: "15:00" },
+    { start: "15:00", end: "17:00" },
+    { start: "17:00", end: "19:00" }
+  ];
+
+  let scheduledCount = 0;
+  let failedCount = 0;
+
+  for (let subject of createdSubjects) {
+    // Check if already scheduled
+    if (db.schedules.some(sch => sch.subject_id === subject.id && sch.instructor_id === teacher.id)) {
+      consoleEl.innerHTML += `Section <strong>${subject.course} ${subject.block_section}</strong> is already scheduled for ${teacher.name}.<br>`;
+      scheduledCount++;
+      continue;
+    }
+
+    let isScheduled = false;
+    const conflictsEncountered = new Set();
+
+    dayLoop:
+    for (let day of standardDays) {
+      for (let slot of timeslots) {
+        const candidate = {
+          id: 'temp_' + uniqueId(),
+          instructor_id: teacher.id,
+          room_id: null,
+          day,
+          time_start: slot.start,
+          time_end: slot.end,
+          subject_id: subject.id
+        };
+
+        const availableRoom = db.rooms.find(r => {
+          if (isSpecialRoom(r.name)) return false; // prefer regular standard rooms
+          candidate.room_id = r.id;
+          const validation = validateSchedule(candidate);
+          if (validation.valid) {
+            return true;
+          } else {
+            validation.errors.forEach(err => conflictsEncountered.add(err));
+            return false;
+          }
+        });
+
+        if (availableRoom) {
+          const newSch = {
+            id: uniqueId(),
+            instructor_id: teacher.id,
+            room_id: availableRoom.id,
+            day,
+            time_start: slot.start,
+            time_end: slot.end,
+            subject_id: subject.id
+          };
+          db.schedules.push(newSch);
+          scheduledCount++;
+          isScheduled = true;
+          consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Assigned:</span> ${teacher.name} -> ${subject.course} ${subject.block_section} in Room ${availableRoom.name} on ${day} (${slot.start}-${slot.end})<br>`;
+          break dayLoop;
+        }
+      }
+    }
+
+    if (!isScheduled) {
+      failedCount++;
+      consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Failed:</span> Could not schedule ${subject.course} ${subject.block_section} for ${teacher.name}.<br>`;
+      if (conflictsEncountered.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
+    }
+  }
+
+  await saveDatabase();
+  renderSchedulesTable();
+  updateStats();
+
+  const isSuccess = failedCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Single Teacher Generator Successful!' : 'Single Teacher Generator Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${sectionsCount} section(s) for instructor ${teacher.name}.` + 
+    (!isSuccess ? ` ${failedCount} section(s) encountered conflicts.` : '');
+  
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
+}
+
+async function runPerSectionScheduler() {
+  const courseEl = document.getElementById('section-course');
+  const yearEl = document.getElementById('section-year');
+  const blockEl = document.getElementById('section-block');
+  const curriculumEl = document.getElementById('section-curriculum');
+
+  if (!courseEl || !yearEl || !blockEl) return;
+
+  const course = courseEl.value;
+  const year = parseInt(yearEl.value, 10);
+  const block = blockEl.value;
+  const curriculum = curriculumEl ? curriculumEl.value : 'new';
+  const sectionDaysSetting = document.getElementById("section-days-count") ? document.getElementById("section-days-count").value : "all";
+
+  const listEl = document.getElementById('section-subjects-list');
+  const selects = listEl ? listEl.querySelectorAll('.section-instructor-select') : [];
+
+  if (selects.length === 0) {
+    showToast("No subjects to schedule for selected section!", "danger");
+    return;
+  }
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `Starting Per-Section Auto-Scheduler for <strong>${course} ${year}${block}</strong> (${curriculum.toUpperCase()} Curriculum)...<br>`;
+
+  let scheduledCount = 0;
+  let unscheduledCount = 0;
+
+  for (let sel of selects) {
+    const subId = sel.getAttribute('data-subject-id');
+    const assignedTeacherId = sel.value;
+    const sub = db.subjects.find(s => s.id === subId);
+    if (!sub) continue;
+
+    // Update target block section
+    sub.block_section = block;
+
+    let teachersToTry = [];
+    if (assignedTeacherId) {
+      const teacherObj = db.instructors.find(t => t.id === assignedTeacherId);
+      if (teacherObj) teachersToTry = [teacherObj];
+    } else {
+      teachersToTry = [...db.instructors];
+    }
+
+    if (teachersToTry.length === 0) {
+      consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No instructors available for ${sub.title_and_code}.<br>`;
+      unscheduledCount++;
+      continue;
+    }
+
+    const days = getFilteredStandardDays(sectionDaysSetting);
+    const timeslots = [
+      { start: '07:00', end: '09:00' },
+      { start: '08:00', end: '10:00' },
+      { start: '10:00', end: '12:00' },
+      { start: '13:00', end: '15:00' },
+      { start: '15:00', end: '17:00' },
+      { start: '17:00', end: '19:00' }
+    ];
+
+    let scheduled = false;
+
+    const sectionConflicts = new Set();
+
+    teacherLoop:
+    for (let teacher of teachersToTry) {
+      for (let day of days) {
+        for (let slot of timeslots) {
+          const candidate = {
+            id: 'temp_' + uniqueId(),
+            instructor_id: teacher.id,
+            room_id: null,
+            day: day,
+            time_start: slot.start,
+            time_end: slot.end,
+            subject_id: sub.id
+          };
+
+          const availableRoom = db.rooms.find(r => {
+            if (sub.is_major && (sub.title_and_code.toLowerCase().includes('computer') || sub.title_and_code.toLowerCase().includes('programming'))) {
+              if (r.name.toUpperCase() !== 'COMLAB') return false;
+            }
+
+            candidate.room_id = r.id;
+            const validation = validateSchedule(candidate);
+            if (validation.valid) {
+              return true;
+            } else {
+              validation.errors.forEach(err => sectionConflicts.add(err));
+              return false;
+            }
+          });
+
+          if (availableRoom) {
+            const newSch = {
+              id: uniqueId(),
+              instructor_id: teacher.id,
+              room_id: availableRoom.id,
+              day: day,
+              time_start: slot.start,
+              time_end: slot.end,
+              subject_id: sub.id
+            };
+            db.schedules.push(newSch);
+            scheduledCount++;
+            scheduled = true;
+            consoleEl.innerHTML += `<span class="text-success">✔ Scheduled:</span> ${sub.title_and_code} (${sub.course} ${year}${block}) with ${teacher.name} in ${availableRoom.name} [${day} ${slot.start}-${slot.end}]<br>`;
+            break teacherLoop;
+          }
+        }
+      }
+    }
+
+    if (!scheduled) {
+      unscheduledCount++;
+      consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
+      if (sectionConflicts.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(sectionConflicts).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
+    }
+  }
+
+  saveDatabase();
+  renderSchedulesTable();
+  updateStats();
+
+  const isSuccess = unscheduledCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Per-Section Scheduling Successful!' : 'Per-Section Scheduling Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${selects.length} subjects for section ${course} ${year}${block}.` + 
+    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled due to teacher, room, time, or section conflicts.` : '');
+  
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // Initialize on document load
