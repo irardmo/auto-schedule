@@ -53,8 +53,10 @@ try {
         units INT NOT NULL,
         lec_hours INT NOT NULL DEFAULT 0,
         lab_hours INT NOT NULL DEFAULT 0,
-        is_major INT NOT NULL DEFAULT 0
+        is_major INT NOT NULL DEFAULT 0,
+        curriculum_type VARCHAR(20) DEFAULT 'new'
     ) ENGINE=InnoDB;");
+
 
     // Create Schedules
     $conn->exec("CREATE TABLE IF NOT EXISTS schedules (
