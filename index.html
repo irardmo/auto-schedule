@@ -366,7 +366,197 @@
 
     <!-- ================= AUTO-GENERATOR TAB ================= -->
     <div id="panel-auto" class="tab-panel d-none">
+      <!-- Full Width Custom Batch Generator & Auto-Scheduler Card (Edge-to-Edge on Top) -->
       <div class="row mb-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-light">
+              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Custom Batch Generator & Auto-Scheduler</h5>
+            </div>
+            <div class="card-body pb-0">
+              <div class="tab-content" id="batchTabContent">
+                <!-- PANE 1: MULTIPLE TEACHERS WATERFALL -->
+                <div class="tab-pane fade show active" id="pane-mode-waterfall" role="tabpanel">
+                  <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
+                  <form id="waterfallForm" onsubmit="event.preventDefault();">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="batch-subject" placeholder="Physical Education PE 101" list="existing-subjects-list" required>
+                        <datalist id="existing-subjects-list">
+                          <!-- Filled dynamically -->
+                        </datalist>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="batch-course" placeholder="bsit" required>
+                        <small class="text-muted" style="font-size: 0.75rem;">Support multiple courses (e.g. <code>bsit:4, bscs:2</code> or <code>bsit, bscs</code>)</small>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-year">
+                          <option value="1" selected>1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Hours<span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-hours">
+                          <option value="1">1</option>
+                          <option value="1.5" selected>1.5</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Number of Sections <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="10" required>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-units">
+                          <option value="1">1 Unit</option>
+                          <option value="2" selected>2 Units</option>
+                          <option value="3">3 Units</option>
+                          <option value="4">4 Units</option>
+                          <option value="5">5 Units</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Lecture</label>
+                        <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Lab</label>
+                        <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
+                      </div>
+                      <div class="col-md-12">
+                        <label class="form-label fw-semibold">Preferred Room (Optional)</label>
+                        <select class="form-select" id="waterfall-room">
+                          <option value="">Any available room</option>
+                          <!-- Filled dynamically -->
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+                          <label class="form-label fw-semibold mb-0">Select Participating Instructors <span class="text-danger">*</span></label>
+                          <div class="d-flex flex-wrap gap-2 align-items-center">
+                            <input type="text" id="waterfall-teacher-search" class="form-control form-control-sm" placeholder="Search teacher..." oninput="onWaterfallSearchChange()" style="max-width: 200px;">
+                            <nav aria-label="Waterfall Pagination" class="mb-0">
+                              <ul class="pagination pagination-sm mb-0" id="waterfall-teachers-pagination">
+                                <!-- Pagination dynamic -->
+                              </ul>
+                            </nav>
+                          </div>
+                        </div>
+                        <div id="waterfall-instructors-list" class="row g-2 p-2 bg-light rounded" style="max-height: 180px; overflow-y: auto;">
+                          <!-- Filled dynamically with checkboxes -->
+                        </div>
+                      </div>
+                      <div class="col-12 d-flex justify-content-end mb-3">
+                        <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                          <i class="bi bi-lightning-fill"></i> Auto-Generate Rooms, Times & Schedules
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 2: SINGLE TEACHER -->
+                <div class="tab-pane fade" id="pane-mode-single" role="tabpanel">
+                  <p class="text-muted small">Generate schedules assigned to a single dedicated instructor across multiple sections.</p>
+                  <form id="singleTeacherForm" onsubmit="event.preventDefault();">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="Computer Programming CC 102" list="existing-subjects-list">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="bsit">
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Year Level</label>
+                        <select class="form-select">
+                          <option value="1">1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Number of Sections</label>
+                        <input type="number" class="form-control" min="1" max="10" value="3">
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Select Instructor</label>
+                        <select class="form-select" id="single-mode-teacher">
+                          <option value="">Choose teacher...</option>
+                        </select>
+                      </div>
+                      <div class="col-12 d-flex justify-content-end mb-3">
+                        <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                          <i class="bi bi-lightning-fill"></i> Generate Single Teacher Schedule
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- PANE 3: PER-SECTION GENERATOR -->
+                <div class="tab-pane fade" id="pane-mode-section" role="tabpanel">
+                  <p class="text-muted small">Automatically compile conflict-free schedules section by section.</p>
+                  <form id="perSectionForm" onsubmit="event.preventDefault();">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Target Section <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="e.g. BSIT 1A">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Preferred Timeslot Block</label>
+                        <select class="form-select">
+                          <option value="morning">Morning (8:00 AM - 12:00 PM)</option>
+                          <option value="afternoon">Afternoon (1:00 PM - 5:00 PM)</option>
+                          <option value="evening">Evening (4:00 PM - 7:00 PM)</option>
+                        </select>
+                      </div>
+                      <div class="col-12 d-flex justify-content-end mb-3">
+                        <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                          <i class="bi bi-lightning-fill"></i> Generate Section Schedule
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- Bottom Nav Tabs for Auto-Generate Modes -->
+            <div class="card-footer bg-white border-top border-light pt-2 pb-0">
+              <ul class="nav nav-tabs card-footer-tabs border-bottom-0" id="batch-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active fw-semibold" id="tab-mode-waterfall" data-bs-toggle="tab" data-bs-target="#pane-mode-waterfall" type="button" role="tab">
+                    <i class="bi bi-people-fill me-1"></i> Multiple Teachers Waterfall
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold" id="tab-mode-single" data-bs-toggle="tab" data-bs-target="#pane-mode-single" type="button" role="tab">
+                    <i class="bi bi-person-fill me-1"></i> Single Teacher
+                  </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold" id="tab-mode-section" data-bs-toggle="tab" data-bs-target="#pane-mode-section" type="button" role="tab">
+                    <i class="bi bi-grid-fill me-1"></i> Per-Section Generator
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <!-- Instructions Panel -->
         <div class="col-lg-5">
           <div class="card border-0 shadow-sm mb-4 mb-lg-0 h-100">
@@ -451,104 +641,6 @@
               <div class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.8rem; max-height: 200px; overflow-y: auto;" id="schedulerConsole">
                 <!-- Log entries -->
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Full Width Custom Batch Generator & Auto-Scheduler Card (Edge-to-Edge) -->
-      <div class="row">
-        <div class="col-12">
-          <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3 border-light">
-              <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Custom Batch Generator & Auto-Scheduler</h5>
-            </div>
-            <div class="card-body">
-              <p class="text-muted small">Input a subject title, course, year level, number of sections, and select instructors to dynamically generate conflict-free rooms and times. It auto-compresses daily schedules to minimize empty gaps (leaving only lunch breaks) and distributes sections using waterfall load-balancing.</p>
-              <form id="waterfallForm" onsubmit="event.preventDefault();">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="batch-subject" placeholder="Physical Education PE 101" list="existing-subjects-list" required>
-                    <datalist id="existing-subjects-list">
-                      <!-- Filled dynamically -->
-                    </datalist>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="batch-course" placeholder="bsit" required>
-                    <small class="text-muted" style="font-size: 0.75rem;">Support multiple courses (e.g. <code>bsit:4, bscs:2</code> or <code>bsit, bscs</code>)</small>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
-                    <select class="form-select" id="batch-year">
-                      <option value="1" selected>1st Year</option>
-                      <option value="2">2nd Year</option>
-                      <option value="3">3rd Year</option>
-                      <option value="4">4th Year</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Hours<span class="text-danger">*</span></label>
-                    <select class="form-select" id="batch-hours">
-                      <option value="1">1</option>
-                      <option value="1.5" selected>1.5</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Number of Sections <span class="text-danger">*</span></label>
-                    <input type="number" class="form-control" id="batch-sections-count" min="1" max="24" value="10" required>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
-                    <select class="form-select" id="batch-units">
-                      <option value="1">1 Unit</option>
-                      <option value="2" selected>2 Units</option>
-                      <option value="3">3 Units</option>
-                      <option value="4">4 Units</option>
-                      <option value="5">5 Units</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Lecture</label>
-                    <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-semibold">Lab</label>
-                    <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
-                  </div>
-                  <div class="col-md-12">
-                    <label class="form-label fw-semibold">Preferred Room (Optional)</label>
-                    <select class="form-select" id="waterfall-room">
-                      <option value="">Any available room</option>
-                      <!-- Filled dynamically -->
-                    </select>
-                  </div>
-                  <div class="col-12">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
-                      <label class="form-label fw-semibold mb-0">Select Participating Instructors <span class="text-danger">*</span></label>
-                      <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <input type="text" id="waterfall-teacher-search" class="form-control form-control-sm" placeholder="Search teacher..." oninput="onWaterfallSearchChange()" style="max-width: 200px;">
-                        <nav aria-label="Waterfall Pagination" class="mb-0">
-                          <ul class="pagination pagination-sm mb-0" id="waterfall-teachers-pagination">
-                            <!-- Pagination dynamic -->
-                          </ul>
-                        </nav>
-                      </div>
-                    </div>
-                    <div id="waterfall-instructors-list" class="row g-2 p-2 bg-light rounded" style="max-height: 180px; overflow-y: auto;">
-                      <!-- Filled dynamically with checkboxes -->
-                    </div>
-                  </div>
-                  <div class="col-12 d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
-                      <i class="bi bi-lightning-fill"></i> Auto-Generate Rooms, Times & Schedules
-                    </button>
-                  </div>
-                </div>
-              </form>
             </div>
           </div>
         </div>
@@ -809,6 +901,7 @@
                         <option value="Both">Both (Lecture & Lab)</option>
                         <option value="Laboratory">Laboratory Room Only</option>
                         <option value="Lecture">Lecture Room Only</option>
+                        <option value="Special Room">Special Room</option>
                       </select>
                     </div>
                     <div class="col-12 d-flex justify-content-end gap-2">

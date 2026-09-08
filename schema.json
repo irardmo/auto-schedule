@@ -30,7 +30,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory"] }
+          "room_type": { "type": "string", "enum": ["Both", "Lecture", "Laboratory", "Special Room"] }
         }
       }
     },

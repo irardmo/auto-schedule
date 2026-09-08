@@ -234,29 +234,26 @@ const demoData = {
   ],
   rooms: [
     { id: "r1", name: "COMLAB", room_type: "Laboratory" },
-    { id: "r2", name: "W- ComLab", room_type: "Laboratory" },
-    { id: "r3", name: "T-COMLAB", room_type: "Laboratory" },
-    { id: "r4", name: "TH-COMLAB", room_type: "Laboratory" },
-    { id: "r5", name: "HS-101", room_type: "Lecture" },
-    { id: "r6", name: "TH-203", room_type: "Lecture" },
-    { id: "r7", name: "T-204", room_type: "Lecture" },
-    { id: "r8", name: "CRIMLAB", room_type: "Laboratory" },
-    { id: "r9", name: "205", room_type: "Lecture" },
-    { id: "r10", name: "206", room_type: "Lecture" },
-    { id: "r11", name: "207", room_type: "Lecture" },
-    { id: "r12", name: "208", room_type: "Lecture" },
-    { id: "r13", name: "HS102", room_type: "Lecture" },
-    { id: "r14", name: "HS103", room_type: "Lecture" },
-    { id: "r15", name: "HS104", room_type: "Lecture" },
-    { id: "r16", name: "HS105", room_type: "Lecture" },
-    { id: "r17", name: "HS106", room_type: "Lecture" },
-    { id: "r18", name: "HS107", room_type: "Lecture" },
-    { id: "r19", name: "HS108", room_type: "Lecture" },
-    { id: "r20", name: "HS109", room_type: "Lecture" },
-    { id: "r21", name: "HS110", room_type: "Lecture" },
-    { id: "r22", name: "Library 1", room_type: "Both" },
-    { id: "r23", name: "Library 2", room_type: "Both" },
-    { id: "r24", name: "TBL Room", room_type: "Both" }
+    { id: "r2", name: "CRIMLAB", room_type: "Laboratory" },
+    { id: "r3", name: "203", room_type: "Lecture" },
+    { id: "r4", name: "204", room_type: "Lecture" },
+    { id: "r5", name: "205", room_type: "Lecture" },
+    { id: "r6", name: "206", room_type: "Lecture" },
+    { id: "r7", name: "207", room_type: "Lecture" },
+    { id: "r8", name: "208", room_type: "Lecture" },
+    { id: "r9", name: "HS-101", room_type: "Lecture" },
+    { id: "r10", name: "HS-102", room_type: "Lecture" },
+    { id: "r11", name: "HS-103", room_type: "Lecture" },
+    { id: "r12", name: "HS-104", room_type: "Lecture" },
+    { id: "r13", name: "HS-105", room_type: "Lecture" },
+    { id: "r14", name: "HS-106", room_type: "Lecture" },
+    { id: "r15", name: "HS-107", room_type: "Lecture" },
+    { id: "r16", name: "HS-108", room_type: "Lecture" },
+    { id: "r17", name: "HS-109", room_type: "Lecture" },
+    { id: "r18", name: "HS110", room_type: "Lecture" },
+    { id: "r19", name: "Library 1", room_type: "Special Room" },
+    { id: "r20", name: "Library 2", room_type: "Special Room" },
+    { id: "r21", name: "TBL Room", room_type: "Special Room" }
   ],
   subjects: [
 {
@@ -2477,10 +2474,20 @@ function updateStats() {
 function populateFormSelects() {
   // Teacher selector
   const teacherSel = document.getElementById('input-teacher');
-  teacherSel.innerHTML = '<option value="">Select Teacher...</option>';
-  db.instructors.forEach(t => {
-    teacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
-  });
+  if (teacherSel) {
+    teacherSel.innerHTML = '<option value="">Select Teacher...</option>';
+    db.instructors.forEach(t => {
+      teacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+    });
+  }
+
+  const singleTeacherSel = document.getElementById('single-mode-teacher');
+  if (singleTeacherSel) {
+    singleTeacherSel.innerHTML = '<option value="">Choose teacher...</option>';
+    db.instructors.forEach(t => {
+      singleTeacherSel.innerHTML += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+    });
+  }
 
   // Room selector
   const roomSel = document.getElementById('input-room');
