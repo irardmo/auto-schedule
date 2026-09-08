@@ -3036,17 +3036,25 @@ document.getElementById('scheduleForm').addEventListener('submit', function(e) {
     return;
   }
 
+  if (validation.warnings && validation.warnings.length > 0) {
+    showToast(validation.warnings[0], "warning");
+  }
+
   if (id) {
     // Edit existing schedule
     const index = db.schedules.findIndex(s => s.id === id);
     if (index !== -1) {
       db.schedules[index] = candidate;
-      showToast("Schedule updated successfully!");
+      if (!validation.warnings || validation.warnings.length === 0) {
+        showToast("Schedule updated successfully!");
+      }
     }
   } else {
     // Add new schedule
     db.schedules.push(candidate);
-    showToast("New schedule created successfully!");
+    if (!validation.warnings || validation.warnings.length === 0) {
+      showToast("New schedule created successfully!");
+    }
   }
 
   saveDatabase();
@@ -3477,7 +3485,8 @@ function runAutoScheduler() {
   // Define Standard Time slots and days available for schedule blocks
   // Adding more evening/afternoon slots for High School Room constraints if needed
   const standardTimeSlots = [
-    // 2 Hour blocks
+    // 2 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
     { start: "13:00", end: "15:00", dur: 2 },
@@ -3485,13 +3494,15 @@ function runAutoScheduler() {
     { start: "17:00", end: "19:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
     
-    // 3 Hour blocks
+    // 3 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "10:00", dur: 3 },
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "09:00", end: "12:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
     
-    // 1.5 Hour blocks
+    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:30", dur: 1.5 },
     { start: "07:30", end: "09:00", dur: 1.5 },
     { start: "09:00", end: "10:30", dur: 1.5 },
     { start: "10:30", end: "12:00", dur: 1.5 },
@@ -3500,7 +3511,8 @@ function runAutoScheduler() {
     { start: "16:00", end: "17:30", dur: 1.5 },
     { start: "17:30", end: "19:00", dur: 1.5 },
     
-    // 1 Hour blocks
+    // 1 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:00", dur: 1 },
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
     { start: "10:00", end: "11:00", dur: 1 },
@@ -3791,12 +3803,14 @@ async function runWaterfallScheduler() {
 
   // Build standard list of timeslots, heavily prioritized to minimize empty daily gaps (compress schedules for a day with only lunch break).
   const standardTimeSlots = [
-    // 3 Hour blocks
+    // 3 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "10:00", dur: 3 },
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
     
-    // 2 Hour blocks
+    // 2 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
     { start: "10:00", end: "12:00", dur: 2 },
     { start: "13:00", end: "15:00", dur: 2 },
@@ -3804,7 +3818,8 @@ async function runWaterfallScheduler() {
     { start: "17:00", end: "19:00", dur: 2 },
     { start: "16:00", end: "18:00", dur: 2 },
 
-    // 1.5 Hour blocks
+    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:30", dur: 1.5 },
     { start: "07:30", end: "09:00", dur: 1.5 },
     { start: "09:00", end: "10:30", dur: 1.5 },
     { start: "10:30", end: "12:00", dur: 1.5 },
@@ -3813,7 +3828,8 @@ async function runWaterfallScheduler() {
     { start: "16:00", end: "17:30", dur: 1.5 },
     { start: "17:30", end: "19:00", dur: 1.5 },
     
-    // 1 Hour blocks
+    // 1 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:00", dur: 1 },
     { start: "08:00", end: "09:00", dur: 1 },
     { start: "09:00", end: "10:00", dur: 1 },
     { start: "10:00", end: "11:00", dur: 1 },
@@ -4333,6 +4349,159 @@ function loadSectionSubjects() {
   listEl.innerHTML = html;
 }
 
+// --- SINGLE TEACHER MULTI-SECTION ENGINE ---
+async function runSingleTeacherScheduler() {
+  const subjectTitle = document.getElementById('single-subject').value.trim();
+  const courseInput = document.getElementById('single-course').value.trim();
+  const yearLevel = parseInt(document.getElementById('single-year').value, 10) || 1;
+  const sectionsCount = parseInt(document.getElementById('single-sections').value, 10) || 3;
+  const teacherId = document.getElementById('single-mode-teacher').value;
+  const daysSetting = document.getElementById('single-days-count') ? document.getElementById('single-days-count').value : "all";
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+
+  if (!subjectTitle || !courseInput || !teacherId) {
+    showToast("Please fill in Subject Title, Course, and select an Instructor!", "danger");
+    return;
+  }
+
+  const teacher = db.instructors.find(t => t.id === teacherId);
+  if (!teacher) {
+    showToast("Selected teacher not found!", "danger");
+    return;
+  }
+
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `Starting Single Teacher Generator for <strong>${teacher.name}</strong>: <strong>${subjectTitle}</strong> (${courseInput.toUpperCase()} - ${sectionsCount} sections)...<br>`;
+
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const createdSubjects = [];
+
+  for (let i = 0; i < sectionsCount; i++) {
+    const sectionLetter = alphabet[i] || String(i + 1);
+    const sectionCode = `${yearLevel}${sectionLetter}`;
+
+    let existingSub = db.subjects.find(s =>
+      s.title_and_code.toLowerCase() === subjectTitle.toLowerCase() &&
+      s.course.toLowerCase() === courseInput.toLowerCase() &&
+      s.year_level === yearLevel &&
+      s.block_section === sectionCode
+    );
+
+    if (!existingSub) {
+      existingSub = {
+        id: 's_single_' + uniqueId(),
+        title_and_code: subjectTitle,
+        course: courseInput.toUpperCase(),
+        year_level: yearLevel,
+        block_section: sectionCode,
+        units: 3,
+        lec_hours: 2,
+        lab_hours: 0,
+        is_major: 0
+      };
+      db.subjects.push(existingSub);
+    }
+    createdSubjects.push(existingSub);
+  }
+
+  await saveDatabase();
+
+  const standardDays = getFilteredStandardDays(daysSetting);
+  const timeslots = [
+    { start: "07:00", end: "09:00" },
+    { start: "08:00", end: "10:00" },
+    { start: "10:00", end: "12:00" },
+    { start: "13:00", end: "15:00" },
+    { start: "15:00", end: "17:00" },
+    { start: "17:00", end: "19:00" }
+  ];
+
+  let scheduledCount = 0;
+  let failedCount = 0;
+
+  for (let subject of createdSubjects) {
+    // Check if already scheduled
+    if (db.schedules.some(sch => sch.subject_id === subject.id && sch.instructor_id === teacher.id)) {
+      consoleEl.innerHTML += `Section <strong>${subject.course} ${subject.block_section}</strong> is already scheduled for ${teacher.name}.<br>`;
+      scheduledCount++;
+      continue;
+    }
+
+    let isScheduled = false;
+    const conflictsEncountered = new Set();
+
+    dayLoop:
+    for (let day of standardDays) {
+      for (let slot of timeslots) {
+        const candidate = {
+          id: 'temp_' + uniqueId(),
+          instructor_id: teacher.id,
+          room_id: null,
+          day,
+          time_start: slot.start,
+          time_end: slot.end,
+          subject_id: subject.id
+        };
+
+        const availableRoom = db.rooms.find(r => {
+          if (isSpecialRoom(r.name)) return false; // prefer regular standard rooms
+          candidate.room_id = r.id;
+          const validation = validateSchedule(candidate);
+          if (validation.valid) {
+            return true;
+          } else {
+            validation.errors.forEach(err => conflictsEncountered.add(err));
+            return false;
+          }
+        });
+
+        if (availableRoom) {
+          const newSch = {
+            id: uniqueId(),
+            instructor_id: teacher.id,
+            room_id: availableRoom.id,
+            day,
+            time_start: slot.start,
+            time_end: slot.end,
+            subject_id: subject.id
+          };
+          db.schedules.push(newSch);
+          scheduledCount++;
+          isScheduled = true;
+          consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Assigned:</span> ${teacher.name} -> ${subject.course} ${subject.block_section} in Room ${availableRoom.name} on ${day} (${slot.start}-${slot.end})<br>`;
+          break dayLoop;
+        }
+      }
+    }
+
+    if (!isScheduled) {
+      failedCount++;
+      consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Failed:</span> Could not schedule ${subject.course} ${subject.block_section} for ${teacher.name}.<br>`;
+      if (conflictsEncountered.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
+    }
+  }
+
+  await saveDatabase();
+  renderSchedulesTable();
+  updateStats();
+
+  const isSuccess = failedCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Single Teacher Generator Successful!' : 'Single Teacher Generator Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${sectionsCount} section(s) for instructor ${teacher.name}.` +
+    (!isSuccess ? ` ${failedCount} section(s) encountered conflicts.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
+}
+
 async function runPerSectionScheduler() {
   const courseEl = document.getElementById('section-course');
   const yearEl = document.getElementById('section-year');
@@ -4345,6 +4514,7 @@ async function runPerSectionScheduler() {
   const year = parseInt(yearEl.value, 10);
   const block = blockEl.value;
   const curriculum = curriculumEl ? curriculumEl.value : 'new';
+  const sectionDaysSetting = document.getElementById("section-days-count") ? document.getElementById("section-days-count").value : "all";
 
   const listEl = document.getElementById('section-subjects-list');
   const selects = listEl ? listEl.querySelectorAll('.section-instructor-select') : [];
@@ -4385,8 +4555,9 @@ async function runPerSectionScheduler() {
       continue;
     }
 
-    const days = sub.is_major ? ['M', 'T', 'W', 'TH', 'F', 'S'] : ['MWF', 'TTH', 'M', 'T', 'W', 'TH', 'F', 'S'];
+    const days = getFilteredStandardDays(sectionDaysSetting);
     const timeslots = [
+      { start: '07:00', end: '09:00' },
       { start: '08:00', end: '10:00' },
       { start: '10:00', end: '12:00' },
       { start: '13:00', end: '15:00' },
@@ -4460,7 +4631,7 @@ async function runPerSectionScheduler() {
   }
 
   saveDatabase();
-  renderSchedulesList();
+  renderSchedulesTable();
   updateStats();
 
   const isSuccess = unscheduledCount === 0;

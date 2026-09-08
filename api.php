@@ -57,33 +57,6 @@ try {
         curriculum_type VARCHAR(20) DEFAULT 'new'
     ) ENGINE=InnoDB;");
 
-    // Create Specific Course & Curriculum Tables
-    $course_tables = [
-        'bsit_subject_new', 'bsit_subject_old',
-        'beed_subject_new', 'beed_subject_old',
-        'bsed_subject_new', 'bsed_subject_old',
-        'bsca_subject_new', 'bsca_subject_old',
-        'bscrim_subject_new', 'bscrim_subject_old',
-        'bshm_subject_new', 'bshm_subject_old',
-        'bsba_fm_subject_new', 'bsba_fm_subject_old',
-        'bsba_hrdm_subject_new', 'bsba_hrdm_subject_old',
-        'bsba_mm_subject_new', 'bsba_mm_subject_old',
-        'bscs_subject_new', 'bscs_subject_old'
-    ];
-
-    foreach ($course_tables as $tbl) {
-        $conn->exec("CREATE TABLE IF NOT EXISTS {$tbl} (
-            id VARCHAR(50) PRIMARY KEY,
-            title_and_code VARCHAR(255) NOT NULL,
-            course VARCHAR(100),
-            year_level INT NOT NULL,
-            block_section VARCHAR(50) NOT NULL,
-            units INT NOT NULL,
-            lec_hours INT NOT NULL DEFAULT 0,
-            lab_hours INT NOT NULL DEFAULT 0,
-            is_major INT NOT NULL DEFAULT 0
-        ) ENGINE=InnoDB;");
-    }
 
     // Create Schedules
     $conn->exec("CREATE TABLE IF NOT EXISTS schedules (

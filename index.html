@@ -600,15 +600,15 @@
                     <div class="row g-3">
                       <div class="col-md-6">
                         <label class="form-label fw-semibold">Subject Title / Code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" placeholder="Computer Programming CC 102" list="existing-subjects-list">
+                        <input type="text" class="form-control" id="single-subject" placeholder="Computer Programming CC 102" list="existing-subjects-list" required>
                       </div>
                       <div class="col-md-6">
                         <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" placeholder="bsit">
+                        <input type="text" class="form-control" id="single-course" placeholder="bsit" required>
                       </div>
                       <div class="col-md-4">
                         <label class="form-label fw-semibold">Year Level</label>
-                        <select class="form-select">
+                        <select class="form-select" id="single-year">
                           <option value="1">1st Year</option>
                           <option value="2">2nd Year</option>
                           <option value="3">3rd Year</option>
@@ -617,11 +617,11 @@
                       </div>
                       <div class="col-md-4">
                         <label class="form-label fw-semibold">Number of Sections</label>
-                        <input type="number" class="form-control" min="1" max="10" value="3">
+                        <input type="number" class="form-control" id="single-sections" min="1" max="10" value="3">
                       </div>
                       <div class="col-md-4">
-                        <label class="form-label fw-semibold">Select Instructor</label>
-                        <select class="form-select" id="single-mode-teacher">
+                        <label class="form-label fw-semibold">Select Instructor <span class="text-danger">*</span></label>
+                        <select class="form-select" id="single-mode-teacher" required>
                           <option value="">Choose teacher...</option>
                         </select>
                       </div>
@@ -635,7 +635,7 @@
                         </select>
                       </div>
                       <div class="col-12 d-flex justify-content-end mt-4">
-                        <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
+                        <button type="button" class="btn btn-primary" onclick="runSingleTeacherScheduler()">
                           <i class="bi bi-lightning-fill"></i> Generate Single Teacher Schedule
                         </button>
                       </div>
