@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS rooms (
     room_type VARCHAR(50) NOT NULL -- 'Both', 'Lecture', 'Laboratory'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 3. Subjects Table
+-- 3. Master Subjects Table
 CREATE TABLE IF NOT EXISTS subjects (
     id VARCHAR(50) PRIMARY KEY,
     title_and_code VARCHAR(255) NOT NULL,
@@ -36,6 +36,247 @@ CREATE TABLE IF NOT EXISTS subjects (
     lab_hours INT NOT NULL DEFAULT 0,
     is_major INT NOT NULL DEFAULT 0,
     curriculum_type VARCHAR(20) DEFAULT 'new'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3a. Specific Course & Curriculum Tables
+CREATE TABLE IF NOT EXISTS bsit_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSIT',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsit_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSIT',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS beed_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BEED',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS beed_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BEED',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsed_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSED',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsed_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSED',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsca_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCA',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsca_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCA',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bscrim_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCRIM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bscrim_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCRIM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bshm_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSHM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bshm_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSHM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_fm_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-FM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_fm_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-FM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_hrdm_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-HRDM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_hrdm_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-HRDM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_mm_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-MM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bsba_mm_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSBA-MM',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bscs_subject_new (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCS',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS bscs_subject_old (
+    id VARCHAR(50) PRIMARY KEY,
+    title_and_code VARCHAR(255) NOT NULL,
+    course VARCHAR(100) DEFAULT 'BSCS',
+    year_level INT NOT NULL,
+    block_section VARCHAR(50) NOT NULL,
+    units INT NOT NULL,
+    lec_hours INT NOT NULL DEFAULT 0,
+    lab_hours INT NOT NULL DEFAULT 0,
+    is_major INT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 4. Schedules Table
@@ -86,7 +327,7 @@ INSERT IGNORE INTO rooms (id, name, room_type) VALUES
 ('r20', 'Library 2', 'Special Room'),
 ('r21', 'TBL Room', 'Special Room');
 
--- 3. Seed Subjects (All SIBT Programs Old & New Curriculums)
+-- 3. Seed Master Subjects (All SIBT Programs Old & New Curriculums)
 INSERT IGNORE INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES
 ('s1', 'Computer Programming 1 CC 102', 'BSIT', 1, '1A', 3, 2, 2, 1, 'new'),
 ('s1b', 'Introduction to Computing CC 101', 'BSIT', 1, '1A', 3, 3, 0, 1, 'new'),
@@ -223,8 +464,38 @@ INSERT IGNORE INTO subjects (id, title_and_code, course, year_level, block_secti
 ('scs2', 'Data Structures & Algorithms CS 102', 'BSCS', 2, '2A', 3, 2, 2, 1, 'new'),
 ('scs3', 'Artificial Intelligence CS 201', 'BSCS', 3, '3A', 3, 2, 2, 1, 'new');
 
--- 4. Seed Initial Sample Schedules
+-- Seed Specific Course & Curriculum Tables from Master Subjects
+INSERT IGNORE INTO bsit_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSIT' AND curriculum_type='new';
+INSERT IGNORE INTO bsit_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSIT' AND curriculum_type='old';
+
+INSERT IGNORE INTO beed_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BEED' AND curriculum_type='new';
+INSERT IGNORE INTO beed_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BEED' AND curriculum_type='old';
+
+INSERT IGNORE INTO bsed_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSED' AND curriculum_type='new';
+INSERT IGNORE INTO bsed_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSED' AND curriculum_type='old';
+
+INSERT IGNORE INTO bsca_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCA' AND curriculum_type='new';
+INSERT IGNORE INTO bsca_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCA' AND curriculum_type='old';
+
+INSERT IGNORE INTO bscrim_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCRIM' AND curriculum_type='new';
+INSERT IGNORE INTO bscrim_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCRIM' AND curriculum_type='old';
+
+INSERT IGNORE INTO bshm_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSHM' AND curriculum_type='new';
+INSERT IGNORE INTO bshm_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSHM' AND curriculum_type='old';
+
+INSERT IGNORE INTO bsba_fm_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-FM' AND curriculum_type='new';
+INSERT IGNORE INTO bsba_fm_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-FM' AND curriculum_type='old';
+
+INSERT IGNORE INTO bsba_hrdm_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-HRDM' AND curriculum_type='new';
+INSERT IGNORE INTO bsba_hrdm_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-HRDM' AND curriculum_type='old';
+
+INSERT IGNORE INTO bsba_mm_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-MM' AND curriculum_type='new';
+INSERT IGNORE INTO bsba_mm_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSBA-MM' AND curriculum_type='old';
+
+INSERT IGNORE INTO bscs_subject_new SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCS' AND curriculum_type='new';
+INSERT IGNORE INTO bscs_subject_old SELECT id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major FROM subjects WHERE course='BSCS' AND curriculum_type='old';
+
+-- 5. Seed Initial Sample Schedules
 INSERT IGNORE INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
 ('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
 ('sch2', 't2', 'r1', 'M', '13:00', '16:00', 's2');
-
