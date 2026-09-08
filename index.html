@@ -476,6 +476,9 @@
                 <li class="nav-item" role="presentation">
                   <button class="nav-link fw-semibold btn-sm" id="batch-single-teacher-tab" data-bs-toggle="tab" data-bs-target="#batch-single-teacher-pane" type="button" role="tab"><i class="bi bi-person-badge-fill me-1"></i> Single Teacher (Multi-Course & Subject)</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link fw-semibold btn-sm" id="batch-section-tab" data-bs-toggle="tab" data-bs-target="#batch-section-pane" type="button" role="tab" onclick="onPerSectionTabClick()"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Per-Section Generator</button>
+                </li>
               </ul>
             </div>
             <div class="card-body">
@@ -634,6 +637,76 @@
                           <i class="bi bi-play-circle-fill me-1"></i> Auto-Generate Schedule for Single Teacher
                         </button>
                       </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- TAB 3: PER-SECTION GENERATOR -->
+                <div class="tab-pane fade" id="batch-section-pane" role="tabpanel">
+                  <p class="text-muted small">Generate a complete conflict-free section schedule for a specific course, year level, block/section, and curriculum type (New vs. Old). Assign instructors to each subject in the section curriculum and click generate. COMLAB rooms are automatically prioritized for BSIT major subjects and computer courses.</p>
+                  <form id="perSectionBatchForm" onsubmit="event.preventDefault();">
+                    <div class="row g-3 mb-3">
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Course / Department <span class="text-danger">*</span></label>
+                        <select class="form-select" id="ps-course-select" onchange="renderPerSectionSubjectsList()">
+                          <option value="BSIT" selected>BSIT</option>
+                          <option value="BSCS">BSCS</option>
+                          <option value="BSHM">BSHM</option>
+                          <option value="BSCRIM">BSCRIM</option>
+                          <option value="BSBA">BSBA</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                        <select class="form-select" id="ps-year-select" onchange="renderPerSectionSubjectsList()">
+                          <option value="1" selected>1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Block / Section <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ps-block-input" value="1A" placeholder="e.g. 1A" required>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Curriculum Type <span class="text-danger">*</span></label>
+                        <select class="form-select" id="ps-curriculum-select" onchange="renderPerSectionSubjectsList()">
+                          <option value="new" selected>New Curriculum</option>
+                          <option value="old">Old Curriculum</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="card border mb-3">
+                      <div class="card-header bg-light py-2">
+                        <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-list-check me-2 text-primary"></i>Curriculum Subjects & Teacher Assignment</h6>
+                      </div>
+                      <div class="card-body p-0">
+                        <div class="table-responsive">
+                          <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light fs-7">
+                              <tr>
+                                <th style="width: 40px;" class="ps-3"><input type="checkbox" class="form-check-input" id="ps-check-all-subjects" checked onchange="toggleSelectAllPerSectionSubjects(this.checked)"></th>
+                                <th>Subject Title & Code</th>
+                                <th>Type</th>
+                                <th class="text-center">Lec/Lab</th>
+                                <th class="text-center">Units</th>
+                                <th style="width: 350px;" class="pe-3">Assigned Instructor <span class="text-danger">*</span></th>
+                              </tr>
+                            </thead>
+                            <tbody id="ps-subjects-table-body">
+                              <!-- Filled dynamically based on course, year level & curriculum -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-3">
+                      <button type="button" class="btn btn-primary fw-bold px-4" onclick="runPerSectionScheduler()">
+                        <i class="bi bi-lightning-charge-fill me-1"></i> Auto-Generate Section Timetable
+                      </button>
                     </div>
                   </form>
                 </div>

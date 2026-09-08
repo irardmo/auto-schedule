@@ -3017,3 +3017,247 @@ document.addEventListener('DOMContentLoaded', () => {
     startEl.addEventListener('change', calculateTimeEnd);
   }
 });
+
+
+
+// ==================== PER-SECTION AUTO-SCHEDULER ENGINE ====================
+function onPerSectionTabClick() {
+  renderPerSectionSubjectsList();
+}
+
+function renderPerSectionSubjectsList() {
+  const tbody = document.getElementById('ps-subjects-table-body');
+  if (!tbody) return;
+
+  const courseSelect = document.getElementById('ps-course-select');
+  const yearSelect = document.getElementById('ps-year-select');
+  const curriculumSelect = document.getElementById('ps-curriculum-select');
+
+  const course = courseSelect ? courseSelect.value.toUpperCase() : 'BSIT';
+  const year = yearSelect ? parseInt(yearSelect.value, 10) : 1;
+  const currType = curriculumSelect ? curriculumSelect.value : 'new';
+
+  let subjects = db.subjects.filter(s => {
+    const sCourse = (s.course || '').toUpperCase();
+    const sYear = parseInt(s.year_level, 10);
+    const sCurr = s.curriculum_type || 'new';
+    return sCourse === course && sYear === year && sCurr === currType;
+  });
+
+  // Fallback: if no subjects found for specific curriculum, filter by course & year
+  if (subjects.length === 0) {
+    subjects = db.subjects.filter(s => (s.course || '').toUpperCase() === course && parseInt(s.year_level, 10) === year);
+  }
+
+  if (subjects.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No curriculum subjects found for ${course} Year ${year} (${currType === 'old' ? 'Old' : 'New'} Curriculum). You can upload a curriculum file or add subjects in Manage Data.</td></tr>`;
+    return;
+  }
+
+  const teacherOptions = db.instructors.map(t => `<option value="${t.id}">${t.name} (${t.designation})</option>`).join('');
+
+  tbody.innerHTML = subjects.map((sub, idx) => {
+    const isComputer = isComputerSubject(sub.title_and_code, sub.course, sub.is_major);
+    const badgeType = sub.is_major ? '<span class="badge bg-warning text-dark me-1">Major</span>' : '<span class="badge bg-light text-dark border me-1">Minor</span>';
+    const badgeComlab = isComputer ? '<span class="badge bg-info text-dark">COMLAB Required</span>' : '';
+
+    return `
+      <tr>
+        <td class="ps-3"><input type="checkbox" class="form-check-input ps-subject-cb" value="${sub.id}" checked></td>
+        <td class="fw-bold text-dark">${sub.title_and_code}</td>
+        <td>${badgeType}${badgeComlab}</td>
+        <td class="text-center">${sub.lec_hours}/${sub.lab_hours}</td>
+        <td class="text-center fw-semibold">${sub.units}</td>
+        <td class="pe-3">
+          <select class="form-select form-select-sm ps-teacher-select" data-subject-id="${sub.id}">
+            <option value="">Select Instructor...</option>
+            ${teacherOptions}
+          </select>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function toggleSelectAllPerSectionSubjects(checked) {
+  const cbs = document.querySelectorAll('.ps-subject-cb');
+  cbs.forEach(cb => cb.checked = checked);
+}
+
+// Helper to identify if subject is a Computer/COMLAB subject
+function isComputerSubject(titleAndCode, course, isMajor) {
+  if (!titleAndCode) return false;
+  const upper = titleAndCode.toUpperCase();
+  const upperCourse = (course || '').toUpperCase();
+
+  if (upperCourse === 'BSIT' && isMajor) return true;
+  if (upperCourse === 'BSCS' && isMajor) return true;
+
+  const computerKeywords = [
+    'COMPUTER', 'COMP', 'PROGRAMMING', 'DATABASE', 'DATA STRUCTURE',
+    'INFORMATION', 'NETWORKING', 'WEB', 'SOFTWARE', 'HARDWARE',
+    'SYSTEM', 'INTEGRATION', 'MULTIMEDIA', 'ANIMATION', 'HCI', 'CC 10', 'CC10', 'PF 10', 'IM 10', 'WS 10', 'IPT', 'IAS', 'SA 10'
+  ];
+
+  return computerKeywords.some(kw => upper.includes(kw));
+}
+
+async function runPerSectionScheduler() {
+  const courseSelect = document.getElementById('ps-course-select');
+  const yearSelect = document.getElementById('ps-year-select');
+  const blockInput = document.getElementById('ps-block-input');
+
+  const courseCode = courseSelect ? courseSelect.value.toUpperCase() : 'BSIT';
+  const yearLevel = yearSelect ? parseInt(yearSelect.value, 10) : 1;
+  const blockSection = blockInput ? blockInput.value.trim() : '1A';
+
+  const rowCbs = document.querySelectorAll('.ps-subject-cb:checked');
+  if (rowCbs.length === 0) {
+    showToast('Please select at least one subject to schedule.', 'danger');
+    return;
+  }
+
+  const subjectsToSchedule = [];
+  let missingTeacher = false;
+
+  rowCbs.forEach(cb => {
+    const subId = cb.value;
+    const sub = db.subjects.find(s => s.id === subId);
+    const teacherSel = document.querySelector(`.ps-teacher-select[data-subject-id="${subId}"]`);
+    const teacherId = teacherSel ? teacherSel.value : '';
+
+    if (!teacherId) {
+      missingTeacher = true;
+    } else if (sub) {
+      subjectsToSchedule.push({ subject: sub, teacherId });
+    }
+  });
+
+  if (missingTeacher) {
+    showToast('Please assign an instructor to all selected subjects before generating.', 'danger');
+    return;
+  }
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `[${new Date().toLocaleTimeString()}] Starting Per-Section Auto-Scheduler for ${courseCode} ${yearLevel}-${blockSection}...<br>`;
+
+  const log = (msg) => {
+    if (consoleEl) {
+      consoleEl.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+  };
+
+  const daysOrder = ['M', 'T', 'W', 'TH', 'F', 'S'];
+
+  // 2-hour standard timeslots
+  const defaultSlots = [
+    { start: '08:00', end: '10:00' },
+    { start: '10:00', end: '12:00' },
+    { start: '13:00', end: '15:00' },
+    { start: '15:00', end: '17:00' },
+    { start: '17:00', end: '19:00' }
+  ];
+
+  let scheduledCount = 0;
+  let failedCount = 0;
+
+  for (const item of subjectsToSchedule) {
+    const subject = item.subject;
+    const instructor = db.instructors.find(t => t.id === item.teacherId);
+    if (!instructor) {
+      log(`<span class="text-danger">Instructor not found for subject ${subject.title_and_code}.</span>`);
+      failedCount++;
+      continue;
+    }
+
+    log(`Scheduling ${subject.title_and_code} for ${courseCode} ${yearLevel}-${blockSection} with Instructor ${instructor.name}...`);
+
+    // Check teacher load limit
+    const currentLoad = calculateTeacherWorkload(instructor.id);
+    const maxLimit = getMaxUnitsForDesignation(instructor.designation);
+
+    if (currentLoad + subject.units > maxLimit + 2) {
+      log(`<span class="text-warning">Skipping ${subject.title_and_code}: Instructor ${instructor.name} load limit reached (${currentLoad}/${maxLimit} units).</span>`);
+      failedCount++;
+      continue;
+    }
+
+    const isComputer = isComputerSubject(subject.title_and_code, courseCode, subject.is_major);
+
+    // Prioritize COMLAB rooms if computer/major subject
+    let sortedRooms = [...db.rooms].sort((a, b) => {
+      const aIsComlab = a.name.toUpperCase().includes('COMLAB');
+      const bIsComlab = b.name.toUpperCase().includes('COMLAB');
+      if (isComputer) {
+        if (aIsComlab && !bIsComlab) return -1;
+        if (!aIsComlab && bIsComlab) return 1;
+      } else {
+        if (!aIsComlab && bIsComlab) return -1;
+        if (aIsComlab && !bIsComlab) return 1;
+      }
+      return 0;
+    });
+
+    let scheduled = false;
+    const isProgramHead = (instructor.designation || '').toUpperCase().includes('PROGRAM HEAD');
+
+    for (const day of daysOrder) {
+      if (scheduled) break;
+      if (isProgramHead && day === 'S') continue;
+
+      for (const slot of defaultSlots) {
+        if (scheduled) break;
+        if (isProgramHead && parseTimeToMinutes(slot.start) >= 960) continue;
+
+        // Check teacher conflict
+        const tConflict = checkTeacherScheduleConflict(instructor.id, day, slot.start, slot.end);
+        if (tConflict) continue;
+
+        // Check section conflict
+        const secConflict = checkSectionScheduleConflict(courseCode, yearLevel, blockSection, day, slot.start, slot.end);
+        if (secConflict) continue;
+
+        for (const rm of sortedRooms) {
+          if (isHighSchoolRoom(rm.name) && !hsRoomTimeAllowed(day, slot.start, slot.end)) continue;
+
+          const rmConflict = checkRoomScheduleConflict(rm.id, day, slot.start, slot.end);
+          if (rmConflict) continue;
+
+          // Create schedule
+          const newSched = {
+            id: uniqueId(),
+            instructor_id: instructor.id,
+            room_id: rm.id,
+            day: day,
+            time_start: slot.start,
+            time_end: slot.end,
+            subject_id: subject.id
+          };
+
+          // Assign block section to subject if needed
+          subject.block_section = blockSection;
+          subject.course = courseCode;
+          subject.year_level = yearLevel;
+
+          db.schedules.push(newSched);
+          scheduled = true;
+          scheduledCount++;
+          log(`<span class="text-success">✔ Scheduled ${subject.title_and_code} on ${day} ${slot.start}-${slot.end} in ${rm.name} (${instructor.name}).</span>`);
+          break;
+        }
+      }
+    }
+
+    if (!scheduled) {
+      log(`<span class="text-danger">✖ Could not find conflict-free slot for ${subject.title_and_code}.</span>`);
+      failedCount++;
+    }
+  }
+
+  saveDatabase();
+  renderAllViews();
+  showToast(`Per-Section Schedule Generation complete! ${scheduledCount} scheduled, ${failedCount} unscheduled.`, scheduledCount > 0 ? 'success' : 'warning');
+}
