@@ -2547,9 +2547,10 @@ function populateFormSelects() {
   const existingList = document.getElementById('existing-subjects-list');
   if (existingList) {
     existingList.innerHTML = '';
-    const uniqueTitles = [...new Set(db.subjects.map(s => s.title_and_code))];
-    uniqueTitles.forEach(title => {
-      existingList.innerHTML += `<option value="${title}">`;
+    // Suggest subjects from both New and Old curriculums
+    db.subjects.forEach(s => {
+      const cLabel = s.curriculum_type ? s.curriculum_type.toUpperCase() + ' Curriculum' : 'NEW Curriculum';
+      existingList.innerHTML += `<option value="${s.title_and_code}">[${cLabel} - ${s.course}] ${s.title_and_code}</option>`;
     });
   }
 
@@ -2562,6 +2563,7 @@ function populateFormSelects() {
   }
 
   renderWaterfallTeachers();
+  loadSectionSubjects();
 }
 
 // Waterfall / Batch Generate Teacher Search, Pagination and State
@@ -4209,6 +4211,188 @@ function bulkDeleteRooms() {
     saveDatabase();
     showToast("Selected rooms deleted successfully!", "danger");
   }
+}
+
+// Per-Section Generator Logic
+function loadSectionSubjects() {
+  const courseEl = document.getElementById('section-course');
+  const yearEl = document.getElementById('section-year');
+  const blockEl = document.getElementById('section-block');
+  const curriculumEl = document.getElementById('section-curriculum');
+  const listEl = document.getElementById('section-subjects-list');
+  const countEl = document.getElementById('section-subject-count');
+
+  if (!courseEl || !yearEl || !listEl) return;
+
+  const course = courseEl.value;
+  const year = parseInt(yearEl.value, 10);
+  const block = blockEl ? blockEl.value : '';
+  const curriculum = curriculumEl ? curriculumEl.value : 'all';
+
+  // Filter subjects matching Course, Year, and Curriculum
+  let matching = db.subjects.filter(s => {
+    if (s.course.toUpperCase() !== course.toUpperCase()) return false;
+    if (parseInt(s.year_level, 10) !== year) return false;
+    if (curriculum !== 'all') {
+      const cType = s.curriculum_type || 'new';
+      if (cType !== curriculum) return false;
+    }
+    return true;
+  });
+
+  if (countEl) countEl.innerText = `${matching.length} Subject${matching.length !== 1 ? 's' : ''} Found`;
+
+  if (matching.length === 0) {
+    listEl.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
+    return;
+  }
+
+  // Teacher dropdown options
+  let teacherOpts = '<option value="">Auto-Assign / Any Teacher</option>';
+  db.instructors.forEach(t => {
+    teacherOpts += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
+  });
+
+  let html = '';
+  matching.forEach(s => {
+    const curBadge = (s.curriculum_type === 'old') ? '<span class="badge bg-warning text-dark">Old</span>' : '<span class="badge bg-primary">New</span>';
+    html += `
+      <tr>
+        <td class="fw-semibold">${s.title_and_code}</td>
+        <td>${curBadge} ${s.is_major ? '<span class="badge bg-info text-dark">Major</span>' : ''}</td>
+        <td class="text-center fw-bold">${s.units}</td>
+        <td class="text-center">${s.lec_hours}/${s.lab_hours}</td>
+        <td>
+          <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
+            ${teacherOpts}
+          </select>
+        </td>
+      </tr>
+    `;
+  });
+
+  listEl.innerHTML = html;
+}
+
+async function runPerSectionScheduler() {
+  const courseEl = document.getElementById('section-course');
+  const yearEl = document.getElementById('section-year');
+  const blockEl = document.getElementById('section-block');
+  const curriculumEl = document.getElementById('section-curriculum');
+
+  if (!courseEl || !yearEl || !blockEl) return;
+
+  const course = courseEl.value;
+  const year = parseInt(yearEl.value, 10);
+  const block = blockEl.value;
+  const curriculum = curriculumEl ? curriculumEl.value : 'new';
+
+  const listEl = document.getElementById('section-subjects-list');
+  const selects = listEl ? listEl.querySelectorAll('.section-instructor-select') : [];
+
+  if (selects.length === 0) {
+    showToast("No subjects to schedule for selected section!", "danger");
+    return;
+  }
+
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+  if (logContainer) logContainer.classList.remove('d-none');
+  if (consoleEl) consoleEl.innerHTML = `Starting Per-Section Auto-Scheduler for <strong>${course} ${year}${block}</strong> (${curriculum.toUpperCase()} Curriculum)...<br>`;
+
+  let scheduledCount = 0;
+  let unscheduledCount = 0;
+
+  for (let sel of selects) {
+    const subId = sel.getAttribute('data-subject-id');
+    const assignedTeacherId = sel.value;
+    const sub = db.subjects.find(s => s.id === subId);
+    if (!sub) continue;
+
+    // Update target block section
+    sub.block_section = block;
+
+    let teachersToTry = [];
+    if (assignedTeacherId) {
+      const teacherObj = db.instructors.find(t => t.id === assignedTeacherId);
+      if (teacherObj) teachersToTry = [teacherObj];
+    } else {
+      teachersToTry = [...db.instructors];
+    }
+
+    if (teachersToTry.length === 0) {
+      consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No instructors available for ${sub.title_and_code}.<br>`;
+      unscheduledCount++;
+      continue;
+    }
+
+    const days = sub.is_major ? ['M', 'T', 'W', 'TH', 'F', 'S'] : ['MWF', 'TTH', 'M', 'T', 'W', 'TH', 'F', 'S'];
+    const timeslots = [
+      { start: '08:00', end: '10:00' },
+      { start: '10:00', end: '12:00' },
+      { start: '13:00', end: '15:00' },
+      { start: '15:00', end: '17:00' },
+      { start: '17:00', end: '19:00' }
+    ];
+
+    let scheduled = false;
+
+    teacherLoop:
+    for (let teacher of teachersToTry) {
+      for (let day of days) {
+        for (let slot of timeslots) {
+          const availableRoom = db.rooms.find(r => {
+            if (sub.is_major && (sub.title_and_code.toLowerCase().includes('computer') || sub.title_and_code.toLowerCase().includes('programming'))) {
+              if (r.name.toUpperCase() !== 'COMLAB') return false;
+            }
+            // Room overlap
+            const roomOverlap = db.schedules.some(sch => sch.room_id === r.id && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end));
+            if (roomOverlap) return false;
+
+            // Teacher overlap
+            const teacherOverlap = db.schedules.some(sch => sch.instructor_id === teacher.id && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end));
+            if (teacherOverlap) return false;
+
+            // Section overlap
+            const sectionOverlap = db.schedules.some(sch => {
+              const schSub = db.subjects.find(s => s.id === sch.subject_id);
+              return schSub && schSub.course === sub.course && schSub.year_level === sub.year_level && schSub.block_section === sub.block_section && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end);
+            });
+            if (sectionOverlap) return false;
+
+            return true;
+          });
+
+          if (availableRoom) {
+            const newSch = {
+              id: 'sch_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+              instructor_id: teacher.id,
+              room_id: availableRoom.id,
+              day: day,
+              time_start: slot.start,
+              time_end: slot.end,
+              subject_id: sub.id
+            };
+            db.schedules.push(newSch);
+            scheduledCount++;
+            scheduled = true;
+            consoleEl.innerHTML += `<span class="text-success">✔ Scheduled:</span> ${sub.title_and_code} (${sub.course} ${year}${block}) with ${teacher.name} in ${availableRoom.name} [${day} ${slot.start}-${slot.end}]<br>`;
+            break teacherLoop;
+          }
+        }
+      }
+    }
+
+    if (!scheduled) {
+      unscheduledCount++;
+      consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
+    }
+  }
+
+  saveDatabase();
+  renderSchedulesList();
+  updateStats();
+  showToast(`Per-Section Scheduling complete! Scheduled ${scheduledCount}/${selects.length} subjects.`);
 }
 
 // Initialize on document load

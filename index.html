@@ -616,26 +616,86 @@
 
                 <!-- PANE 3: PER-SECTION GENERATOR -->
                 <div class="tab-pane fade" id="pane-mode-section" role="tabpanel">
-                  <p class="text-muted small mb-4">Automatically compile conflict-free schedules section by section.</p>
+                  <p class="text-muted small mb-3">Select course, year, section, and curriculum to automatically display all subjects for the section and assign instructors.</p>
                   <form id="perSectionForm" onsubmit="event.preventDefault();">
-                    <div class="row g-3">
-                      <div class="col-md-6">
-                        <label class="form-label fw-semibold">Target Section <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" placeholder="e.g. BSIT 1A">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label fw-semibold">Preferred Timeslot Block</label>
-                        <select class="form-select">
-                          <option value="morning">Morning (8:00 AM - 12:00 PM)</option>
-                          <option value="afternoon">Afternoon (1:00 PM - 5:00 PM)</option>
-                          <option value="evening">Evening (4:00 PM - 7:00 PM)</option>
+                    <div class="row g-3 mb-3">
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Course / Dept <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-course" onchange="loadSectionSubjects()">
+                          <option value="BSIT">BSIT</option>
+                          <option value="BEED">BEED</option>
+                          <option value="BSED">BSED</option>
+                          <option value="BSCA">BSCA</option>
+                          <option value="BSCRIM">BSCRIM</option>
+                          <option value="BSHM">BSHM</option>
+                          <option value="BSBA-FM">BSBA-FM</option>
+                          <option value="BSBA-HRDM">BSBA-HRDM</option>
+                          <option value="BSBA-MM">BSBA-MM</option>
+                          <option value="BSCS">BSCS</option>
                         </select>
                       </div>
-                      <div class="col-12 d-flex justify-content-end mt-4">
-                        <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
-                          <i class="bi bi-lightning-fill"></i> Generate Section Schedule
-                        </button>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-year" onchange="loadSectionSubjects()">
+                          <option value="1">1st Year</option>
+                          <option value="2">2nd Year</option>
+                          <option value="3">3rd Year</option>
+                          <option value="4">4th Year</option>
+                        </select>
                       </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Section / Block <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-block" onchange="loadSectionSubjects()">
+                          <option value="1A">1A</option>
+                          <option value="1B">1B</option>
+                          <option value="2A">2A</option>
+                          <option value="2B">2B</option>
+                          <option value="3A">3A</option>
+                          <option value="3B">3B</option>
+                          <option value="4A">4A</option>
+                          <option value="4B">4B</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Curriculum <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-curriculum" onchange="loadSectionSubjects()">
+                          <option value="new">New Curriculum</option>
+                          <option value="old">Old Curriculum</option>
+                          <option value="all">All Curriculums</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Subjects & Instructor Mapping Table Container -->
+                    <div id="section-subjects-wrapper" class="card border mb-3">
+                      <div class="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark small"><i class="bi bi-journal-bookmark-fill me-1 text-primary"></i>Matching Subjects for Selected Section</span>
+                        <span class="badge bg-secondary" id="section-subject-count">0 Subjects Found</span>
+                      </div>
+                      <div class="card-body p-0">
+                        <div class="table-responsive">
+                          <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light fs-7 fw-bold">
+                              <tr>
+                                <th>Subject Code & Title</th>
+                                <th>Type</th>
+                                <th class="text-center">Units</th>
+                                <th class="text-center">Lec/Lab</th>
+                                <th style="min-width: 250px;">Assigned Instructor</th>
+                              </tr>
+                            </thead>
+                            <tbody id="section-subjects-list">
+                              <!-- Dynamically populated -->
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                      <button type="button" class="btn btn-primary" onclick="runPerSectionScheduler()">
+                        <i class="bi bi-lightning-fill me-1"></i> Generate Section Schedule
+                      </button>
                     </div>
                   </form>
                 </div>
