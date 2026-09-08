@@ -1,3 +1,14 @@
+
+function getFilteredStandardDays(selectedSetting) {
+  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  if (!selectedSetting || selectedSetting === 'all') return allDays;
+  const count = parseInt(selectedSetting, 10);
+  if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
+  if (count === 2) return ["MT", "TTH"];
+  if (count === 3) return ["MWF"];
+  return allDays;
+}
+
 // Southwestern Institute of Business and Technology (SIBT) Scheduling Logic Engine
 
 // Initialize Database structure
@@ -3473,7 +3484,8 @@ function runAutoScheduler() {
     { start: "18:00", end: "19:00", dur: 1 }
   ];
 
-  const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const autoDaysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(autoDaysSetting);
 
   let scheduledCount = 0;
   let unscheduledCount = 0;
@@ -3777,7 +3789,8 @@ async function runWaterfallScheduler() {
     { start: "18:00", end: "19:00", dur: 1 }
   ];
 
-  const standardDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const batchDaysSetting = document.getElementById("batch-days-count") ? document.getElementById("batch-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(batchDaysSetting);
   let successfullyScheduled = 0;
 
   for (let subject of subjectsToSchedule) {

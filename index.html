@@ -405,7 +405,18 @@
                 <p class="text-muted">This process will run the scheduling engine on all subjects and classes currently defined in the system. It automatically schedules them conflict-free.</p>
               </div>
 
-              <div class="row g-2 justify-content-center mb-4">
+              <div class="row g-3 justify-content-center align-items-center mb-4">
+                <div class="col-auto">
+                  <div class="d-flex align-items-center">
+                    <label for="auto-days-count" class="form-label fw-semibold me-2 mb-0"><i class="bi bi-calendar3 me-1"></i>Days:</label>
+                    <select class="form-select form-select-sm" id="auto-days-count" style="width: 140px;">
+                      <option value="all" selected>All Days</option>
+                      <option value="1">1 Day (1-day/wk)</option>
+                      <option value="2">2 Days (2-day/wk)</option>
+                      <option value="3">3 Days (3-day/wk)</option>
+                    </select>
+                  </div>
+                </div>
                 <div class="col-auto">
                   <div class="form-check form-switch text-start">
                     <input class="form-check-input" type="checkbox" id="overwriteSchedules" checked>
@@ -534,6 +545,15 @@
                         </select>
                       </div>
                       <div class="col-md-4">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week (e.g. M, T, W, S)</option>
+                          <option value="2">2 Days per week (e.g. MT, TTH)</option>
+                          <option value="3">3 Days per week (e.g. MWF)</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
                         <label class="form-label fw-semibold">Lecture</label>
                         <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
                       </div>
@@ -605,6 +625,15 @@
                           <option value="">Choose teacher...</option>
                         </select>
                       </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Number of Days</label>
+                        <select class="form-select" id="single-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week</option>
+                          <option value="2">2 Days per week</option>
+                          <option value="3">3 Days per week</option>
+                        </select>
+                      </div>
                       <div class="col-12 d-flex justify-content-end mt-4">
                         <button type="button" class="btn btn-primary" onclick="runWaterfallScheduler()">
                           <i class="bi bi-lightning-fill"></i> Generate Single Teacher Schedule
@@ -662,6 +691,15 @@
                           <option value="new">New Curriculum</option>
                           <option value="old">Old Curriculum</option>
                           <option value="all">All Curriculums</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week</option>
+                          <option value="2">2 Days per week</option>
+                          <option value="3">3 Days per week</option>
                         </select>
                       </div>
                     </div>
