@@ -511,160 +511,55 @@ const demoData = {
     { id: "r24", name: "TBL Room", room_type: "Both" }
   ],
   subjects: [
-    {
-      id: "s1",
-      title_and_code: "Computer Programming 1 CC102",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s2",
-      title_and_code: "SYSTEM ADMIN AND MAINTENANCE SA 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s3",
-      title_and_code: "Social and Professional Issues SP 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3",
-      units: 3,
-      lec_hours: 3,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s4",
-      title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s5",
-      title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s6",
-      title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s7",
-      title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 3,
-      lec_hours: 2,
-      lab_hours: 2,
-      is_major: 1
-    },
-    {
-      id: "s8",
-      title_and_code: "National Service Training Program 1 NSTP 1",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 3,
-      lec_hours: 3,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s9",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s10",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 1,
-      block_section: "1B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s11",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s12",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 2,
-      block_section: "2B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s13",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3A",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    },
-    {
-      id: "s14",
-      title_and_code: "Physical Education PE 101",
-      course: "BSIT",
-      year_level: 3,
-      block_section: "3B",
-      units: 2,
-      lec_hours: 2,
-      lab_hours: 0,
-      is_major: 0
-    }
+    // --- BSIT NEW CURRICULUM ---
+    { id: "s1", title_and_code: "Computer Programming 1 CC102", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s1b", title_and_code: "Introduction to Computing CC101", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "s2", title_and_code: "SYSTEM ADMIN AND MAINTENANCE SA 101", course: "BSIT", year_level: 3, block_section: "3", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s3", title_and_code: "Social and Professional Issues SP 101", course: "BSIT", year_level: 3, block_section: "3", units: 3, lec_hours: 3, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s4", title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101", course: "BSIT", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s5", title_and_code: "FUNDAMENTALS OF DATABASE SYSTEM IM 101", course: "BSIT", year_level: 2, block_section: "2B", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s6", title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101", course: "BSIT", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s7", title_and_code: "OBJECT ORIENTED PROGRAMMING PF 101", course: "BSIT", year_level: 2, block_section: "2B", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s8", title_and_code: "National Service Training Program 1 NSTP 1", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s9", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 1, block_section: "1A", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s10", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 1, block_section: "1B", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s11", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 2, block_section: "2A", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s12", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 2, block_section: "2B", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s13", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 3, block_section: "3A", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s14", title_and_code: "Physical Education PE 101", course: "BSIT", year_level: 3, block_section: "3B", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "new" },
+    { id: "s15", title_and_code: "Information Assurance & Security IAS 101", course: "BSIT", year_level: 3, block_section: "3A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s16", title_and_code: "Web Systems and Technologies WS 101", course: "BSIT", year_level: 3, block_section: "3A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "s17", title_and_code: "Capstone Project 1 CAP 101", course: "BSIT", year_level: 4, block_section: "4A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "s18", title_and_code: "Capstone Project 2 CAP 102", course: "BSIT", year_level: 4, block_section: "4A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+
+    // --- BSIT OLD CURRICULUM ---
+    { id: "so1", title_and_code: "Basic Computer Concepts & Logic Formulation IT 101", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so2", title_and_code: "Computer Programming C++ IT 102", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so3", title_and_code: "Visual Basic Programming IT 201", course: "BSIT", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so4", title_and_code: "Database Management System FoxPro/SQL IT 202", course: "BSIT", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so5", title_and_code: "Operating Systems & Utility Software IT 203", course: "BSIT", year_level: 2, block_section: "2A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "old" },
+    { id: "so6", title_and_code: "Computer Hardware & Networking Fundamentals IT 301", course: "BSIT", year_level: 3, block_section: "3A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so7", title_and_code: "Systems Analysis and Design SAD IT 302", course: "BSIT", year_level: 3, block_section: "3A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "old" },
+    { id: "so8", title_and_code: "Web Page Development HTML/CSS IT 303", course: "BSIT", year_level: 3, block_section: "3A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "old" },
+    { id: "so9", title_and_code: "Software Engineering & IT Management IT 401", course: "BSIT", year_level: 4, block_section: "4A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "old" },
+    { id: "so10", title_and_code: "IT Practicum / OJT 480 Hours IT 402", course: "BSIT", year_level: 4, block_section: "4A", units: 6, lec_hours: 0, lab_hours: 6, is_major: 1, curriculum_type: "old" },
+    { id: "so11", title_and_code: "Old Physical Education 1 Physical Fitness PE 1", course: "BSIT", year_level: 1, block_section: "1A", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "old" },
+    { id: "so12", title_and_code: "Old Physical Education 2 Rhythmic Activities PE 2", course: "BSIT", year_level: 1, block_section: "1A", units: 2, lec_hours: 2, lab_hours: 0, is_major: 0, curriculum_type: "old" },
+    { id: "so13", title_and_code: "Old NSTP 1 Civic Welfare Training NSTP 1", course: "BSIT", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 0, curriculum_type: "old" },
+
+    // --- OTHER SIBT PROGRAMS ---
+    { id: "scs1", title_and_code: "Discrete Mathematics CS 101", course: "BSCS", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "scs2", title_and_code: "Data Structures & Algorithms CS 102", course: "BSCS", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "scs3", title_and_code: "Artificial Intelligence CS 201", course: "BSCS", year_level: 3, block_section: "3A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "sba1", title_and_code: "Financial Management BA 101", course: "BSBA", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "sba2", title_and_code: "Principles of Marketing BA 102", course: "BSBA", year_level: 2, block_section: "2A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "shm1", title_and_code: "Food and Beverage Service HM 101", course: "BSHM", year_level: 1, block_section: "1A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "shm2", title_and_code: "Front Office Operations HM 102", course: "BSHM", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "stm1", title_and_code: "Principles of Tourism TM 101", course: "BSTM", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "scrim1", title_and_code: "Introduction to Criminology CRIM 101", course: "BSCRIM", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "scrim2", title_and_code: "Forensic Photography CRIM 102", course: "BSCRIM", year_level: 2, block_section: "2A", units: 3, lec_hours: 2, lab_hours: 2, is_major: 1, curriculum_type: "new" },
+    { id: "seed1", title_and_code: "Child & Adolescent Development EED 101", course: "BEED", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" },
+    { id: "sed1", title_and_code: "Principles of Teaching SED 101", course: "BSED", year_level: 1, block_section: "1A", units: 3, lec_hours: 3, lab_hours: 0, is_major: 1, curriculum_type: "new" }
   ],
   schedules: [
     {
@@ -1707,6 +1602,7 @@ function renderSubjectsTable() {
         <td class="fw-bold text-dark">${s.title_and_code}</td>
         <td>${s.course}</td>
         <td>${typeBadge}</td>
+        <td><span class="badge ${s.curriculum_type === 'old' ? 'bg-warning text-dark' : 'bg-info text-dark'}">${s.curriculum_type === 'old' ? 'Old' : 'New'}</span></td>
         <td>${s.year_level} Year</td>
         <td>Block ${s.block_section || '1'}</td>
         <td class="text-center fw-bold text-primary">${s.units}</td>
