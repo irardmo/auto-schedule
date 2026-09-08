@@ -2460,14 +2460,43 @@ function uniqueId() {
   return 'id_' + Math.random().toString(36).substr(2, 9);
 }
 
-// TOAST NOTIFICATIONS
+// GLOBAL ALERTS & TOAST NOTIFICATIONS
+function showGlobalAlert(title, message, type = "success") {
+  const container = document.getElementById('globalAlerts');
+  if (!container) return;
+
+  const alertId = 'alert_' + Date.now();
+  const alertBg = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
+  const alertIcon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+
+  container.innerHTML = `
+    <div id="${alertId}" class="alert ${alertBg} alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+      <i class="bi ${alertIcon} fs-4 me-3"></i>
+      <div>
+        <strong class="d-block mb-1">${title}</strong>
+        <span>${message}</span>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `;
+
+  // Auto dismiss after 10 seconds
+  setTimeout(() => {
+    const el = document.getElementById(alertId);
+    if (el) {
+      const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+      if (bsAlert) bsAlert.close();
+    }
+  }, 10000);
+}
+
 function showToast(message, type = "success") {
   const toastEl = document.getElementById('actionToast');
   const msgEl = document.getElementById('toastMsg');
   if (!toastEl || !msgEl) return;
 
   msgEl.innerText = message;
-  toastEl.className = `toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : 'bg-danger'}`;
+  toastEl.className = `toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : (type === 'warning' ? 'bg-warning text-dark' : 'bg-danger')}`;
   
   const toast = new bootstrap.Toast(toastEl);
   toast.show();
@@ -3640,7 +3669,15 @@ function runAutoScheduler() {
   }
 
   saveDatabase();
-  showToast(`Auto-Scheduler finished. ${scheduledCount} successfully scheduled, ${unscheduledCount} failed.`);
+
+  const isSuccess = unscheduledCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Auto-Scheduler Engine Completed Successfully!' : 'Auto-Scheduler Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${db.subjects.length} subjects.` +
+    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled conflict-free. Check the execution logs for details.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // --- WATERFALL SUBJECT SHARING ENGINE ---
@@ -3896,7 +3933,16 @@ async function runWaterfallScheduler() {
   }
 
   await saveDatabase();
-  showToast(`Waterfall Allocation complete. Successfully scheduled ${successfullyScheduled}/${subjectsToSchedule.length} sections!`);
+
+  const failedCount = subjectsToSchedule.length - successfullyScheduled;
+  const isSuccess = failedCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Batch Generator Completed Successfully!' : 'Batch Generator Finished with Conflicts';
+  const alertMsg = `Successfully scheduled ${successfullyScheduled} out of ${subjectsToSchedule.length} section(s).` +
+    (!isSuccess ? ` ${failedCount} section(s) encountered conflicts (teacher load/availability, room, or section overlap). See execution logs below for conflict breakdown.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // --- PRINT LAYOUT GENERATOR (Matching the Image) ---
@@ -4350,35 +4396,40 @@ async function runPerSectionScheduler() {
 
     let scheduled = false;
 
+    const sectionConflicts = new Set();
+
     teacherLoop:
     for (let teacher of teachersToTry) {
       for (let day of days) {
         for (let slot of timeslots) {
+          const candidate = {
+            id: 'temp_' + uniqueId(),
+            instructor_id: teacher.id,
+            room_id: null,
+            day: day,
+            time_start: slot.start,
+            time_end: slot.end,
+            subject_id: sub.id
+          };
+
           const availableRoom = db.rooms.find(r => {
             if (sub.is_major && (sub.title_and_code.toLowerCase().includes('computer') || sub.title_and_code.toLowerCase().includes('programming'))) {
               if (r.name.toUpperCase() !== 'COMLAB') return false;
             }
-            // Room overlap
-            const roomOverlap = db.schedules.some(sch => sch.room_id === r.id && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end));
-            if (roomOverlap) return false;
 
-            // Teacher overlap
-            const teacherOverlap = db.schedules.some(sch => sch.instructor_id === teacher.id && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end));
-            if (teacherOverlap) return false;
-
-            // Section overlap
-            const sectionOverlap = db.schedules.some(sch => {
-              const schSub = db.subjects.find(s => s.id === sch.subject_id);
-              return schSub && schSub.course === sub.course && schSub.year_level === sub.year_level && schSub.block_section === sub.block_section && sch.day === day && timesOverlap(sch.time_start, sch.time_end, slot.start, slot.end);
-            });
-            if (sectionOverlap) return false;
-
-            return true;
+            candidate.room_id = r.id;
+            const validation = validateSchedule(candidate);
+            if (validation.valid) {
+              return true;
+            } else {
+              validation.errors.forEach(err => sectionConflicts.add(err));
+              return false;
+            }
           });
 
           if (availableRoom) {
             const newSch = {
-              id: 'sch_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+              id: uniqueId(),
               instructor_id: teacher.id,
               room_id: availableRoom.id,
               day: day,
@@ -4399,13 +4450,27 @@ async function runPerSectionScheduler() {
     if (!scheduled) {
       unscheduledCount++;
       consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
+      if (sectionConflicts.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(sectionConflicts).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
     }
   }
 
   saveDatabase();
   renderSchedulesList();
   updateStats();
-  showToast(`Per-Section Scheduling complete! Scheduled ${scheduledCount}/${selects.length} subjects.`);
+
+  const isSuccess = unscheduledCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Per-Section Scheduling Successful!' : 'Per-Section Scheduling Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${selects.length} subjects for section ${course} ${year}${block}.` +
+    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled due to teacher, room, time, or section conflicts.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
 // Initialize on document load
