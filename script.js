@@ -1228,6 +1228,10 @@ function switchTab(tabName) {
   } else if (tabName === 'manual') {
     populateFormSelects();
     checkRealtimeConflict();
+  } else if (tabName === 'manage') {
+    renderTeachersTable();
+    renderSubjectsTable();
+    renderRoomsTable();
   }
 }
 
@@ -1242,7 +1246,9 @@ function switchManageSubTab(subTab) {
   document.querySelectorAll('#manageSubTabs .list-group-item').forEach(btn => {
     btn.classList.remove('active');
   });
-  event.target.classList.add('active');
+  if (typeof event !== 'undefined' && event && event.target) {
+    event.target.classList.add('active');
+  }
 }
 
 // Generate unique ID
@@ -1671,8 +1677,16 @@ function renderSubjectsTable() {
   if (checkAll) checkAll.checked = false;
   updateBulkDeleteUI('subjects');
 
+  const filterCurrElem = document.getElementById('filter-manage-curriculum');
+  const currFilter = filterCurrElem ? filterCurrElem.value : 'all';
+
+  let filteredSubjects = db.subjects || [];
+  if (currFilter && currFilter !== 'all') {
+    filteredSubjects = filteredSubjects.filter(s => (s.curriculum_type || 'new') === currFilter);
+  }
+
   subjectsCurrentPage = renderPaginationControls(
-    db.subjects.length,
+    filteredSubjects.length,
     subjectsCurrentPage,
     GENERAL_PAGE_SIZE,
     'subjects-pagination',
@@ -1680,7 +1694,7 @@ function renderSubjectsTable() {
     'changeSubjectsPage'
   );
   const startIdx = (subjectsCurrentPage - 1) * GENERAL_PAGE_SIZE;
-  const pagedItems = db.subjects.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+  const pagedItems = filteredSubjects.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
   pagedItems.forEach(s => {
     const typeBadge = s.is_major 
@@ -1694,7 +1708,7 @@ function renderSubjectsTable() {
         <td>${s.course}</td>
         <td>${typeBadge}</td>
         <td>${s.year_level} Year</td>
-        <td>Block ${s.block_section}</td>
+        <td>Block ${s.block_section || '1'}</td>
         <td class="text-center fw-bold text-primary">${s.units}</td>
         <td class="text-center">${s.lec_hours} / ${s.lab_hours}</td>
         <td class="text-end">
