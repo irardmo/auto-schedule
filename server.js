@@ -32,7 +32,7 @@ const server = http.createServer((req, res) => {
   let filePath = req.url === '/' ? 'index.html' : req.url.substring(1);
   // Remove query string or hash if present
   filePath = filePath.split('?')[0].split('#')[0];
-
+  
   const resolvedPath = path.resolve(__dirname, filePath);
 
   // Security check to prevent directory traversal
