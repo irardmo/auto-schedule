@@ -4323,7 +4323,7 @@ function loadSectionSubjects() {
   }
 
   // Teacher dropdown options
-  let teacherOpts = '<option value="">Auto-Assign / Any Teacher</option>';
+  let teacherOpts = '<option value="" disabled selected>Select Instructor...</option>';
   db.instructors.forEach(t => {
     teacherOpts += `<option value="${t.id}">${t.name} (${t.designation})</option>`;
   });
@@ -4521,6 +4521,19 @@ async function runPerSectionScheduler() {
 
   if (selects.length === 0) {
     showToast("No subjects to schedule for selected section!", "danger");
+    return;
+  }
+
+  // Ensure an instructor is selected for every subject
+  let missingInstructor = false;
+  selects.forEach(sel => {
+    if (!sel.value) {
+      missingInstructor = true;
+    }
+  });
+
+  if (missingInstructor) {
+    showToast("Please select an instructor for all subjects in the section before generating!", "danger");
     return;
   }
 
