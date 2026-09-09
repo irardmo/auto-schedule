@@ -9511,7 +9511,7 @@ function loadSectionSubjects() {
   if (countEl) countEl.innerText = `${matching.length} Subject${matching.length !== 1 ? 's' : ''} Found`;
 
   if (matching.length === 0) {
-    listEl.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
+    listEl.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
     return;
   }
 
@@ -9524,29 +9524,12 @@ function loadSectionSubjects() {
   let html = '';
   matching.forEach(s => {
     const curBadge = (s.curriculum_type === 'old') ? '<span class="badge bg-warning text-dark">Old</span>' : '<span class="badge bg-primary">New</span>';
-    const defaultHours = s.lab_hours > 0 ? "3" : (s.lec_hours ? String(s.lec_hours) : "1.5");
     html += `
       <tr>
         <td class="fw-semibold">${s.title_and_code}</td>
         <td>${curBadge} ${s.is_major ? '<span class="badge bg-info text-dark">Major</span>' : ''}</td>
         <td class="text-center fw-bold">${s.units}</td>
         <td class="text-center">${s.lec_hours}/${s.lab_hours}</td>
-        <td>
-          <select class="form-select form-select-sm section-hours-select" data-subject-id="${s.id}">
-            <option value="1" ${defaultHours === "1" ? "selected" : ""}>1</option>
-            <option value="1.5" ${defaultHours === "1.5" ? "selected" : ""}>1.5</option>
-            <option value="2" ${defaultHours === "2" ? "selected" : ""}>2</option>
-            <option value="3" ${defaultHours === "3" ? "selected" : ""}>3</option>
-          </select>
-        </td>
-        <td>
-          <select class="form-select form-select-sm section-days-select" data-subject-id="${s.id}">
-            <option value="all" selected>All Days</option>
-            <option value="1">1 Day / wk</option>
-            <option value="2">2 Days / wk</option>
-            <option value="3">3 Days / wk</option>
-          </select>
-        </td>
         <td>
           <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
             ${teacherOpts}
@@ -9759,6 +9742,8 @@ async function runPerSectionScheduler() {
   const year = parseInt(yearEl.value, 10);
   const block = blockEl.value;
   const curriculum = curriculumEl ? curriculumEl.value : 'new';
+  const sectionDaysSetting = document.getElementById('section-days-count') ? document.getElementById('section-days-count').value : 'all';
+  const sectionHoursSetting = document.getElementById('section-hours') ? document.getElementById('section-hours').value : 'auto';
 
   const listEl = document.getElementById('section-subjects-list');
   const selects = listEl ? listEl.querySelectorAll('.section-instructor-select') : [];
@@ -9793,14 +9778,6 @@ async function runPerSectionScheduler() {
     const sub = db.subjects.find(s => s.id === subId);
     if (!sub) continue;
 
-    // Get number of days setting specific to this subject row
-    const daysSelect = listEl ? listEl.querySelector(`.section-days-select[data-subject-id="${subId}"]`) : null;
-    const subjectDaysSetting = daysSelect ? daysSelect.value : 'all';
-
-    // Get hours duration setting specific to this subject row
-    const hoursSelect = listEl ? listEl.querySelector(`.section-hours-select[data-subject-id="${subId}"]`) : null;
-    const rowHours = hoursSelect ? parseFloat(hoursSelect.value) : null;
-
     // Update target block section
     sub.block_section = block;
 
@@ -9818,9 +9795,11 @@ async function runPerSectionScheduler() {
       continue;
     }
 
-    const days = getFilteredStandardDays(subjectDaysSetting);
+    const days = getFilteredStandardDays(sectionDaysSetting);
 
-    const targetDuration = rowHours || (sub.lab_hours > 0 ? 3 : (parseFloat(sub.lec_hours) || 1.5));
+    const targetDuration = (sectionHoursSetting !== 'auto' && !isNaN(parseFloat(sectionHoursSetting)))
+      ? parseFloat(sectionHoursSetting)
+      : (sub.lab_hours > 0 ? 3 : (parseFloat(sub.lec_hours) || 1.5));
     const standardTimeSlots = [
       // 3 Hour blocks
       { start: "07:00", end: "10:00", dur: 3 },
