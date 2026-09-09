@@ -38,13 +38,12 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "title_and_code", "course", "year_level", "block_section", "units", "lec_hours", "lab_hours", "is_major"],
+        "required": ["id", "title_and_code", "course", "year_level", "units", "lec_hours", "lab_hours", "is_major"],
         "properties": {
           "id": { "type": "string" },
           "title_and_code": { "type": "string" },
           "course": { "type": "string" },
           "year_level": { "type": "integer", "minimum": 1, "maximum": 4 },
-          "block_section": { "type": "string" },
           "units": { "type": "integer" },
           "lec_hours": { "type": "integer" },
           "lab_hours": { "type": "integer" },

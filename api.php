@@ -49,7 +49,6 @@ try {
         title_and_code VARCHAR(255) NOT NULL,
         course VARCHAR(100) NOT NULL,
         year_level INT NOT NULL,
-        block_section VARCHAR(50) NOT NULL,
         units INT NOT NULL,
         lec_hours INT NOT NULL DEFAULT 0,
         lab_hours INT NOT NULL DEFAULT 0,
@@ -123,11 +122,11 @@ switch ($action) {
                 }
 
                 if (isset($data['subjects']) && is_array($data['subjects'])) {
-                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, block_section, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO subjects (id, title_and_code, course, year_level, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['subjects'] as $sub) {
                         $stmt->execute([
                             $sub['id'], $sub['title_and_code'], $sub['course'], 
-                            $sub['year_level'], $sub['block_section'], 
+                            $sub['year_level'],
                             $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
                             $sub['is_major'] ?? 0,
                             $sub['curriculum_type'] ?? 'new'
