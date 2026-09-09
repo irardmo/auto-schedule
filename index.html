@@ -552,11 +552,20 @@
                         <label class="form-label fw-semibold">Lab</label>
                         <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
                       </div>
-                      <div class="col-md-12">
+                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Preferred Room (Optional)</label>
                         <select class="form-select" id="waterfall-room">
                           <option value="">Any available room</option>
                           <!-- Filled dynamically -->
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week</option>
+                          <option value="2">2 Days per week</option>
+                          <option value="3">3 Days per week</option>
                         </select>
                       </div>
                       <div class="col-12">
@@ -614,6 +623,15 @@
                         <label class="form-label fw-semibold">Select Instructor <span class="text-danger">*</span></label>
                         <select class="form-select" id="single-mode-teacher" required>
                           <option value="">Choose teacher...</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
+                        <select class="form-select" id="single-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week</option>
+                          <option value="2">2 Days per week</option>
+                          <option value="3">3 Days per week</option>
                         </select>
                       </div>
                       <div class="col-12 d-flex justify-content-end mt-4">

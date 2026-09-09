@@ -8918,13 +8918,19 @@ function loadSectionSubjects() {
   const block = blockEl ? blockEl.value : '';
   const curriculum = curriculumEl ? curriculumEl.value : 'all';
 
+  const normCourse = (course || '').trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
   // Filter subjects matching Course, Year, and Curriculum
   let matching = db.subjects.filter(s => {
-    if (s.course.toUpperCase() !== course.toUpperCase()) return false;
-    if (parseInt(s.year_level, 10) !== year) return false;
+    const sCourse = (s.course || '').trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (sCourse !== normCourse) return false;
+
+    const sYear = parseInt(String(s.year_level || '').replace(/\D/g, ''), 10) || 1;
+    if (sYear !== year) return false;
+
     if (curriculum !== 'all') {
-      const cType = s.curriculum_type || 'new';
-      if (cType !== curriculum) return false;
+      const cType = (s.curriculum_type || 'new').toLowerCase();
+      if (cType !== curriculum.toLowerCase()) return false;
     }
     return true;
   });
@@ -9278,6 +9284,13 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   renderAllViews();
   
+  // Tab switch listener for Per-Section tab
+  const secTab = document.getElementById('tab-mode-section');
+  if (secTab) {
+    secTab.addEventListener('shown.bs.tab', loadSectionSubjects);
+    secTab.addEventListener('click', loadSectionSubjects);
+  }
+
   // Connect realtime end time calculation
   const startEl = document.getElementById('input-time-start');
   if (startEl) {
