@@ -663,7 +663,7 @@
                           <option value="BSCS">BSCS</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
                         <select class="form-select" id="section-year" onchange="loadSectionSubjects()">
                           <option value="1">1st Year</option>
@@ -672,7 +672,15 @@
                           <option value="4">4th Year</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
+                        <label class="form-label fw-semibold">Semester <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-semester" onchange="loadSectionSubjects()">
+                          <option value="1" selected>1st Semester</option>
+                          <option value="2">2nd Semester</option>
+                          <option value="all">All Semesters</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
                         <label class="form-label fw-semibold">Section / Block <span class="text-danger">*</span></label>
                         <select class="form-select" id="section-block" onchange="loadSectionSubjects()">
                           <option value="1A">1A</option>

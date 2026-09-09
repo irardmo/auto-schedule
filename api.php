@@ -65,6 +65,7 @@ try {
             title_and_code VARCHAR(255) NOT NULL,
             course VARCHAR(100) NOT NULL,
             year_level INT NOT NULL,
+            semester INT NOT NULL DEFAULT 1,
             units INT NOT NULL,
             lec_hours INT NOT NULL DEFAULT 0,
             lab_hours INT NOT NULL DEFAULT 0,
@@ -163,10 +164,10 @@ switch ($action) {
                         if (!in_array($targetTbl, $courseTables)) {
                             $targetTbl = "bsit_subject_new";
                         }
-                        $stmt = $conn->prepare("INSERT INTO {$targetTbl} (id, title_and_code, course, year_level, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt = $conn->prepare("INSERT INTO {$targetTbl} (id, title_and_code, course, year_level, semester, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                         $stmt->execute([
                             $sub['id'], $sub['title_and_code'], $sub['course'], 
-                            $sub['year_level'],
+                            $sub['year_level'], $sub['semester'] ?? 1,
                             $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
                             $sub['is_major'] ?? 0,
                             $sub['curriculum_type'] ?? 'new'
