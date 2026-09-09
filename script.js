@@ -9511,7 +9511,7 @@ function loadSectionSubjects() {
   if (countEl) countEl.innerText = `${matching.length} Subject${matching.length !== 1 ? 's' : ''} Found`;
 
   if (matching.length === 0) {
-    listEl.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
+    listEl.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No matching subjects found for ${course} Year ${year} (${curriculum.toUpperCase()} Curriculum). Add subjects in Manage Data if needed.</td></tr>`;
     return;
   }
 
@@ -9530,6 +9530,14 @@ function loadSectionSubjects() {
         <td>${curBadge} ${s.is_major ? '<span class="badge bg-info text-dark">Major</span>' : ''}</td>
         <td class="text-center fw-bold">${s.units}</td>
         <td class="text-center">${s.lec_hours}/${s.lab_hours}</td>
+        <td>
+          <select class="form-select form-select-sm section-days-select" data-subject-id="${s.id}">
+            <option value="all" selected>All Days</option>
+            <option value="1">1 Day / wk</option>
+            <option value="2">2 Days / wk</option>
+            <option value="3">3 Days / wk</option>
+          </select>
+        </td>
         <td>
           <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
             ${teacherOpts}
@@ -9707,7 +9715,6 @@ async function runPerSectionScheduler() {
   const year = parseInt(yearEl.value, 10);
   const block = blockEl.value;
   const curriculum = curriculumEl ? curriculumEl.value : 'new';
-  const sectionDaysSetting = document.getElementById("section-days-count") ? document.getElementById("section-days-count").value : "all";
 
   const listEl = document.getElementById('section-subjects-list');
   const selects = listEl ? listEl.querySelectorAll('.section-instructor-select') : [];
@@ -9742,6 +9749,10 @@ async function runPerSectionScheduler() {
     const sub = db.subjects.find(s => s.id === subId);
     if (!sub) continue;
 
+    // Get number of days setting specific to this subject row
+    const daysSelect = listEl ? listEl.querySelector(`.section-days-select[data-subject-id="${subId}"]`) : null;
+    const subjectDaysSetting = daysSelect ? daysSelect.value : 'all';
+
     // Update target block section
     sub.block_section = block;
 
@@ -9759,7 +9770,7 @@ async function runPerSectionScheduler() {
       continue;
     }
 
-    const days = getFilteredStandardDays(sectionDaysSetting);
+    const days = getFilteredStandardDays(subjectDaysSetting);
     const timeslots = [
       { start: '07:00', end: '09:00' },
       { start: '08:00', end: '10:00' },
