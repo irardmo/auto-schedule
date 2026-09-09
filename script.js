@@ -9022,8 +9022,8 @@ async function runWaterfallScheduler() {
     { start: "18:00", end: "19:00", dur: 1 }
   ];
 
-  const batchDaysSetting = document.getElementById("batch-days-count") ? document.getElementById("batch-days-count").value : "all";
-  const standardDays = getFilteredStandardDays(batchDaysSetting);
+  const autoDaysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(autoDaysSetting);
   let successfullyScheduled = 0;
 
   for (let subject of subjectsToSchedule) {
@@ -9540,14 +9540,6 @@ function loadSectionSubjects() {
           </select>
         </td>
         <td>
-          <select class="form-select form-select-sm section-days-select" data-subject-id="${s.id}">
-            <option value="all" selected>All Days</option>
-            <option value="1">1 Day / wk</option>
-            <option value="2">2 Days / wk</option>
-            <option value="3">3 Days / wk</option>
-          </select>
-        </td>
-        <td>
           <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
             ${teacherOpts}
           </select>
@@ -9566,7 +9558,7 @@ async function runSingleTeacherScheduler() {
   const yearLevel = parseInt(document.getElementById('single-year').value, 10) || 1;
   const sectionsCount = parseInt(document.getElementById('single-sections').value, 10) || 3;
   const teacherId = document.getElementById('single-mode-teacher').value;
-  const daysSetting = document.getElementById('single-days-count') ? document.getElementById('single-days-count').value : "all";
+  const daysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
 
   const logContainer = document.getElementById('autoSchedulerResults');
   const consoleEl = document.getElementById('schedulerConsole');
@@ -9793,9 +9785,9 @@ async function runPerSectionScheduler() {
     const sub = db.subjects.find(s => s.id === subId);
     if (!sub) continue;
 
-    // Get number of days setting specific to this subject row
-    const daysSelect = listEl ? listEl.querySelector(`.section-days-select[data-subject-id="${subId}"]`) : null;
-    const subjectDaysSetting = daysSelect ? daysSelect.value : 'all';
+    // Get number of days setting from top panel auto-days-count
+    const autoDaysEl = document.getElementById('auto-days-count');
+    const subjectDaysSetting = autoDaysEl ? autoDaysEl.value : 'all';
 
     // Get hours duration setting specific to this subject row
     const hoursSelect = listEl ? listEl.querySelector(`.section-hours-select[data-subject-id="${subId}"]`) : null;
