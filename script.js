@@ -9609,15 +9609,50 @@ async function runSingleTeacherScheduler() {
 
   await saveDatabase();
 
-  const standardDays = getFilteredStandardDays(daysSetting);
-  const timeslots = [
-    { start: "07:00", end: "09:00" },
-    { start: "08:00", end: "10:00" },
-    { start: "10:00", end: "12:00" },
-    { start: "13:00", end: "15:00" },
-    { start: "15:00", end: "17:00" },
-    { start: "17:00", end: "19:00" }
+  const targetDuration = parseFloat(document.getElementById('single-hours') ? document.getElementById('single-hours').value : 1.5) || 1.5;
+
+  const standardTimeSlots = [
+    // 3 Hour blocks
+    { start: "07:00", end: "10:00", dur: 3 },
+    { start: "08:00", end: "11:00", dur: 3 },
+    { start: "13:00", end: "16:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 },
+
+    // 2 Hour blocks
+    { start: "07:00", end: "09:00", dur: 2 },
+    { start: "08:00", end: "10:00", dur: 2 },
+    { start: "10:00", end: "12:00", dur: 2 },
+    { start: "13:00", end: "15:00", dur: 2 },
+    { start: "15:00", end: "17:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 },
+    { start: "16:00", end: "18:00", dur: 2 },
+
+    // 1.5 Hour blocks
+    { start: "07:00", end: "08:30", dur: 1.5 },
+    { start: "07:30", end: "09:00", dur: 1.5 },
+    { start: "09:00", end: "10:30", dur: 1.5 },
+    { start: "10:30", end: "12:00", dur: 1.5 },
+    { start: "13:00", end: "14:30", dur: 1.5 },
+    { start: "14:30", end: "16:00", dur: 1.5 },
+    { start: "16:00", end: "17:30", dur: 1.5 },
+    { start: "17:30", end: "19:00", dur: 1.5 },
+
+    // 1 Hour blocks
+    { start: "07:00", end: "08:00", dur: 1 },
+    { start: "08:00", end: "09:00", dur: 1 },
+    { start: "09:00", end: "10:00", dur: 1 },
+    { start: "10:00", end: "11:00", dur: 1 },
+    { start: "11:00", end: "12:00", dur: 1 },
+    { start: "13:00", end: "14:00", dur: 1 },
+    { start: "14:00", end: "15:00", dur: 1 },
+    { start: "15:00", end: "16:00", dur: 1 },
+    { start: "16:00", end: "17:00", dur: 1 },
+    { start: "17:00", end: "18:00", dur: 1 },
+    { start: "18:00", end: "19:00", dur: 1 }
   ];
+
+  const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
+  const standardDays = getFilteredStandardDays(daysSetting);
 
   let scheduledCount = 0;
   let failedCount = 0;
@@ -9635,7 +9670,7 @@ async function runSingleTeacherScheduler() {
 
     dayLoop:
     for (let day of standardDays) {
-      for (let slot of timeslots) {
+      for (let slot of filteredSlots) {
         const candidate = {
           id: 'temp_' + uniqueId(),
           instructor_id: teacher.id,
@@ -9771,14 +9806,49 @@ async function runPerSectionScheduler() {
     }
 
     const days = getFilteredStandardDays(subjectDaysSetting);
-    const timeslots = [
-      { start: '07:00', end: '09:00' },
-      { start: '08:00', end: '10:00' },
-      { start: '10:00', end: '12:00' },
-      { start: '13:00', end: '15:00' },
-      { start: '15:00', end: '17:00' },
-      { start: '17:00', end: '19:00' }
+
+    const targetDuration = sub.lab_hours > 0 ? 3 : (parseFloat(sub.lec_hours) || 2);
+    const standardTimeSlots = [
+      // 3 Hour blocks
+      { start: "07:00", end: "10:00", dur: 3 },
+      { start: "08:00", end: "11:00", dur: 3 },
+      { start: "13:00", end: "16:00", dur: 3 },
+      { start: "16:00", end: "19:00", dur: 3 },
+
+      // 2 Hour blocks
+      { start: "07:00", end: "09:00", dur: 2 },
+      { start: "08:00", end: "10:00", dur: 2 },
+      { start: "10:00", end: "12:00", dur: 2 },
+      { start: "13:00", end: "15:00", dur: 2 },
+      { start: "15:00", end: "17:00", dur: 2 },
+      { start: "17:00", end: "19:00", dur: 2 },
+      { start: "16:00", end: "18:00", dur: 2 },
+
+      // 1.5 Hour blocks
+      { start: "07:00", end: "08:30", dur: 1.5 },
+      { start: "07:30", end: "09:00", dur: 1.5 },
+      { start: "09:00", end: "10:30", dur: 1.5 },
+      { start: "10:30", end: "12:00", dur: 1.5 },
+      { start: "13:00", end: "14:30", dur: 1.5 },
+      { start: "14:30", end: "16:00", dur: 1.5 },
+      { start: "16:00", end: "17:30", dur: 1.5 },
+      { start: "17:30", end: "19:00", dur: 1.5 },
+
+      // 1 Hour blocks
+      { start: "07:00", end: "08:00", dur: 1 },
+      { start: "08:00", end: "09:00", dur: 1 },
+      { start: "09:00", end: "10:00", dur: 1 },
+      { start: "10:00", end: "11:00", dur: 1 },
+      { start: "11:00", end: "12:00", dur: 1 },
+      { start: "13:00", end: "14:00", dur: 1 },
+      { start: "14:00", end: "15:00", dur: 1 },
+      { start: "15:00", end: "16:00", dur: 1 },
+      { start: "16:00", end: "17:00", dur: 1 },
+      { start: "17:00", end: "18:00", dur: 1 },
+      { start: "18:00", end: "19:00", dur: 1 }
     ];
+
+    const timeslots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
     let scheduled = false;
 
