@@ -545,15 +545,6 @@
                         </select>
                       </div>
                       <div class="col-md-4">
-                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
-                        <select class="form-select" id="batch-days-count">
-                          <option value="all" selected>All Days Patterns</option>
-                          <option value="1">1 Day per week (e.g. M, T, W, S)</option>
-                          <option value="2">2 Days per week (e.g. MT, TTH)</option>
-                          <option value="3">3 Days per week (e.g. MWF)</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
                         <label class="form-label fw-semibold">Lecture</label>
                         <input type="number" class="form-control" id="batch-lec-hours" min="0" max="10" value="3">
                       </div>
@@ -561,11 +552,20 @@
                         <label class="form-label fw-semibold">Lab</label>
                         <input type="number" class="form-control" id="batch-lab-hours" min="0" max="10" value="0">
                       </div>
-                      <div class="col-md-12">
+                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Preferred Room (Optional)</label>
                         <select class="form-select" id="waterfall-room">
                           <option value="">Any available room</option>
                           <!-- Filled dynamically -->
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
+                        <select class="form-select" id="batch-days-count">
+                          <option value="all" selected>All Days Patterns</option>
+                          <option value="1">1 Day per week</option>
+                          <option value="2">2 Days per week</option>
+                          <option value="3">3 Days per week</option>
                         </select>
                       </div>
                       <div class="col-12">
@@ -616,17 +616,26 @@
                         </select>
                       </div>
                       <div class="col-md-4">
+                        <label class="form-label fw-semibold">Hours<span class="text-danger">*</span></label>
+                        <select class="form-select" id="single-hours">
+                          <option value="1">1</option>
+                          <option value="1.5" selected>1.5</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
                         <label class="form-label fw-semibold">Number of Sections</label>
                         <input type="number" class="form-control" id="single-sections" min="1" max="10" value="3">
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-6">
                         <label class="form-label fw-semibold">Select Instructor <span class="text-danger">*</span></label>
                         <select class="form-select" id="single-mode-teacher" required>
                           <option value="">Choose teacher...</option>
                         </select>
                       </div>
-                      <div class="col-md-4">
-                        <label class="form-label fw-semibold">Number of Days</label>
+                      <div class="col-md-6">
+                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
                         <select class="form-select" id="single-days-count">
                           <option value="all" selected>All Days Patterns</option>
                           <option value="1">1 Day per week</option>
@@ -663,7 +672,7 @@
                           <option value="BSCS">BSCS</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
                         <select class="form-select" id="section-year" onchange="loadSectionSubjects()">
                           <option value="1">1st Year</option>
@@ -672,7 +681,15 @@
                           <option value="4">4th Year</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-2">
+                        <label class="form-label fw-semibold">Semester <span class="text-danger">*</span></label>
+                        <select class="form-select" id="section-semester" onchange="loadSectionSubjects()">
+                          <option value="1" selected>1st Semester</option>
+                          <option value="2">2nd Semester</option>
+                          <option value="all">All Semesters</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2">
                         <label class="form-label fw-semibold">Section / Block <span class="text-danger">*</span></label>
                         <select class="form-select" id="section-block" onchange="loadSectionSubjects()">
                           <option value="1A">1A</option>
@@ -693,15 +710,6 @@
                           <option value="all">All Curriculums</option>
                         </select>
                       </div>
-                      <div class="col-md-3">
-                        <label class="form-label fw-semibold">Number of Days <span class="text-danger">*</span></label>
-                        <select class="form-select" id="section-days-count">
-                          <option value="all" selected>All Days Patterns</option>
-                          <option value="1">1 Day per week</option>
-                          <option value="2">2 Days per week</option>
-                          <option value="3">3 Days per week</option>
-                        </select>
-                      </div>
                     </div>
 
                     <!-- Subjects & Instructor Mapping Table Container -->
@@ -719,7 +727,9 @@
                                 <th>Type</th>
                                 <th class="text-center">Units</th>
                                 <th class="text-center">Lec/Lab</th>
-                                <th style="min-width: 250px;">Assigned Instructor</th>
+                                <th style="min-width: 100px;">Hours</th>
+                                <th style="min-width: 150px;">Number of Days</th>
+                                <th style="min-width: 220px;">Assigned Instructor</th>
                               </tr>
                             </thead>
                             <tbody id="section-subjects-list">
@@ -754,7 +764,7 @@
               <i class="bi bi-people me-2"></i> Instructors
             </button>
             <button class="list-group-item list-group-item-action fw-medium" onclick="switchManageSubTab('subjects')">
-              <i class="bi bi-book-half me-2"></i> Subjects & Sections
+              <i class="bi bi-book-half me-2"></i> Subjects
             </button>
             <button class="list-group-item list-group-item-action fw-medium" onclick="switchManageSubTab('rooms')">
               <i class="bi bi-door-closed me-2"></i> Rooms
@@ -900,7 +910,7 @@
                       <label class="form-label fw-semibold">Course / Dept <span class="text-danger">*</span></label>
                       <input type="text" class="form-control" id="subject-course-val" placeholder="e.g. BSIT" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <label class="form-label fw-semibold">Year Level <span class="text-danger">*</span></label>
                       <select class="form-select" id="subject-year" required>
                         <option value="1">1st Year</option>
@@ -909,19 +919,15 @@
                         <option value="4">4th Year</option>
                       </select>
                     </div>
-                    <div class="col-md-4">
-                      <label class="form-label fw-semibold">Block / Section <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="subject-block" placeholder="e.g. 1A" required>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <label class="form-label fw-semibold">Units <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="subject-units" min="1" max="10" value="3" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <label class="form-label fw-semibold">Lecture Hours <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="subject-lec" min="0" max="20" value="2" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                       <label class="form-label fw-semibold">Laboratory Hours <span class="text-danger">*</span></label>
                       <input type="number" class="form-control" id="subject-lab" min="0" max="20" value="2" required>
                     </div>
@@ -956,7 +962,6 @@
                       <th>Course</th>
                       <th>Type</th>
                       <th>Year</th>
-                      <th>Block/Section</th>
                       <th class="text-center">Units</th>
                       <th class="text-center">Lec/Lab</th>
                       <th class="text-end">Actions</th>
