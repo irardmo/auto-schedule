@@ -4331,29 +4331,12 @@ function loadSectionSubjects() {
   let html = '';
   matching.forEach(s => {
     const curBadge = (s.curriculum_type === 'old') ? '<span class="badge bg-warning text-dark">Old</span>' : '<span class="badge bg-primary">New</span>';
-    const defaultHours = s.lab_hours > 0 ? "3" : (s.lec_hours ? String(s.lec_hours) : "1.5");
     html += `
       <tr>
         <td class="fw-semibold">${s.title_and_code}</td>
         <td>${curBadge} ${s.is_major ? '<span class="badge bg-info text-dark">Major</span>' : ''}</td>
         <td class="text-center fw-bold">${s.units}</td>
         <td class="text-center">${s.lec_hours}/${s.lab_hours}</td>
-        <td>
-          <select class="form-select form-select-sm section-hours-select" data-subject-id="${s.id}">
-            <option value="1" ${defaultHours === "1" ? "selected" : ""}>1 Hour</option>
-            <option value="1.5" ${defaultHours === "1.5" ? "selected" : ""}>1.5 Hours</option>
-            <option value="2" ${defaultHours === "2" ? "selected" : ""}>2 Hours</option>
-            <option value="3" ${defaultHours === "3" ? "selected" : ""}>3 Hours</option>
-          </select>
-        </td>
-        <td>
-          <select class="form-select form-select-sm section-days-select" data-subject-id="${s.id}">
-            <option value="all" selected>All Days</option>
-            <option value="1">1 Day / wk</option>
-            <option value="2">2 Days / wk</option>
-            <option value="3">3 Days / wk</option>
-          </select>
-        </td>
         <td>
           <select class="form-select form-select-sm section-instructor-select" data-subject-id="${s.id}">
             ${teacherOpts}
@@ -4555,14 +4538,6 @@ async function runPerSectionScheduler() {
     const sub = db.subjects.find(s => s.id === subId);
     if (!sub) continue;
 
-    // Get number of days setting specific to this subject row
-    const daysSelect = listEl ? listEl.querySelector(`.section-days-select[data-subject-id="${subId}"]`) : null;
-    const sectionDaysSetting = daysSelect ? daysSelect.value : 'all';
-
-    // Get hours duration setting specific to this subject row
-    const hoursSelect = listEl ? listEl.querySelector(`.section-hours-select[data-subject-id="${subId}"]`) : null;
-    const rowHours = hoursSelect ? parseFloat(hoursSelect.value) : null;
-
     // Update target block section
     sub.block_section = block;
 
@@ -4581,49 +4556,14 @@ async function runPerSectionScheduler() {
     }
 
     const days = getFilteredStandardDays(sectionDaysSetting);
-
-    const targetDuration = rowHours || (sub.lab_hours > 0 ? 3 : (parseFloat(sub.lec_hours) || 1.5));
-    const standardTimeSlots = [
-      // 3 Hour blocks
-      { start: "07:00", end: "10:00", dur: 3 },
-      { start: "08:00", end: "11:00", dur: 3 },
-      { start: "13:00", end: "16:00", dur: 3 },
-      { start: "16:00", end: "19:00", dur: 3 },
-
-      // 2 Hour blocks
-      { start: "07:00", end: "09:00", dur: 2 },
-      { start: "08:00", end: "10:00", dur: 2 },
-      { start: "10:00", end: "12:00", dur: 2 },
-      { start: "13:00", end: "15:00", dur: 2 },
-      { start: "15:00", end: "17:00", dur: 2 },
-      { start: "17:00", end: "19:00", dur: 2 },
-      { start: "16:00", end: "18:00", dur: 2 },
-
-      // 1.5 Hour blocks
-      { start: "07:00", end: "08:30", dur: 1.5 },
-      { start: "07:30", end: "09:00", dur: 1.5 },
-      { start: "09:00", end: "10:30", dur: 1.5 },
-      { start: "10:30", end: "12:00", dur: 1.5 },
-      { start: "13:00", end: "14:30", dur: 1.5 },
-      { start: "14:30", end: "16:00", dur: 1.5 },
-      { start: "16:00", end: "17:30", dur: 1.5 },
-      { start: "17:30", end: "19:00", dur: 1.5 },
-
-      // 1 Hour blocks
-      { start: "07:00", end: "08:00", dur: 1 },
-      { start: "08:00", end: "09:00", dur: 1 },
-      { start: "09:00", end: "10:00", dur: 1 },
-      { start: "10:00", end: "11:00", dur: 1 },
-      { start: "11:00", end: "12:00", dur: 1 },
-      { start: "13:00", end: "14:00", dur: 1 },
-      { start: "14:00", end: "15:00", dur: 1 },
-      { start: "15:00", end: "16:00", dur: 1 },
-      { start: "16:00", end: "17:00", dur: 1 },
-      { start: "17:00", end: "18:00", dur: 1 },
-      { start: "18:00", end: "19:00", dur: 1 }
+    const timeslots = [
+      { start: '07:00', end: '09:00' },
+      { start: '08:00', end: '10:00' },
+      { start: '10:00', end: '12:00' },
+      { start: '13:00', end: '15:00' },
+      { start: '15:00', end: '17:00' },
+      { start: '17:00', end: '19:00' }
     ];
-
-    const timeslots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
     let scheduled = false;
 
