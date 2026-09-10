@@ -72,7 +72,7 @@ try {
         FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
 
-    
+
 // Process API Request routing
 switch ($action) {
     case 'get_all':
@@ -127,7 +127,7 @@ switch ($action) {
                     foreach ($data['subjects'] as $sub) {
                         $stmt->execute([
                             $sub['id'], $sub['title_and_code'], $sub['course'], 
-                            $sub['year_level'], $sub['block_section'], 
+                            $sub['year_level'], $sub['block_section'],
                             $sub['units'], $sub['lec_hours'], $sub['lab_hours'],
                             $sub['is_major'] ?? 0
                         ]);
