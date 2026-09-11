@@ -1,0 +1,3652 @@
+{
+  "bsed": [
+    {
+      "code": "GE 101",
+      "title": "Understanding the Self",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "Basic English Grammar",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "Entrepreneurial Mind",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "EL 100",
+      "title": "Introduction to Linguistics",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "EL 101",
+      "title": "Language, Culture and Society",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "EL 102",
+      "title": "Structures of English",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "Movement Competency Training",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 101",
+      "title": "Social Arts 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "National Service Training Program 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "Comp 101",
+      "title": "Computer 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "Mathematics in the Modern World",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "Purposive Communication",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "EL 103",
+      "title": "Principles and Theories of Language Acquisition and Learning",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "EL 104",
+      "title": "Language Programs and Policies in Multilingual Societies",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "EL 105",
+      "title": "Preparation of Language Learning Materials",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "EL 106",
+      "title": "The Child and Adolescent Learner and Learning Principles",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "Exercise-Based Fitness Activities",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "Social Arts 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "National Service Training Program 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "Science, Technology and Society",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "The Contemporary World",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "Philippine Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "EL 107",
+      "title": "Speech and Theater Arts",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "EL 108",
+      "title": "The Teaching Profession",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "ELT 1",
+      "title": "Teaching and Assessment of Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "ELT 2",
+      "title": "Teaching and Assessment of the Micro-skills",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "ELT 3",
+      "title": "Teaching and Assessment of Grammar",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "Group Exercises (Aerobics, Yoga, etc.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "Ethics",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "Readings on Philippine History",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "Art Appreciation",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "Public Speaking and Debate",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "EL 110",
+      "title": "The Teacher and the Community, School Culture and Organizational Leadership",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "LIT 1",
+      "title": "Children and Adolescent Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "LIT 2",
+      "title": "Mythology and Folklore",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "LIT 3",
+      "title": "Survey of Philippine Literature in English",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "Sports",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "RZL",
+      "title": "Life and Works of Rizal",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "GE 111",
+      "title": "Statistics",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "EL 111",
+      "title": "Foundation of Special and Inclusive Education",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "EL 112",
+      "title": "Assessment of Learning 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "ELT 4",
+      "title": "Technical Writing",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "LIT 4",
+      "title": "Survey of Afro-Asian Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "LIT 5",
+      "title": "Survey of English and American Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "LIT 6",
+      "title": "Contemporary and Popular Literature",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "LIT 7",
+      "title": "Literary Criticism",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "EL 113",
+      "title": "Campus Journalism",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL 114",
+      "title": "Stylistics and Discourse Analysis",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL 115",
+      "title": "Remedial Instruction",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL 116",
+      "title": "Assessment of Learning 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL 117",
+      "title": "The Teacher and the School Curriculum",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL 118",
+      "title": "Building and Enhancing New Literacies Across the Curriculum",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "ELT 5",
+      "title": "Facilitating Learner-Centered Teaching",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "TTL 1",
+      "title": "Technology for Teaching and Learning 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "TTL 2",
+      "title": "Technology for Teaching and Learning 2 (Technology in Language Education)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EL-FS 1",
+      "title": "FIELD STUDY 1 (Observations of Teaching)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "EL-FS 2",
+      "title": "FIELD STUDY 2 (Participation and Teaching Assistanship)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "RES 1",
+      "title": "Language Research 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "EL-TIB",
+      "title": "TEACHING INTERNSHIP",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "RES 2",
+      "title": "Language Research 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bsit": [
+    {
+      "code": "GE 101",
+      "title": "UNDERSTANDING THE SELF",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "SINING NG PAKIKIPAGTALASTASAN",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "ENTREPRENEURIAL MIND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 103",
+      "title": "SOCIAL ARTS 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "MOVEMENT COMPETENCY TRAINING",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "CC 101",
+      "title": "INTRODUCTION TO COMPUTING",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "MS 101",
+      "title": "DISCRETE MATHEMATICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "MATHEMATICS IN MODERN WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "PURPOSIVE COMMUNICATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "SOCIAL ARTS 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "EXERCISE-BASED FITNESS ACTIVITIES",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "CC 102",
+      "title": "COMPUTER PROGRAMMING 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "MS 102",
+      "title": "QUANTITATIVE METHODS (INCLUDING MODELLING AND SIMULATION)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "INDIGENOUS CREATIVE ARTS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "CC 103",
+      "title": "COMPUTER PROGRAMMING 2",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "IM 101",
+      "title": "FUNDAMENTALS OF DATABASE SYSTEM",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PF 101",
+      "title": "OBJECT ORIENTED PROGRAMMING",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "BUSINESS ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "SPORTS",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "CC 104",
+      "title": "DATA STRUCTURES AND ALGORITHM",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "CC 105",
+      "title": "INFORMATION MANAGEMENT",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "HCI 101",
+      "title": "HUMAN COMPUTER INTERACTION 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 111",
+      "title": "STATISTICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CC 106",
+      "title": "APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGIES",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "NET 101",
+      "title": "NETWORKING 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "IAS 101",
+      "title": "INFORMATION ASSURANCE AND SECURITY 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "SA 101",
+      "title": "SYSTEM ADMINISTRATION AND MAINTENANCE",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "SP 101",
+      "title": "SOCIAL AND PROFESSIONAL ISSUES",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "WS 101",
+      "title": "WEB SYSTEMS AND TECHNOLOGY",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "IPT 101",
+      "title": "INTEGRATIVE PROGRAMMING AND TECHNOLOGY",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "NET 102",
+      "title": "NETWORKING 2",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "IAS 102",
+      "title": "INFORMATION ASSURANCE AND SECURITY 2",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "SIA 101",
+      "title": "SYSTEM INTEGRATION AND ARCHITECTURE 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CAP 101",
+      "title": "CAPSTONE PROJECT AND RESEARCH 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "SIA 102",
+      "title": "SYSTEM INTEGRATION AND ARCHITECTURE 2",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "PT 101",
+      "title": "PLATFORM TECHNOLOGY",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "IT 101",
+      "title": "MULTIMEDIA AND ANIMATION",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HCI 102",
+      "title": "HUMAN COMPUTER INTERACTION 2",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CAP 102",
+      "title": "CAPSTONE PROJECT AND RESEARCH 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "PRAC 101",
+      "title": "PRACTICUM",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bsba_mm": [
+    {
+      "code": "GE 101",
+      "title": "UNDERSTANDING THE SELF",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "SINING NG PAKIKIPAGTALASTASAN",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "ENTREPRENEURIAL MIND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 101",
+      "title": "SOCIAL ARTS 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "COMP 101",
+      "title": "COMPUTER 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "MOVEMENT COMPETENCY TRAINING",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 1",
+      "title": "BASIC MICROECONOMICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "MATHEMATICS IN MODERN WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "PURPOSIVE COMMUNICATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "SOCIAL ARTS 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "COMP 102",
+      "title": "ADVANCE COMPUTER",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "EXERCISE-BASED FITNESS ACTIVITIES",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 112",
+      "title": "BUSINESS LAW (OBLIGATION AND CONTRACTS)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "INDIGENOUS CREATIVE ARTS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 113",
+      "title": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR MM 121",
+      "title": "PROFESSIONAL SALESMANSHIP",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR MM 122",
+      "title": "MARKETING MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "BME 141",
+      "title": "OPERATIONS MANAGEMENT (TQM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "BUSINESS ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "SPORTS",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 114",
+      "title": "INCOME TAXATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR MM 123",
+      "title": "DISTRIBUTION MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR MM 124",
+      "title": "ADVERTISING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "MM ELEC 131",
+      "title": "PERSONAL FINANCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "BME 142",
+      "title": "STRATEGIC MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 111",
+      "title": "STATISTICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 115",
+      "title": "HUMAN RESOURCE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 116",
+      "title": "BUSINESS RESEARCH",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR MM 125",
+      "title": "PRODUCT MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "MM ELEC 132",
+      "title": "CUSTOMER SERVICE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "MM ELEC 133",
+      "title": "FRANCHISING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "MM ELEC 134",
+      "title": "COOPERATIVE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR MM 126",
+      "title": "RETAIL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR MM 127",
+      "title": "PRICING STRATEGY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR MM 128",
+      "title": "MARKETING RESEARCH",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "MM ELEC 135",
+      "title": "CONSUMER BEHAVIOR",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "MM ELEC 136",
+      "title": "SALES MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "MM ELEC 137",
+      "title": "INDUSTRIAL/AGRICULTURAL MARKETING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "MM ELEC 138",
+      "title": "PROJECT MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "THESIS 1",
+      "title": "RESEARCH 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 117",
+      "title": "INTERNATIONAL BUSINESS AND TRADE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "MM ELEC 139",
+      "title": "ENTREPRENEURIAL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "MM ELEC 140",
+      "title": "SPECIAL TOPICS IN MARKETING MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "COMP 103",
+      "title": "INTRODUCTION TO COMPUTING",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "COMP 104",
+      "title": "WEB DEVELOPMENT",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "THESIS 2",
+      "title": "RESEARCH 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "INT",
+      "title": "INTERNSHIP",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bscrim": [
+    {
+      "code": "GE 101",
+      "title": "Understanding The Self (General Psychology)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "Sining ng Pakikipagtalastasan",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "Entrepreneurial Mind",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "Environmental Science",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 104",
+      "title": "Gender and Society",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "CRIM 111",
+      "title": "Introduction to Criminology",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "CLJ 121",
+      "title": "Introduction to Philippine Criminal Justice",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "Reserve Officers' Training Corps 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PE 181",
+      "title": "Fundamentals of Martial Arts",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "Mathematics in Modern World (Plane Trigonometry)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "Purposive Communication",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "CDI 131",
+      "title": "Fundamentals of Investigation and Intelligence",
+      "units": 4,
+      "lec": 4,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "LEA 151",
+      "title": "Law Enforcement Organization and Administration",
+      "units": 4,
+      "lec": 4,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "LEA 152",
+      "title": "Comparative Models in Policing",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "Reserve Officers' Training Corps 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PE 182",
+      "title": "Arnis and Disarming Technique",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "EHC 171",
+      "title": "ENHANCEMENT COURSE 1",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "FORENSIC 141",
+      "title": "Forensic Photography",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "CA 161",
+      "title": "Institutional Corrections",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "CFLM-1",
+      "title": "Character Formation, Nationalism and Patriotism",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "CRIM 112",
+      "title": "Theories of Crime Causation",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "CDI 132",
+      "title": "Specialized Crime Investigation 1 with Legal Medicine",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PE 183",
+      "title": "First Aid and Water Safety",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "ADGE",
+      "title": "General Chemistry (Organic)",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "FORENSIC 142",
+      "title": "Personal Identification Techniques",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "CRIM 113",
+      "title": "Human Behavior and Victimology",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "LEA 153",
+      "title": "Introduction to Industrial Security Concepts",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PE 184",
+      "title": "Fundamentals of Marksmanship",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "EHC 172",
+      "title": "ENHANCEMENT COURSE 2",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CFLM-2",
+      "title": "Character Formation with Leadership, Decision Making, Management and Supervision",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CLJ 122",
+      "title": "Human Rights Education",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CLJ 123",
+      "title": "Criminal Law (Book 1)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "FORENSIC 143",
+      "title": "Forensic Chemistry and Toxicology",
+      "units": 5,
+      "lec": 3,
+      "lab": 2,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CDI 133",
+      "title": "Specialized Crime Investigation 2 with Simulation on Interrogation and Interview",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CDI 134",
+      "title": "Traffic Management and Accident Investigation with Driving",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "LEA 154",
+      "title": "Law Enforcement Operations and Planning with Crime Mapping",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "CA 162",
+      "title": "Non-Institutional Corrections",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CLJ 124",
+      "title": "Criminal Law (Book 2)",
+      "units": 4,
+      "lec": 4,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CRIM 114",
+      "title": "Professional Conduct and Ethical Standards",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CRIM 115",
+      "title": "Juvenile Delinquency and Juvenile Justice System",
+      "units": 4,
+      "lec": 4,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FORENSIC 144",
+      "title": "Questioned Documents Examination",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FORENSIC 145",
+      "title": "Lie Detection Techniques",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CDI 135",
+      "title": "Technical English 1 (Technical Report Writing and Presentation)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "EHC 3",
+      "title": "ENHANCEMENT COURSE 3",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "CA 163",
+      "title": "Therapeutic Modalities",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CLJ 125",
+      "title": "Evidence",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CRIM 116",
+      "title": "Dispute Resolution and Crises/Incidents Management",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CRIM 117",
+      "title": "Criminological Research1 (Research Methods with Applied Statistics)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CDI 136",
+      "title": "Fire Protection and Arson Investigation",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CDI 137",
+      "title": "Vice and Drug Education and Control",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CP 191",
+      "title": "Internship (On-the Job Training)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "CLJ 126",
+      "title": "Criminal Procedure and Court Testimony",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "FORENSIC 146",
+      "title": "Forensic Ballistics",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "CRIM 118",
+      "title": "Criminological Research 2 (Thesis Writing and Presentation)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "CDI 138",
+      "title": "Technical English 2 (Legal Forms)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "CDI 139",
+      "title": "Introduction to Cybercrime and Environmental Laws and Protection",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 2
+    },
+    {
+      "code": "CP 192",
+      "title": "Internship (On-the Job Training)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bsba_fm": [
+    {
+      "code": "GE 101",
+      "title": "UNDERSTANDING THE SELF",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "SINING NG PAKIKIPAGTALASTASAN",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "ENTREPRENEURIAL MIND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 101",
+      "title": "SOCIAL ARTS 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "COMP 101",
+      "title": "COMPUTER 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "MOVEMENT COMPETENCY TRAINING",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 1",
+      "title": "BASIC MICROECONOMICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "MATHEMATICS IN MODERN WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "PURPOSIVE COMMUNICATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "SOCIAL ARTS 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "COMP 102",
+      "title": "ADVANCE COMPUTER",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "EXERCISE-BASED FITNESS ACTIVITIES",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 112",
+      "title": "BUSINESS LAW (OBLIGATION AND CONTRACTS)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "INDIGENOUS CREATIVE ARTS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 113",
+      "title": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR FM 121",
+      "title": "FINANCIAL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR FM 122",
+      "title": "BANKING AND FINANCIAL INSTITUTION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "BME 141",
+      "title": "OPERATIONS MANAGEMENT (TQM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "BUSINESS ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "SPORTS",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 114",
+      "title": "INCOME TAXATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR FM 123",
+      "title": "INVESTMENT AND PORTFOLIO MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR FM 124",
+      "title": "CAPITAL MARKET",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "FM ELEC 131",
+      "title": "PERSONAL FINANCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "BME 142",
+      "title": "STRATEGIC MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 111",
+      "title": "STATISTICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 115",
+      "title": "HUMAN RESOURCE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 116",
+      "title": "BUSINESS RESEARCH",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR FM 125",
+      "title": "FINANCIAL ANALYSIS AND REPORTING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "FM ELEC 132",
+      "title": "CUSTOMER SERVICE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "FM ELEC 133",
+      "title": "FRANCHISING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "FM ELEC 134",
+      "title": "COOPERATIVE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "PROF COR FM 126",
+      "title": "CREDIT AND COLLECTION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR FM 127",
+      "title": "MONETARY POLICY AND CENTRAL BANKING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "PROF COR FM 128",
+      "title": "SPECIAL TOPICS IN FINANCIAL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FM ELEC 135",
+      "title": "BEHAVIORAL FINANCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FM ELEC 136",
+      "title": "TREASURY MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FM ELEC 137",
+      "title": "MUTUAL FUND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "FM ELEC 138",
+      "title": "PROJECT MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "THESIS 1",
+      "title": "RESEARCH 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 117",
+      "title": "INTERNATIONAL BUSINESS AND TRADE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "FM ELEC 139",
+      "title": "ENTREPRENEURIAL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "FM ELEC 140",
+      "title": "RISK MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "COMP 103",
+      "title": "INTRODUCTION TO COMPUTING",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "COMP 104",
+      "title": "COMPUTER PROGRAMMING 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "THESIS 2",
+      "title": "RESEARCH 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "INT",
+      "title": "INTERNSHIP",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bshm": [
+    {
+      "code": "GE 101",
+      "title": "UNDERSTANDING THE SELF",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "SINING NG PAKIKIPAGTALASTASAN",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "ENTREPRENEURIAL MIND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 101",
+      "title": "SOCIAL ARTS 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "COMP 101",
+      "title": "COMPUTER 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "MOVEMENT COMPETENCY TRAINING",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "THC 111",
+      "title": "PHILIPPINE CULTURE AND TOURISM GEOGRAPHY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "(NABMB 151)",
+      "title": "ORGANIZATION AND MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "MATHEMATICS IN MODERN WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "PURPOSIVE COMMUNICATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 105",
+      "title": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "SOCIAL ARTS 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "COMP 102",
+      "title": "ADVANCE COMPUTER",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "EXERCISE-BASED FITNESS ACTIVITIES",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "THC 112",
+      "title": "RISK MANAGEMENT AS APPLIED TO SAFETY, SECURITY AND SANITATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "(NABMB 152)",
+      "title": "BUSINESS MARKETING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "INDIGENOUS CREATIVE ARTS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "THC 113",
+      "title": "QUALITY SERVICE MANAGEMENT IN TOURISM AND HOSPITALITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "HPC 121",
+      "title": "KITCHEN ESSENTIALS AND BASIC FOOD PREPARATIONS",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "BME 141",
+      "title": "OPERATIONS MANAGEMENT (TQM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "(NABMB 153)",
+      "title": "OPERATIONS MANAGEMENT (FOR NON-ABM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "BUSINESS ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "SPORTS",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "THC 114",
+      "title": "LEGAL ASPECTS IN TOURISM AND HOSPITALITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "HPC 122",
+      "title": "FUNDAMENTALS IN FOOD SERVICE OPERATION",
+      "units": 3,
+      "lec": 1,
+      "lab": 2,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "HMPE 131",
+      "title": "CULINARY FUNDAMENTALS",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "BME 142",
+      "title": "STRATEGIC MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "(NABMB 154)",
+      "title": "APPLIED ECONOMICS (FOR NON-ABM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 111",
+      "title": "STATISTICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "THC 115",
+      "title": "MACRO PERSPECTIVE OF TOURISM AND HOSPITALITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "THC 116",
+      "title": "PROFESSIONAL DEVELOPMENT AND APPLIED ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HPC 123",
+      "title": "FUNDAMENTALS IN LODGING OPERATIONS",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HMPE 132",
+      "title": "FOOD AND BEVERAGE OPERATION",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HMPE 3",
+      "title": "HOUSEKEEPING OPERATIONS",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "NABMB 155",
+      "title": "FUNDAMENTALS OF ACCOUNTING (FOR NON-ABM)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "THC 117",
+      "title": "MULTICULTURAL DIVERSITY IN WORKPLACE FOR THE TOURISM PROFESSIONAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "THC 118",
+      "title": "MICRO PERSPECTIVE OF TOURISM AND HOSPITALITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HPC 124",
+      "title": "APPLIED BUSINESS TOOLS AND TECHNOLOGIES",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HMPE 134",
+      "title": "FRONT OFFICE OPERATION",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HMPE 135",
+      "title": "ROOM DIVISION MANAGEMENT",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HPC 125",
+      "title": "SUPPLY CHAIN MANAGEMENT IN HOSPITALITY INDUSTRY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HPC 128",
+      "title": "FOREIGN LANGUAGE 1 (SPANISH)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "RESEARCH 1",
+      "title": "HOSPITALITY RESEARCH 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HPC 126",
+      "title": "Introduction to Meetings, Incentives, Conferences and Events Management (MICE) (Events Mgt. - NC III)",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HPC 127",
+      "title": "ERGONOMETRIC AND FACILITIES PLANNING FOR THE HOSPITALITY INDUSTRY",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HPC 129",
+      "title": "FOREIGN LANGUAGE 2 (SPANISH)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "THC 119",
+      "title": "TOURISM AND HOSPITALITY MARKETING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "THC 120",
+      "title": "ENTREPRENEURSHIP IN TOURISM AND HOSPITALITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "RESEARCH 2",
+      "title": "HOSPITALITY RESEARCH 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "INT",
+      "title": "INTERNSHIP/PRACTICUM",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ],
+  "bsba_hrdm": [
+    {
+      "code": "GE 101",
+      "title": "UNDERSTANDING THE SELF",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 102",
+      "title": "SINING NG PAKIKIPAGTALASTASAN",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "MGT 1",
+      "title": "PRINCIPLES OF MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 101",
+      "title": "ENTREPRENEURIAL MIND",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "SIBTECH 101",
+      "title": "SOCIAL ARTS 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 111",
+      "title": "BASIC MICROECONOMICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "COMP 101",
+      "title": "COMPUTER 1",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 1",
+      "title": "MOVEMENT COMPETENCY TRAINING",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "NSTP 1",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 1
+    },
+    {
+      "code": "GE 103",
+      "title": "MATHEMATICS IN MODERN WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 104",
+      "title": "PURPOSIVE COMMUNICATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "FIN 1",
+      "title": "BASIC FINANCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "ACCTG 1",
+      "title": "FUNDAMENTALS OF ACCOUNTING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "SIBTECH 102",
+      "title": "SOCIAL ARTS 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "MGT 2",
+      "title": "HUMAN BEHAVIOR IN ORGANIZATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "COMP 102",
+      "title": "ADVANCE COMPUTER",
+      "units": 3,
+      "lec": 2,
+      "lab": 1,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 2",
+      "title": "EXERCISE-BASED FITNESS ACTIVITIES",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "NSTP 2",
+      "title": "NATIONAL SERVICE TRAINING PROGRAM 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 1,
+      "sem": 2
+    },
+    {
+      "code": "GE 106",
+      "title": "SCIENCE, TECHNOLOGY AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 107",
+      "title": "THE CONTEMPORARY WORLD",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 102",
+      "title": "PHILIPPINE LITERATURE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 103",
+      "title": "INDIGENOUS CREATIVE ARTS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "MGT 3",
+      "title": "HUMAN RESOURCE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "HRDM 1",
+      "title": "ADMINISTRATIVE AND OFFICE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "HRDM 2",
+      "title": "LABOR LAW AND LEGISLATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "PATHFIT 3",
+      "title": "GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 1
+    },
+    {
+      "code": "GE 108",
+      "title": "BUSINESS ETHICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 109",
+      "title": "READINGS ON PHILIPPINE HISTORY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 110",
+      "title": "ART APPRECIATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "HRDM 3",
+      "title": "RECRUITMENT AND SELECTION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "TAX 1",
+      "title": "INCOME TAXATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "ACCTG 2",
+      "title": "FINANCIAL ACCOUNTING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "MKTG 1",
+      "title": "PRINCIPLES OF MARKETING",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "PATHFIT 4",
+      "title": "SPORTS",
+      "units": 2,
+      "lec": 2,
+      "lab": 0,
+      "year": 2,
+      "sem": 2
+    },
+    {
+      "code": "GE 111",
+      "title": "BUSINESS STATISTICS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "RZL",
+      "title": "LIFE AND WORKS OF RIZAL",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "PSYCHO",
+      "title": "GENERAL PSYCHOLOGY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "ENG 1",
+      "title": "BASIC COMMUNICATION SKILLS",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "MGT 4",
+      "title": "TOTAL QUALITY MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HRDM ELEC 1",
+      "title": "MARKETING MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HRDM 4",
+      "title": "TRAINING AND DEVELOPMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "BUS CORE 113",
+      "title": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 1
+    },
+    {
+      "code": "HRDM ELEC 2",
+      "title": "PROJECT MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "GE EL 105",
+      "title": "GENDER AND SOCIETY",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "BUS CORE 112",
+      "title": "BUSINESS LAW (OBLIGATION AND CONTRACTS)",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "ENG 2",
+      "title": "BUSINESS ENGLISH AND CORRESPONDENCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HRDM ELEC 3",
+      "title": "SPECIAL TOPICS IN HRDM",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HRDM 5",
+      "title": "COMPENSATION AND ADMINISTRATION",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "THESIS 1",
+      "title": "THESIS WRITING 1",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 3,
+      "sem": 2
+    },
+    {
+      "code": "HRDM 6",
+      "title": "STRATEGIC HUMAN RESOURCE MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HRDM 7",
+      "title": "ORGANIZATION AND DEVELOPMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "GE EL 104",
+      "title": "ENVIRONMENTAL SCIENCE",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HRDM ELEC 4",
+      "title": "ENTREPRENEURIAL MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "HRDM ELEC 5",
+      "title": "OPERATIONS MANAGEMENT",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "THESIS 2",
+      "title": "THESIS WRITING 2",
+      "units": 3,
+      "lec": 3,
+      "lab": 0,
+      "year": 4,
+      "sem": 1
+    },
+    {
+      "code": "INT",
+      "title": "INTERNSHIP",
+      "units": 6,
+      "lec": 6,
+      "lab": 0,
+      "year": 4,
+      "sem": 2
+    }
+  ]
+}
