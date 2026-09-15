@@ -5417,7 +5417,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n4",
-                "title_and_code": "Basic Microeconomics BUS CORE 111",
+                "title_and_code": "Financial Management PROF COR FM 121",
                 "course": "BSBA-MM",
                 "year_level": 1,
                 "units": 3,
@@ -5429,7 +5429,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n5",
-                "title_and_code": "Professional Salesmanship PROF COR MM 121",
+                "title_and_code": "Basic Microeconomics BUS CORE 111",
                 "course": "BSBA-MM",
                 "year_level": 1,
                 "units": 3,
@@ -5501,7 +5501,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n11",
-                "title_and_code": "Business Law (Obligation And Contracts) BUS CORE 112",
+                "title_and_code": "Personal Finance FM ELEC 131",
                 "course": "BSBA-MM",
                 "year_level": 1,
                 "units": 3,
@@ -5513,7 +5513,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n12",
-                "title_and_code": "Personal Finance MM ELEC 131",
+                "title_and_code": "Business Law (Obligation And Contracts) BUS CORE 112",
                 "course": "BSBA-MM",
                 "year_level": 1,
                 "units": 3,
@@ -5525,7 +5525,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n13",
-                "title_and_code": "Rhytmic Activities PATHFIT 2",
+                "title_and_code": "Rhythmic Activities PATHFIT 2",
                 "course": "BSBA-MM",
                 "year_level": 1,
                 "units": 2,
@@ -5549,7 +5549,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n15",
-                "title_and_code": "Science, Technology And Society GE 106",
+                "title_and_code": "Science, Technology, and Society GE 106",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5585,7 +5585,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n18",
-                "title_and_code": "Operations Management (Tqm) BME 141",
+                "title_and_code": "Banking And Financial Institution PROF COR FM 122",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5597,7 +5597,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n19",
-                "title_and_code": "Good Governance And Social Responsibility BUS CORE 113",
+                "title_and_code": "Operations Management (Tom) BME 141",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5609,7 +5609,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n20",
-                "title_and_code": "Marketing Management PROF COR MM 122",
+                "title_and_code": "Good Governance And Social Responsibility BUS CORE 113",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5657,7 +5657,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n24",
-                "title_and_code": "Income Taxation BUS CORE 114",
+                "title_and_code": "Income Taxation BUSCOR E 114",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5669,7 +5669,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n25",
-                "title_and_code": "Strategic Management BME 142",
+                "title_and_code": "Investment And Portfolio Management PROF COR FM 123",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5681,7 +5681,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n26",
-                "title_and_code": "Distribution Management PROF COR MM 123",
+                "title_and_code": "Capital Market PROF COR FM 124",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5693,7 +5693,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n27",
-                "title_and_code": "Advertising PROF COR MM 124",
+                "title_and_code": "Strategic Management BME 142",
                 "course": "BSBA-MM",
                 "year_level": 2,
                 "units": 3,
@@ -5717,7 +5717,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n29",
-                "title_and_code": "Statistics GE 111",
+                "title_and_code": "STATISTICS GE 111",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5729,7 +5729,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n30",
-                "title_and_code": "Life And Works Of Rizal RZL",
+                "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5741,7 +5741,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n31",
-                "title_and_code": "Human Resource Management BUS CORE 115",
+                "title_and_code": "HUMAN RESOURCE MANAGEMENT BUS CORE 115",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5753,7 +5753,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n32",
-                "title_and_code": "Business Research BUS CORE 116",
+                "title_and_code": "BUSINESS RESEARCH BUS CORE 116",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5765,7 +5765,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n33",
-                "title_and_code": "Product Management PROF COR MM 125",
+                "title_and_code": "FINANCIAL ANALYSIS AND REPORTING PROF COR FM 125",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5777,7 +5777,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n34",
-                "title_and_code": "Franchising MM ELEC 132",
+                "title_and_code": "CREDIT AND COLLECTION PROF COR FM 126",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5789,7 +5789,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n35",
-                "title_and_code": "Web Development COMP 104",
+                "title_and_code": "INTRODUCTION TO COMPUTING COMP 104",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5801,7 +5801,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n36",
-                "title_and_code": "Retail Management PROF COR MM 126",
+                "title_and_code": "MONETARY POLICY AND CENTRAL BANKING PROF COR FM 127",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5813,7 +5813,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n37",
-                "title_and_code": "Pricing Strategy PROF COR MM 127",
+                "title_and_code": "SPECIAL TOPICS IN FINANCIAL MANGEMENT PROF COR FM 128",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5825,7 +5825,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n38",
-                "title_and_code": "Marketing Research PROF COR MM 128",
+                "title_and_code": "BEHAVIORAL FINANCE FM ELEC 132",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5837,7 +5837,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n39",
-                "title_and_code": "Consumer Behavior MM ELEC 133",
+                "title_and_code": "TREASURY MANAGEMENT FM ELEC 133",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5849,7 +5849,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n40",
-                "title_and_code": "Sales Management MM ELEC 134",
+                "title_and_code": "MUTUAL FUND FM ELEC 134",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5861,7 +5861,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n41",
-                "title_and_code": "Industrial/Agricultural Marketing MM ELEC 135",
+                "title_and_code": "RESEARCH 1 THESIS 1",
                 "course": "BSBA-MM",
                 "year_level": 3,
                 "units": 3,
@@ -5873,9 +5873,9 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n42",
-                "title_and_code": "Research 1 THESIS 1",
+                "title_and_code": "INTERNATIONAL BUSINESS AND TRADE BUS CORE 117",
                 "course": "BSBA-MM",
-                "year_level": 3,
+                "year_level": 4,
                 "units": 3,
                 "lec_hours": 3,
                 "lab_hours": 0,
@@ -5885,7 +5885,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n43",
-                "title_and_code": "International Business And Trade BUS CORE 117",
+                "title_and_code": "ENTREPRENEURIAL MANAGEMENT FM ELEC 135",
                 "course": "BSBA-MM",
                 "year_level": 4,
                 "units": 3,
@@ -5897,7 +5897,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n44",
-                "title_and_code": "Special Topics In Marketing Management MM ELEC 136",
+                "title_and_code": "RISK MANAGEMENT FM ELEC 136",
                 "course": "BSBA-MM",
                 "year_level": 4,
                 "units": 3,
@@ -5909,7 +5909,7 @@ const demoData = {
         },
         {
                 "id": "bsba_mm_n45",
-                "title_and_code": "Research 2 THESIS 2",
+                "title_and_code": "RESEARCH 2 THESIS 2",
                 "course": "BSBA-MM",
                 "year_level": 4,
                 "units": 3,
@@ -5917,7 +5917,7 @@ const demoData = {
                 "lab_hours": 0,
                 "is_major": 1,
                 "curriculum_type": "new",
-                "semester": 2
+                "semester": 1
         },
         {
                 "id": "bsba_mm_n46",
@@ -5925,8 +5925,8 @@ const demoData = {
                 "course": "BSBA-MM",
                 "year_level": 4,
                 "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
+                "lec_hours": 0,
+                "lab_hours": 6,
                 "is_major": 1,
                 "curriculum_type": "new",
                 "semester": 2
@@ -6961,7 +6961,7 @@ const demoData = {
                 "lab_hours": 0,
                 "is_major": 1,
                 "curriculum_type": "new",
-                "semester": 1
+                "semester": 2
         },
         {
                 "id": "bsba_hrdm_n41",
@@ -7009,7 +7009,7 @@ const demoData = {
                 "lab_hours": 0,
                 "is_major": 1,
                 "curriculum_type": "new",
-                "semester": 2
+                "semester": 1
         },
         {
                 "id": "bsba_hrdm_n45",
@@ -7017,8 +7017,8 @@ const demoData = {
                 "course": "BSBA-HRDM",
                 "year_level": 4,
                 "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
+                "lec_hours": 0,
+                "lab_hours": 6,
                 "is_major": 1,
                 "curriculum_type": "new",
                 "semester": 2
