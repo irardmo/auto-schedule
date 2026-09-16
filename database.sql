@@ -291,25 +291,6 @@ INSERT IGNORE INTO rooms (id, name, room_type) VALUES
 
 -- 7. Seed Specific Course Subjects
 INSERT IGNORE INTO bsit_subject_new (id, title_and_code, course, year_level, semester, units, lec_hours, lab_hours, is_major, curriculum_type) VALUES
-('s1', 'Computer Programming 1 CC 102', 'BSIT', 1, 1, 3, 2, 2, 1, 'new'),
-('s1b', 'Introduction to Computing CC 101', 'BSIT', 1, 1, 3, 3, 0, 1, 'new'),
-('s2', 'SYSTEM ADMIN AND MAINTENANCE SA 101', 'BSIT', 3, 1, 3, 2, 2, 1, 'new'),
-('s3', 'Social and Professional Issues SP 101', 'BSIT', 3, 1, 3, 3, 0, 0, 'new'),
-('s4', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, 1, 3, 2, 2, 1, 'new'),
-('s5', 'FUNDAMENTALS OF DATABASE SYSTEM IM 101', 'BSIT', 2, 1, 3, 2, 2, 1, 'new'),
-('s6', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, 1, 3, 2, 2, 1, 'new'),
-('s7', 'OBJECT ORIENTED PROGRAMMING PF 101', 'BSIT', 2, 1, 3, 2, 2, 1, 'new'),
-('s8', 'National Service Training Program 1 NSTP 1', 'BSIT', 1, 1, 3, 3, 0, 0, 'new'),
-('s9', 'Physical Education PE 101', 'BSIT', 1, 1, 2, 2, 0, 0, 'new'),
-('s10', 'Physical Education PE 101', 'BSIT', 1, 1, 2, 2, 0, 0, 'new'),
-('s11', 'Physical Education PE 101', 'BSIT', 2, 1, 2, 2, 0, 0, 'new'),
-('s12', 'Physical Education PE 101', 'BSIT', 2, 1, 2, 2, 0, 0, 'new'),
-('s13', 'Physical Education PE 101', 'BSIT', 3, 1, 2, 2, 0, 0, 'new'),
-('s14', 'Physical Education PE 101', 'BSIT', 3, 1, 2, 2, 0, 0, 'new'),
-('s15', 'Information Assurance & Security IAS 101', 'BSIT', 3, 1, 3, 2, 2, 1, 'new'),
-('s16', 'Web Systems and Technologies WS 101', 'BSIT', 3, 1, 3, 2, 2, 1, 'new'),
-('s17', 'Capstone Project 1 CAP 101', 'BSIT', 4, 1, 3, 3, 0, 1, 'new'),
-('s18', 'Capstone Project 2 CAP 102', 'BSIT', 4, 1, 3, 3, 0, 1, 'new'),
 ('bsit_n1', 'Understanding the Self GE 101', 'BSIT', 1, 1, 3, 3, 0, 0, 'new'),
 ('bsit_n2', 'Sining ng Pakikipagtalastasan GE 102', 'BSIT', 1, 1, 3, 3, 0, 0, 'new'),
 ('bsit_n3', 'Entrepreneurial Mind GE EL 101', 'BSIT', 1, 1, 3, 3, 0, 0, 'new'),
@@ -1338,5 +1319,5 @@ INSERT IGNORE INTO bsba_mm_subject_old (id, title_and_code, course, year_level, 
 
 -- 8. Seed Schedules
 INSERT IGNORE INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
-('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
-('sch2', 't2', 'r1', 'M', '13:00', '16:00', 's2');
+('sch1', 't1', 'r2', 'W', '08:00', '11:00', 'bsit_n4'),
+('sch2', 't2', 'r1', 'M', '13:00', '16:00', 'bsit_n37');
