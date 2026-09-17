@@ -1,10 +1,10 @@
 
 function getFilteredStandardDays(selectedSetting) {
-  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF", "WF", "MW", "MF", "TF"];
   if (!selectedSetting || selectedSetting === 'all') return allDays;
   const count = parseInt(selectedSetting, 10);
   if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
-  if (count === 2) return ["MT", "TTH"];
+  if (count === 2) return ["MT", "TTH", "WF", "MW", "MF", "TF"];
   if (count === 3) return ["MWF"];
   return allDays;
 }
@@ -12449,27 +12449,27 @@ function parseTimeToMinutes(timeStr) {
   return hrs * 60 + mins;
 }
 
-// Day Overlap check
-function daysOverlap(day1, day2) {
-  if (day1 === day2) return true;
-  if (day1 === 'MT' && (day2 === 'M' || day2 === 'T')) return true;
-  if (day2 === 'MT' && (day1 === 'M' || day1 === 'T')) return true;
-  if (day1 === 'TTH' && (day2 === 'T' || day2 === 'TH')) return true;
-  if (day2 === 'TTH' && (day1 === 'T' || day1 === 'TH')) return true;
-  if (day1 === 'MWF' && (day2 === 'M' || day2 === 'W' || day2 === 'F')) return true;
-  if (day2 === 'MWF' && (day1 === 'M' || day1 === 'W' || day1 === 'F')) return true;
-  if (day1 === 'Monday-Friday' || day2 === 'Monday-Friday') return true;
-  return false;
-}
-
 // Get constituent single days from a composite day code
 function getConstituentDays(dayStr) {
   if (!dayStr) return [];
   if (dayStr === 'MT') return ['M', 'T'];
+  if (dayStr === 'MW') return ['M', 'W'];
+  if (dayStr === 'MF') return ['M', 'F'];
+  if (dayStr === 'TF') return ['T', 'F'];
+  if (dayStr === 'WF') return ['W', 'F'];
   if (dayStr === 'TTH') return ['T', 'TH'];
   if (dayStr === 'MWF') return ['M', 'W', 'F'];
   if (dayStr === 'Monday-Friday') return ['M', 'T', 'W', 'TH', 'F'];
   return [dayStr]; // e.g. M, T, W, TH, F, S
+}
+
+// Day Overlap check via set intersection of constituent days
+function daysOverlap(day1, day2) {
+  if (!day1 || !day2) return false;
+  if (day1 === day2) return true;
+  const days1 = getConstituentDays(day1);
+  const days2 = getConstituentDays(day2);
+  return days1.some(d => days2.includes(d));
 }
 
 // Check if a room name is designated for high school (205-208, or HS101-HS110)
@@ -13165,7 +13165,7 @@ function renderSchedulesTable() {
   document.getElementById('scheduleTable').style.display = 'table';
 
   // Sort by day, time start
-  const dayOrder = { "M": 1, "T": 2, "W": 3, "TH": 4, "F": 5, "S": 6, "MT": 1.5, "TTH": 2.5, "MWF": 1.2, "Monday-Friday": 0.5 };
+  const dayOrder = { "M": 1, "T": 2, "W": 3, "TH": 4, "F": 5, "S": 6, "MT": 1.5, "MW": 1.6, "MF": 1.7, "TF": 2.2, "WF": 3.5, "TTH": 2.5, "MWF": 1.2, "Monday-Friday": 0.5 };
   filtered.sort((a, b) => {
     const dayDiff = (dayOrder[a.day] || 9) - (dayOrder[b.day] || 9);
     if (dayDiff !== 0) return dayDiff;
