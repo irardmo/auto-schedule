@@ -13831,230 +13831,6 @@ function clearRoomForm() {
   document.getElementById('room-id').value = "";
 }
 
-// --- INTELLIGENT AUTO-SCHEDULER ENGINE ---
-// Schedules all un-scheduled subjects sequentially while satisfying all conflict conditions.
-function runAutoScheduler() {
-  const overwrite = document.getElementById('overwriteSchedules').checked;
-  const logContainer = document.getElementById('autoSchedulerResults');
-  const consoleEl = document.getElementById('schedulerConsole');
-  
-  logContainer.classList.remove('d-none');
-  consoleEl.innerHTML = `Starting Intelligent Auto-Scheduling engine...<br>`;
-
-  if (overwrite) {
-    db.schedules = [];
-    consoleEl.innerHTML += `<span class="text-warning">Cleared existing schedules as selected.</span><br>`;
-  }
-
-  // Define Standard Time slots and days available for schedule blocks
-  // Adding more evening/afternoon slots for High School Room constraints if needed
-  const standardTimeSlots = [
-    // 2 Hour blocks (7:00 AM to 7:00 PM)
-    { start: "07:00", end: "09:00", dur: 2 },
-    { start: "08:00", end: "10:00", dur: 2 },
-    { start: "10:00", end: "12:00", dur: 2 },
-    { start: "13:00", end: "15:00", dur: 2 },
-    { start: "15:00", end: "17:00", dur: 2 },
-    { start: "17:00", end: "19:00", dur: 2 },
-    { start: "16:00", end: "18:00", dur: 2 },
-    
-    // 3 Hour blocks (7:00 AM to 7:00 PM)
-    { start: "07:00", end: "10:00", dur: 3 },
-    { start: "08:00", end: "11:00", dur: 3 },
-    { start: "09:00", end: "12:00", dur: 3 },
-    { start: "13:00", end: "16:00", dur: 3 },
-    { start: "16:00", end: "19:00", dur: 3 },
-    
-    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
-    { start: "07:00", end: "08:30", dur: 1.5 },
-    { start: "07:30", end: "09:00", dur: 1.5 },
-    { start: "09:00", end: "10:30", dur: 1.5 },
-    { start: "10:30", end: "12:00", dur: 1.5 },
-    { start: "13:00", end: "14:30", dur: 1.5 },
-    { start: "14:30", end: "16:00", dur: 1.5 },
-    { start: "16:00", end: "17:30", dur: 1.5 },
-    { start: "17:30", end: "19:00", dur: 1.5 },
-    
-    // 1 Hour blocks (7:00 AM to 7:00 PM)
-    { start: "07:00", end: "08:00", dur: 1 },
-    { start: "08:00", end: "09:00", dur: 1 },
-    { start: "09:00", end: "10:00", dur: 1 },
-    { start: "10:00", end: "11:00", dur: 1 },
-    { start: "11:00", end: "12:00", dur: 1 },
-    { start: "13:00", end: "14:00", dur: 1 },
-    { start: "14:00", end: "15:00", dur: 1 },
-    { start: "15:00", end: "16:00", dur: 1 },
-    { start: "16:00", end: "17:00", dur: 1 },
-    { start: "17:00", end: "18:00", dur: 1 },
-    { start: "18:00", end: "19:00", dur: 1 }
-  ];
-
-  const autoDaysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
-  const standardDays = getFilteredStandardDays(autoDaysSetting);
-
-  let scheduledCount = 0;
-  let unscheduledCount = 0;
-
-  const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
-
-  // Sort subjects to prioritize major subjects first
-  // major subjects (is_major === 1) should be scheduled first to prioritize COMLAB and CRIMLAB
-  const sortedSubjects = [...db.subjects].sort((a, b) => {
-    return (b.is_major || 0) - (a.is_major || 0);
-  });
-
-  // Loop through all subjects
-  sortedSubjects.forEach(subject => {
-    if (scheduledSubjectIds.has(subject.id)) {
-      consoleEl.innerHTML += `Subject: <span class="text-info">${subject.title_and_code}</span> is already scheduled.<br>`;
-      scheduledCount++;
-      return;
-    }
-
-    let isScheduled = false;
-    consoleEl.innerHTML += `Scheduling subject: <strong>${subject.title_and_code}</strong> (${subject.is_major ? '<span class="text-danger fw-bold">MAJOR</span>' : 'GENERAL'} - ${subject.course} Year ${subject.year_level})...<br>`;
-
-    const targetDuration = subject.lab_hours > 0 ? 3 : 2; // labs prefer 3 hours, lectures prefer 2
-    const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
-
-    // Sort rooms based on major vs general subject room priorities, with special rooms (Library 1, 2, TBL) as absolute last resource:
-    const sortedRooms = [...db.rooms].sort((a, b) => {
-      const aSpecial = isSpecialRoom(a.name);
-      const bSpecial = isSpecialRoom(b.name);
-
-      // If one is special and the other is not, the special room goes to the end
-      if (aSpecial && !bSpecial) return 1;
-      if (!aSpecial && bSpecial) return -1;
-      if (aSpecial && bSpecial) return 0; // maintain relative order of special rooms
-
-      const isALab = a.name.toUpperCase().includes('COMLAB') || a.name.toUpperCase().includes('CRIMLAB');
-      const isBLab = b.name.toUpperCase().includes('COMLAB') || b.name.toUpperCase().includes('CRIMLAB');
-      
-      if (subject.is_major) {
-        // Prioritize lab rooms
-        if (isALab && !isBLab) return -1;
-        if (!isALab && isBLab) return 1;
-      } else {
-        // Prioritize non-lab rooms first
-        if (!isALab && isBLab) return -1;
-        if (isALab && !isBLab) return 1;
-      }
-      return 0;
-    });
-
-    // Waterfall logic for choosing teachers: Always prioritize instructors with fewer units currently assigned
-    const sortedTeachers = [...db.instructors].sort((a, b) => {
-      return calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id);
-    });
-
-    let conflictsEncountered = new Set();
-
-    for (let teacher of sortedTeachers) {
-      const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
-
-      // Prefer Saturday (S) and Evening time blocks (4 PM to 7 PM) for part-time schedules
-      const sortedDays = [...standardDays].sort((a, b) => {
-        if (isPartTime) {
-          if (a === 'S' && b !== 'S') return -1;
-          if (b === 'S' && a !== 'S') return 1;
-        }
-        return 0;
-      });
-
-      const sortedSlots = [...filteredSlots].sort((a, b) => {
-        if (isPartTime) {
-          const aIsEve = timesOverlap(a.start, a.end, "16:00", "19:00");
-          const bIsEve = timesOverlap(b.start, b.end, "16:00", "19:00");
-          if (aIsEve && !bIsEve) return -1;
-          if (!aIsEve && bIsEve) return 1;
-        }
-        return 0;
-      });
-
-      for (let room of sortedRooms) {
-        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab/CrimLab
-        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue; 
-
-        // For auto-scheduler (which finds any room): if the subject is general (non-lab and non-major),
-        // do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
-        if (subject.lab_hours === 0 && !subject.is_major) {
-          const rNameUpper = room.name.toUpperCase();
-          const isComLab = rNameUpper.includes('COMLAB');
-          const isCrimLab = rNameUpper.includes('CRIMLAB');
-          const isSpecial = isSpecialRoom(room.name);
-          if (isComLab || isCrimLab || isSpecial) {
-            continue;
-          }
-        }
-
-        for (let day of sortedDays) {
-          for (let slot of sortedSlots) {
-            
-            const candidate = {
-              id: 'temp_' + uniqueId(),
-              instructor_id: teacher.id,
-              room_id: room.id,
-              day,
-              time_start: slot.start,
-              time_end: slot.end,
-              subject_id: subject.id
-            };
-
-            const validation = validateSchedule(candidate);
-            if (validation.valid) {
-              candidate.id = uniqueId();
-              db.schedules.push(candidate);
-              isScheduled = true;
-              scheduledCount++;
-              consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Assigned:</span> ${teacher.name} inside ${room.name} on ${day} (${slot.start}-${slot.end})<br>`;
-              break;
-            } else {
-              validation.errors.forEach(err => conflictsEncountered.add(err));
-            }
-          }
-          if (isScheduled) break;
-        }
-        if (isScheduled) break;
-      }
-      if (isScheduled) break;
-    }
-
-    if (!isScheduled) {
-      unscheduledCount++;
-      consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Failed:</span> No conflict-free slots found for ${subject.title_and_code}.<br>`;
-      if (conflictsEncountered.size > 0) {
-        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
-        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
-          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
-        });
-      }
-    }
-  });
-
-  document.getElementById('log-total-subjects').innerText = db.subjects.length;
-  document.getElementById('log-scheduled').innerText = scheduledCount;
-  document.getElementById('log-unscheduled').innerText = unscheduledCount;
-  
-  const statusEl = document.getElementById('schedulerStatusBadge');
-  if (unscheduledCount === 0) {
-    statusEl.className = "badge bg-success";
-    statusEl.innerText = "Complete Success";
-  } else {
-    statusEl.className = "badge bg-warning text-dark";
-    statusEl.innerText = "Partially Scheduled";
-  }
-
-  saveDatabase();
-
-  const isSuccess = unscheduledCount === 0;
-  const alertType = isSuccess ? 'success' : 'warning';
-  const alertTitle = isSuccess ? 'Auto-Scheduler Engine Completed Successfully!' : 'Auto-Scheduler Finished with Conflicts';
-  const alertMsg = `Scheduled ${scheduledCount} out of ${db.subjects.length} subjects.` + 
-    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled conflict-free. Check the execution logs for details.` : '');
-
-  showGlobalAlert(alertTitle, alertMsg, alertType);
-  showToast(alertMsg, isSuccess ? 'success' : 'warning');
-}
 
 // --- WATERFALL SUBJECT SHARING ENGINE ---
 async function runWaterfallScheduler() {
@@ -14313,6 +14089,8 @@ async function runWaterfallScheduler() {
   }
 
   await saveDatabase();
+  renderSchedulesTable();
+  updateStats();
 
   const failedCount = subjectsToSchedule.length - successfullyScheduled;
   const isSuccess = failedCount === 0;
@@ -14987,6 +14765,13 @@ async function runPerSectionScheduler() {
 
     // Update target block section
     sub.block_section = block;
+
+    // Prevent duplicate scheduling if subject is already scheduled for this section
+    if (db.schedules.some(sch => sch.subject_id === sub.id)) {
+      consoleEl.innerHTML += `<span class="text-info">ℹ Already Scheduled:</span> ${sub.title_and_code} (${sub.course} ${year}${block}) is already in schedule.<br>`;
+      scheduledCount++;
+      continue;
+    }
 
     let teachersToTry = [];
     if (assignedTeacherId) {
