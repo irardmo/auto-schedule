@@ -12507,8 +12507,35 @@ function isComputerSubject(subject) {
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
+  const exactComputerTitles = [
+    'COMPUTER PROGRAMMING 1',
+    'INFORMATION TECHNOLOGY FUNDAMENTALS',
+    'COMPUTER PROGRAMMING 2',
+    'OBJECT-ORIENTED PROGRAMMING',
+    'FUNDAMENTALS OF DATABASE SYSTEMS',
+    'EVENT DRIVEN PROGRAMMING',
+    'DATA STRUCTURES AND ALGORITHMS',
+    'INFORMATION MANAGEMENT',
+    'INFO ASSURANCE AND SECURITY 1',
+    'APP DEV. & EMERGING TECHNOLOGIES',
+    'NETWORKING 1',
+    'INTRO TO HUMAN-COMPUTER INTERACTION',
+    'SYSTEM ADMIN & MAINTENANCE',
+    'WEB SYSTEMS AND TECHNOLOGY',
+    'INTEGRATIVE PROGRAMMING & TECHNOLOGIES',
+    'NETWORKING 2',
+    'INFO ASSURANCE AND SECURITY 2',
+    'SYSTEM INTEGRATION AND ARCHITECTURE 1',
+    'SYSTEM INTEGRATION AND ARCHITECTURE 2',
+    'PLATFORM TECHNOLOGIES',
+    'MULTIMEDIA AND ANIMATION',
+    'HUMAN-COMPUTER INTERACTION 2'
+  ];
+
+  if (exactComputerTitles.some(t => title.includes(t))) return true;
+
   const computerPrefixes = ['CC', 'IT', 'COMP', 'PF', 'IM', 'NET', 'IAS', 'SA', 'SIA', 'WS', 'IPT', 'HCI', 'PT', 'CAP', 'PRAC'];
-  const computerKeywords = ['COMPUTER', 'PROGRAMMING', 'DATABASE', 'WEB', 'NETWORK', 'SOFTWARE', 'MULTIMEDIA', 'HARDWARE', 'INFORMATION MANAGEMENT', 'SYSTEM INTEGRATION', 'CAPSTONE'];
+  const computerKeywords = ['COMPUTER', 'PROGRAMMING', 'DATABASE', 'WEB', 'NETWORK', 'SOFTWARE', 'MULTIMEDIA', 'HARDWARE', 'INFORMATION MANAGEMENT', 'SYSTEM INTEGRATION', 'CAPSTONE', 'PLATFORM TECHNOLOGIES', 'INTEGRATIVE PROGRAMMING'];
 
   if (computerPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
   if (computerKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
@@ -12517,15 +12544,18 @@ function isComputerSubject(subject) {
   return false;
 }
 
-// Check if subject is criminology related
+// Check if subject is criminology or specialized lab related
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
-  const crimPrefixes = ['FORENSIC', 'CRIM', 'CDI', 'LEA', 'CLJ', 'CA', 'CFLM'];
-  const crimKeywords = ['FORENSIC', 'CRIMINOLOGY', 'INVESTIGATION', 'LAW ENFORCEMENT', 'CRIMINAL', 'CORRECTIONS', 'BALLISTICS', 'LIE DETECTION', 'QUESTIONED DOCUMENTS', 'MARKSMANSHIP', 'ARMS', 'ARSON', 'CYBERCRIME'];
+  const exactSpecialLabCodes = ['HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124', 'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'];
+  if (exactSpecialLabCodes.some(c => code.includes(c))) return true;
+
+  const crimPrefixes = ['FORENSIC', 'CRIM', 'CDI', 'LEA', 'CLJ', 'CA', 'CFLM', 'HPC', 'HMPE'];
+  const crimKeywords = ['FORENSIC', 'CRIMINOLOGY', 'INVESTIGATION', 'LAW ENFORCEMENT', 'CRIMINAL', 'CORRECTIONS', 'BALLISTICS', 'LIE DETECTION', 'QUESTIONED DOCUMENTS', 'MARKSMANSHIP', 'ARMS', 'ARSON', 'CYBERCRIME', 'KITCHEN', 'FOOD SERVICE', 'CULINARY', 'FRONT OFFICE', 'ROOM DIVISION', 'EVENTS MGT'];
 
   if (crimPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
   if (crimKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
