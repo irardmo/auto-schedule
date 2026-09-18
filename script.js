@@ -13239,6 +13239,24 @@ function resetFilters() {
   renderSchedulesTable();
 }
 
+function autoSaveSchedule(id, field, value) {
+  const sch = db.schedules.find(s => s.id === id);
+  if (!sch) return;
+
+  sch[field] = value;
+
+  // Run validation check
+  const validation = validateSchedule(sch);
+  if (!validation.valid) {
+    showToast(`Warning: Schedule conflict detected: ${validation.errors.join(', ')}`, "warning");
+  } else {
+    showToast("Schedule updated successfully!", "info");
+  }
+
+  saveDatabase();
+  renderSchedulesTable();
+}
+
 function renderSchedulesTable() {
   const listEl = document.getElementById('scheduleList');
   if (!listEl) return;
@@ -13295,13 +13313,13 @@ function renderSchedulesTable() {
   const startIdx = (schedulesCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = filtered.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
+  const standardDaysList = ['M', 'T', 'W', 'TH', 'F', 'S', 'MT', 'MW', 'MF', 'TF', 'WF', 'TTH', 'MWF', 'Monday-Friday'];
+
   pagedItems.forEach(sch => {
     const teacher = db.instructors.find(t => t.id === sch.instructor_id);
     const room = db.rooms.find(r => r.id === sch.room_id);
     const subject = db.subjects.find(s => s.id === sch.subject_id);
 
-    const tName = teacher ? teacher.name : 'Unknown';
-    const rName = room ? room.name : 'Unknown';
     const subTitle = subject ? subject.title_and_code : 'Unknown';
     const course = subject ? subject.course : '-';
     const year = subject ? subject.year_level : '-';
@@ -13309,33 +13327,46 @@ function renderSchedulesTable() {
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
-    // Standard 12 hour formatting for rendering
-    const formatTime = (timeStr) => {
-      if (!timeStr) return '-';
-      const [hrs, mins] = timeStr.split(':').map(Number);
-      const ampm = hrs >= 12 ? 'PM' : 'AM';
-      const formattedHrs = hrs % 12 || 12;
-      return `${formattedHrs}:${String(mins).padStart(2, '0')} ${ampm}`;
-    };
+    const teacherSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold ${!sch.instructor_id ? 'text-danger' : 'text-dark'}" onchange="autoSaveSchedule('${sch.id}', 'instructor_id', this.value)" style="min-width: 160px;">
+        <option value="" ${!sch.instructor_id ? 'selected' : ''}>-- Unassigned (Blank) --</option>
+        ${db.instructors.map(i => `<option value="${i.id}" ${sch.instructor_id === i.id ? 'selected' : ''}>${i.name}</option>`).join('')}
+      </select>
+    `;
+
+    const roomSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveSchedule('${sch.id}', 'room_id', this.value)">
+        ${db.rooms.map(r => `<option value="${r.id}" ${sch.room_id === r.id ? 'selected' : ''}>${r.name}</option>`).join('')}
+      </select>
+    `;
+
+    const daySelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold text-primary" onchange="autoSaveSchedule('${sch.id}', 'day', this.value)">
+        ${standardDaysList.map(d => `<option value="${d}" ${sch.day === d ? 'selected' : ''}>${d}</option>`).join('')}
+      </select>
+    `;
+
+    const subjectSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field text-wrap small text-muted" style="max-width: 220px;" onchange="autoSaveSchedule('${sch.id}', 'subject_id', this.value)">
+        ${db.subjects.map(s => `<option value="${s.id}" ${sch.subject_id === s.id ? 'selected' : ''}>${s.title_and_code} (${s.course})</option>`).join('')}
+      </select>
+    `;
 
     listEl.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-schedules" value="${sch.id}" onchange="toggleItemSelection('schedules', '${sch.id}', this.checked)"></td>
-        <td class="fw-bold text-dark">${tName}</td>
-        <td><span class="badge bg-secondary py-1 px-2">${rName}</span></td>
-        <td class="fw-bold text-primary">${sch.day}</td>
-        <td>${formatTime(sch.time_start)}</td>
-        <td>${formatTime(sch.time_end)}</td>
+        <td>${teacherSelect}</td>
+        <td>${roomSelect}</td>
+        <td>${daySelect}</td>
+        <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_start}" onchange="autoSaveSchedule('${sch.id}', 'time_start', this.value)"></td>
+        <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_end}" onchange="autoSaveSchedule('${sch.id}', 'time_end', this.value)"></td>
         <td class="text-center">${year}</td>
         <td>${course} ${block}</td>
-        <td class="text-wrap small text-muted" style="max-width: 200px;">${subTitle}</td>
+        <td>${subjectSelect}</td>
         <td>${course}</td>
         <td class="text-center fw-medium">${lec}</td>
         <td class="text-center fw-medium">${lab}</td>
         <td class="text-end">
-          <button class="btn btn-outline-info btn-xs py-0 px-1 me-1" onclick="editSchedule('${sch.id}')" title="Edit Schedule">
-            <i class="bi bi-pencil-square"></i>
-          </button>
           <button class="btn btn-outline-danger btn-xs py-0 px-1" onclick="deleteSchedule('${sch.id}')" title="Delete Schedule">
             <i class="bi bi-trash-fill"></i>
           </button>
@@ -13896,11 +13927,15 @@ function editTeacher(id) {
 }
 
 function deleteTeacher(id) {
-  if (confirm("Are you sure you want to delete this instructor? This will also remove all their associated schedules.")) {
+  if (confirm("Are you sure you want to delete this instructor? Their associated schedules will remain with a blank instructor assignment.")) {
     db.instructors = db.instructors.filter(ins => ins.id !== id);
-    db.schedules = db.schedules.filter(sch => sch.instructor_id !== id);
+    db.schedules.forEach(sch => {
+      if (sch.instructor_id === id) {
+        sch.instructor_id = "";
+      }
+    });
     saveDatabase();
-    showToast("Instructor and related schedules deleted successfully!", "danger");
+    showToast("Instructor deleted. Associated schedules preserved with blank instructor.", "warning");
   }
 }
 
@@ -14586,12 +14621,17 @@ function bulkDeleteSchedules() {
 
 function bulkDeleteTeachers() {
   if (selectedTeacherIds_manage.size === 0) return;
-  if (confirm(`Are you sure you want to delete ${selectedTeacherIds_manage.size} selected instructor(s)? This will also delete their associated schedules.`)) {
+  if (confirm(`Are you sure you want to delete ${selectedTeacherIds_manage.size} selected instructor(s)? Their associated schedules will remain with blank instructor assignments.`)) {
+    const idsToDelete = Set ? Array.from(selectedTeacherIds_manage) : [];
     db.instructors = db.instructors.filter(t => !selectedTeacherIds_manage.has(t.id));
-    db.schedules = db.schedules.filter(sch => !selectedTeacherIds_manage.has(sch.instructor_id));
+    db.schedules.forEach(sch => {
+      if (selectedTeacherIds_manage.has(sch.instructor_id)) {
+        sch.instructor_id = "";
+      }
+    });
     selectedTeacherIds_manage.clear();
     saveDatabase();
-    showToast("Selected instructors deleted successfully!", "danger");
+    showToast("Selected instructors deleted. Associated schedules preserved with blank instructor.", "warning");
   }
 }
 
