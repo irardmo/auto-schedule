@@ -1,11 +1,53 @@
-/* Custom SIBT Styling */
+/* Custom SIBT Styling - SIBT Royal Blue & Golden Yellow Theme */
+
+:root {
+  --sibt-blue: #0d3b66;
+  --sibt-blue-dark: #092847;
+  --sibt-blue-light: #1d4ed8;
+  --sibt-yellow: #f4d35e;
+  --sibt-yellow-dark: #e0a96d;
+  --sibt-gold: #f59e0b;
+}
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background-color: #f8f9fa;
+  background-color: #f4f6f9;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+/* Header & Navbar SIBT Theme */
+.navbar-sibt {
+  background-color: var(--sibt-blue) !important;
+  border-bottom: 4px solid var(--sibt-yellow);
+}
+
+.navbar-sibt .navbar-brand {
+  color: #ffffff !important;
+}
+
+.navbar-sibt .navbar-brand i {
+  color: var(--sibt-yellow) !important;
+}
+
+.navbar-sibt .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar-sibt .nav-link:hover {
+  color: var(--sibt-yellow) !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-sibt .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(244, 211, 94, 0.25) !important;
+  border-bottom: 3px solid var(--sibt-yellow);
 }
 
 /* Custom Scrollbar */
@@ -17,11 +59,11 @@ body {
   background: #f1f1f1;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--sibt-blue);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--sibt-blue-dark);
 }
 
 /* Custom styles for tables and forms */
@@ -30,21 +72,67 @@ body {
 }
 
 .table > thead {
-  background-color: #f1f3f5;
-  color: #495057;
+  background-color: #0d3b66 !important;
+  color: #ffffff !important;
   font-weight: 600;
 }
 
+.table > thead th {
+  background-color: #0d3b66 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid var(--sibt-yellow) !important;
+}
+
 .bg-light-blue {
-  background-color: #eef2f7;
-  border: 1px solid #dee2e6;
+  background-color: #f0f4f8;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
+}
+
+/* Primary Button Override to SIBT Blue & Gold */
+.btn-primary {
+  background-color: var(--sibt-blue) !important;
+  border-color: var(--sibt-blue) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--sibt-blue-dark) !important;
+  border-color: var(--sibt-blue-dark) !important;
+}
+
+.btn-warning, .btn-outline-warning {
+  background-color: var(--sibt-yellow) !important;
+  border-color: var(--sibt-gold) !important;
+  color: #092847 !important;
+  font-weight: 600;
 }
 
 /* Active sub-tab styling */
 .list-group-item.active {
-  background-color: #0d6efd !important;
-  border-color: #0d6efd !important;
+  background-color: var(--sibt-blue) !important;
+  border-color: var(--sibt-blue) !important;
+  color: #ffffff !important;
+  border-left: 5px solid var(--sibt-yellow) !important;
+}
+
+/* Pagination SIBT Theme */
+.pagination .page-item.active .page-link {
+  background-color: var(--sibt-blue) !important;
+  border-color: var(--sibt-blue) !important;
+  color: var(--sibt-yellow) !important;
+  font-weight: 700;
+}
+
+.pagination .page-link {
+  color: var(--sibt-blue);
+  font-weight: 600;
+}
+
+.pagination .page-link:hover {
+  background-color: rgba(244, 211, 94, 0.2);
+  color: var(--sibt-blue-dark);
 }
 
 /* Conflict styling on live monitor */

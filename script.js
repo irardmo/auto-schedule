@@ -60,14 +60,52 @@ function renderPaginationControls(totalItems, currentPage, pageSize, navElId, in
     </li>
   `;
 
-  // Page numbers
-  for (let i = 1; i <= totalPages; i++) {
-    const activeClass = i === adjustedPage ? 'active' : '';
+  // Determine pages to display: First page, 3 middle pages (around current), Last page
+  let pagesToDisplay = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pagesToDisplay.push(i);
+  } else {
+    pagesToDisplay.push(1); // First page
+
+    let midStart = adjustedPage - 1;
+    let midEnd = adjustedPage + 1;
+
+    if (adjustedPage <= 3) {
+      midStart = 2;
+      midEnd = 4;
+    } else if (adjustedPage >= totalPages - 2) {
+      midStart = totalPages - 3;
+      midEnd = totalPages - 1;
+    }
+
+    for (let i = midStart; i <= midEnd; i++) {
+      if (i > 1 && i < totalPages) {
+        pagesToDisplay.push(i);
+      }
+    }
+
+    pagesToDisplay.push(totalPages); // Last page
+  }
+
+  pagesToDisplay = Array.from(new Set(pagesToDisplay)).sort((a, b) => a - b);
+
+  let prevNum = 0;
+  for (let i = 0; i < pagesToDisplay.length; i++) {
+    const pageNum = pagesToDisplay[i];
+    if (prevNum > 0 && pageNum - prevNum > 1) {
+      navEl.innerHTML += `
+        <li class="page-item disabled">
+          <span class="page-link">...</span>
+        </li>
+      `;
+    }
+    const activeClass = pageNum === adjustedPage ? 'active' : '';
     navEl.innerHTML += `
       <li class="page-item ${activeClass}">
-        <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${i})">${i}</a>
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${pageNum})">${pageNum}</a>
       </li>
     `;
+    prevNum = pageNum;
   }
 
   // Next Button
@@ -12893,9 +12931,24 @@ function checkRealtimeConflict() {
 
 // Tab Switching Routing Function
 function switchTab(tabName) {
+  const pageMap = {
+    'board': 'board.html',
+    'manual': 'input.html',
+    'input': 'input.html',
+    'auto': 'auto.html',
+    'manage': 'manage.html',
+    'print': 'print.html'
+  };
+
+  const panel = document.getElementById(`panel-${tabName}`);
+  if (!panel && pageMap[tabName]) {
+    window.location.href = pageMap[tabName];
+    return;
+  }
+
   // Hide all panels
-  document.querySelectorAll('.tab-panel').forEach(panel => {
-    panel.classList.add('d-none');
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.add('d-none');
   });
   // Un-active all nav items
   document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
@@ -12903,7 +12956,6 @@ function switchTab(tabName) {
   });
 
   // Show active panel
-  const panel = document.getElementById(`panel-${tabName}`);
   if (panel) panel.classList.remove('d-none');
 
   // Highlight active link
@@ -12914,14 +12966,14 @@ function switchTab(tabName) {
   if (tabName === 'print') {
     populatePrintTeachers();
     renderOfficialPrintout();
-  } else if (tabName === 'manual') {
+  } else if (tabName === 'manual' || tabName === 'input') {
     populateFormSelects();
     checkRealtimeConflict();
   }
 }
 
 // Switch between settings manage tables
-function switchManageSubTab(subTab) {
+function switchManageSubTab(subTab, el) {
   document.querySelectorAll('.manage-panel').forEach(panel => {
     panel.classList.add('d-none');
   });
@@ -12931,7 +12983,20 @@ function switchManageSubTab(subTab) {
   document.querySelectorAll('#manageSubTabs .list-group-item').forEach(btn => {
     btn.classList.remove('active');
   });
-  event.target.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+  } else if (window.event && window.event.target) {
+    const target = window.event.target.closest('.list-group-item');
+    if (target) target.classList.add('active');
+  }
+
+  if (subTab === 'teachers') {
+    renderInstructorsTable();
+  } else if (subTab === 'subjects') {
+    renderSubjectsTable();
+  } else if (subTab === 'rooms') {
+    renderRoomsTable();
+  }
 }
 
 // Generate unique ID
@@ -15136,8 +15201,8 @@ async function runPerSectionScheduler() {
 }
 
 // Initialize on document load
-document.addEventListener('DOMContentLoaded', () => {
-  loadDatabase();
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadDatabase();
 
   // Pre-load logic and first rendering
   populateFormSelects();
