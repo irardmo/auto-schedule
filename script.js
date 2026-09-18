@@ -13345,6 +13345,54 @@ function renderSchedulesTable() {
   });
 }
 
+// AUTO-SAVE HELPERS FOR MANAGE DATA INLINE EDITING
+function autoSaveInstructor(id, field, value) {
+  const teacher = db.instructors.find(i => i.id === id);
+  if (!teacher) return;
+
+  if (field === 'max_units') {
+    teacher.max_units = parseFloat(value) || 0;
+  } else if (field === 'designation') {
+    teacher.designation = value;
+    teacher.max_units = getWorkloadLimitByDesignation(value);
+    renderInstructorsTable();
+  } else {
+    teacher[field] = value;
+  }
+
+  saveDatabase();
+  showToast(`Auto-saved instructor "${teacher.name}"`, "info");
+}
+
+function autoSaveSubject(id, field, value) {
+  const sub = db.subjects.find(s => s.id === id);
+  if (!sub) return;
+
+  if (field === 'units' || field === 'lec_hours' || field === 'lab_hours' || field === 'year_level' || field === 'semester') {
+    sub[field] = parseFloat(value) || 0;
+  } else if (field === 'is_major') {
+    sub.is_major = parseInt(value, 10);
+    renderSubjectsTable();
+  } else if (field === 'course') {
+    sub.course = value;
+    renderSubjectsTable();
+  } else {
+    sub[field] = value;
+  }
+
+  saveDatabase();
+  showToast(`Auto-saved subject "${sub.title_and_code}"`, "info");
+}
+
+function autoSaveRoom(id, field, value) {
+  const room = db.rooms.find(r => r.id === id);
+  if (!room) return;
+
+  room[field] = value;
+  saveDatabase();
+  showToast(`Auto-saved room "${room.name}"`, "info");
+}
+
 // RENDER INSTRUCTORS TABLE
 function renderInstructorsTable() {
   const table = document.getElementById('teachersListTable');
@@ -13367,21 +13415,35 @@ function renderInstructorsTable() {
   const startIdx = (instructorsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.instructors.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
+  const desigOptions = [
+    'Licensed Teacher',
+    'Regular Teacher',
+    'Program Head',
+    'Director',
+    'Part-time Teacher',
+    'Admin'
+  ];
+
   pagedItems.forEach(t => {
+    const desigSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveInstructor('${t.id}', 'designation', this.value)">
+        ${desigOptions.map(d => `<option value="${d}" ${t.designation === d ? 'selected' : ''}>${d}</option>`).join('')}
+      </select>
+    `;
+
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-teachers" value="${t.id}" onchange="toggleItemSelection('teachers', '${t.id}', this.checked)"></td>
-        <td class="fw-bold">${t.name}</td>
-        <td><span class="badge bg-light text-dark border">${t.designation}</span></td>
-        <td>${t.degree || '-'}</td>
-        <td>${t.area || '-'}</td>
-        <td>${t.employee_no || '-'}</td>
-        <td class="text-center fw-semibold text-primary">${t.max_units}</td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${t.name || ''}" onchange="autoSaveInstructor('${t.id}', 'name', this.value)"></td>
+        <td>${desigSelect}</td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.degree || ''}" onchange="autoSaveInstructor('${t.id}', 'degree', this.value)" placeholder="Degree"></td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.area || ''}" onchange="autoSaveInstructor('${t.id}', 'area', this.value)" placeholder="Department/Area"></td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.employee_no || ''}" onchange="autoSaveInstructor('${t.id}', 'employee_no', this.value)" placeholder="Emp #"></td>
+        <td class="text-center">
+          <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center fw-bold text-primary editable-field mx-auto" style="width: 60px;" value="${t.max_units}" onchange="autoSaveInstructor('${t.id}', 'max_units', this.value)">
+        </td>
         <td class="text-end">
-          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editTeacher('${t.id}')">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteTeacher('${t.id}')">
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteTeacher('${t.id}')" title="Delete Instructor">
             <i class="bi bi-trash"></i>
           </button>
         </td>
@@ -13412,25 +13474,50 @@ function renderSubjectsTable() {
   const startIdx = (subjectsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.subjects.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
+  const courseOptions = ['BSIT', 'BEED', 'BSED', 'BSCA', 'BSCRIM', 'BSHM', 'BSBA-FM', 'BSBA-HRDM', 'BSBA-MM'];
+
   pagedItems.forEach(s => {
-    const typeBadge = s.is_major 
-      ? '<span class="badge bg-danger">Major</span>' 
-      : '<span class="badge bg-secondary">General</span>';
+    const courseSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveSubject('${s.id}', 'course', this.value)">
+        ${courseOptions.map(c => `<option value="${c}" ${s.course === c ? 'selected' : ''}>${c}</option>`).join('')}
+      </select>
+    `;
+
+    const majorSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold ${s.is_major ? 'text-danger' : 'text-secondary'}" onchange="autoSaveSubject('${s.id}', 'is_major', this.value)">
+        <option value="1" ${s.is_major ? 'selected' : ''}>Major</option>
+        <option value="0" ${!s.is_major ? 'selected' : ''}>General</option>
+      </select>
+    `;
+
+    const yearSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field" onchange="autoSaveSubject('${s.id}', 'year_level', this.value)">
+        <option value="1" ${s.year_level == 1 ? 'selected' : ''}>Year 1</option>
+        <option value="2" ${s.year_level == 2 ? 'selected' : ''}>Year 2</option>
+        <option value="3" ${s.year_level == 3 ? 'selected' : ''}>Year 3</option>
+        <option value="4" ${s.year_level == 4 ? 'selected' : ''}>Year 4</option>
+      </select>
+    `;
 
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-subjects" value="${s.id}" onchange="toggleItemSelection('subjects', '${s.id}', this.checked)"></td>
-        <td class="fw-bold text-dark">${s.title_and_code}</td>
-        <td>${s.course}</td>
-        <td>${typeBadge}</td>
-        <td>${s.year_level} Year</td>
-        <td class="text-center fw-bold text-primary">${s.units}</td>
-        <td class="text-center">${s.lec_hours} / ${s.lab_hours}</td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold text-dark editable-field" value="${s.title_and_code || ''}" onchange="autoSaveSubject('${s.id}', 'title_and_code', this.value)"></td>
+        <td>${courseSelect}</td>
+        <td>${majorSelect}</td>
+        <td>${yearSelect}</td>
+        <td class="text-center">
+          <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center fw-bold text-primary editable-field mx-auto" style="width: 55px;" value="${s.units}" onchange="autoSaveSubject('${s.id}', 'units', this.value)">
+        </td>
+        <td class="text-center">
+          <div class="d-flex align-items-center justify-content-center gap-1">
+            <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center editable-field" style="width: 45px;" value="${s.lec_hours}" onchange="autoSaveSubject('${s.id}', 'lec_hours', this.value)" title="Lecture Hours">
+            <span>/</span>
+            <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center editable-field" style="width: 45px;" value="${s.lab_hours}" onchange="autoSaveSubject('${s.id}', 'lab_hours', this.value)" title="Lab Hours">
+          </div>
+        </td>
         <td class="text-end">
-          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editSubject('${s.id}')">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSubject('${s.id}')">
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSubject('${s.id}')" title="Delete Subject">
             <i class="bi bi-trash"></i>
           </button>
         </td>
@@ -13461,21 +13548,22 @@ function renderRoomsTable() {
   const startIdx = (roomsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.rooms.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
+  const roomTypes = ['Lecture', 'Laboratory', 'Special Room'];
+
   pagedItems.forEach(r => {
+    const typeSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveRoom('${r.id}', 'room_type', this.value)">
+        ${roomTypes.map(rt => `<option value="${rt}" ${r.room_type === rt ? 'selected' : ''}>${rt}</option>`).join('')}
+      </select>
+    `;
+
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-rooms" value="${r.id}" onchange="toggleItemSelection('rooms', '${r.id}', this.checked)"></td>
-        <td class="fw-bold">${r.name}</td>
-        <td>
-          <span class="badge ${r.room_type === 'Laboratory' ? 'bg-primary' : r.room_type === 'Lecture' ? 'bg-success' : 'bg-warning'} text-white">
-            ${r.room_type}
-          </span>
-        </td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${r.name || ''}" onchange="autoSaveRoom('${r.id}', 'name', this.value)"></td>
+        <td>${typeSelect}</td>
         <td class="text-end">
-          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editRoom('${r.id}')">
-            <i class="bi bi-pencil"></i>
-          </button>
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteRoom('${r.id}')">
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteRoom('${r.id}')" title="Delete Room">
             <i class="bi bi-trash"></i>
           </button>
         </td>

@@ -171,3 +171,21 @@ body {
   line-height: 1.2;
 }
 
+/* Inline Editable Fields in Manage Data */
+.editable-field {
+  transition: all 0.2s ease-in-out;
+  border-radius: 4px;
+}
+
+.editable-field:hover {
+  background-color: rgba(13, 110, 253, 0.05) !important;
+  border: 1px solid #ced4da !important;
+  cursor: pointer;
+}
+
+.editable-field:focus {
+  background-color: #ffffff !important;
+  border: 1px solid #0d6efd !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+  outline: none;
+}
