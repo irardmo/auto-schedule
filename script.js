@@ -12500,6 +12500,87 @@ function isSpecialRoom(roomName) {
   return (normalized === 'LIBRARY1' || normalized === 'LIBRARY2' || normalized === 'TBLROOM');
 }
 
+// Check if subject is computer/IT related
+function isComputerSubject(subject) {
+  if (!subject) return false;
+  const code = (subject.code || subject.title_and_code || '').toUpperCase();
+  const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
+  const course = (subject.course || '').toUpperCase();
+
+  const computerPrefixes = ['CC', 'IT', 'COMP', 'PF', 'IM', 'NET', 'IAS', 'SA', 'SIA', 'WS', 'IPT', 'HCI', 'PT', 'CAP', 'PRAC'];
+  const computerKeywords = ['COMPUTER', 'PROGRAMMING', 'DATABASE', 'WEB', 'NETWORK', 'SOFTWARE', 'MULTIMEDIA', 'HARDWARE', 'INFORMATION MANAGEMENT', 'SYSTEM INTEGRATION', 'CAPSTONE'];
+
+  if (computerPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
+  if (computerKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
+  if (course === 'BSIT' && (subject.lab_hours > 0 || subject.is_major)) return true;
+
+  return false;
+}
+
+// Check if subject is criminology related
+function isCriminologySubject(subject) {
+  if (!subject) return false;
+  const code = (subject.code || subject.title_and_code || '').toUpperCase();
+  const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
+  const course = (subject.course || '').toUpperCase();
+
+  const crimPrefixes = ['FORENSIC', 'CRIM', 'CDI', 'LEA', 'CLJ', 'CA', 'CFLM'];
+  const crimKeywords = ['FORENSIC', 'CRIMINOLOGY', 'INVESTIGATION', 'LAW ENFORCEMENT', 'CRIMINAL', 'CORRECTIONS', 'BALLISTICS', 'LIE DETECTION', 'QUESTIONED DOCUMENTS', 'MARKSMANSHIP', 'ARMS', 'ARSON', 'CYBERCRIME'];
+
+  if (crimPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
+  if (crimKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || subject.is_major)) return true;
+
+  return false;
+}
+
+// Get prioritized and filtered room list for scheduling
+function getPrioritizedRooms(subject, roomsList) {
+  const rooms = [...roomsList];
+  const isComp = isComputerSubject(subject);
+  const isCrim = isCriminologySubject(subject);
+
+  return rooms.filter(r => {
+    const rName = (r.name || '').toUpperCase();
+    const isComLab = rName.includes('COMLAB');
+    const isCrimLab = rName.includes('CRIMLAB');
+
+    // COMLAB is strictly reserved for Computer subjects
+    if (isComLab && !isComp) return false;
+
+    // CRIMLAB is strictly reserved for Criminology subjects
+    if (isCrimLab && !isCrim) return false;
+
+    return true;
+  }).sort((a, b) => {
+    const aName = (a.name || '').toUpperCase();
+    const bName = (b.name || '').toUpperCase();
+
+    const aIsComLab = aName.includes('COMLAB');
+    const bIsComLab = bName.includes('COMLAB');
+    const aIsCrimLab = aName.includes('CRIMLAB');
+    const bIsCrimLab = bName.includes('CRIMLAB');
+    const aIsSpecial = isSpecialRoom(a.name);
+    const bIsSpecial = isSpecialRoom(b.name);
+
+    if (isComp) {
+      if (aIsComLab && !bIsComLab) return -1;
+      if (!aIsComLab && bIsComLab) return 1;
+    }
+
+    if (isCrim) {
+      if (aIsCrimLab && !bIsCrimLab) return -1;
+      if (!aIsCrimLab && bIsCrimLab) return 1;
+    }
+
+    // Special rooms (Library 1, Library 2, TBL Room) are LAST RESORT only
+    if (aIsSpecial && !bIsSpecial) return 1;
+    if (!aIsSpecial && bIsSpecial) return -1;
+
+    return 0;
+  });
+}
+
 // Check if the scheduled times are allowed for High School rooms based on the day
 function isHighSchoolRoomTimeAllowed(day, startStr, endStr) {
   const constituents = getConstituentDays(day);
@@ -13999,14 +14080,15 @@ async function runWaterfallScheduler() {
 
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
-    // Sort rooms: If a specific room is preferred, put it first in the list
-    const sortedRooms = [...db.rooms].sort((a, b) => {
-      if (preferredRoomId) {
+    // Sort and filter rooms using getPrioritizedRooms based on subject type and preferred room
+    let sortedRooms = getPrioritizedRooms(subject, db.rooms);
+    if (preferredRoomId) {
+      sortedRooms = [...sortedRooms].sort((a, b) => {
         if (a.id === preferredRoomId) return -1;
         if (b.id === preferredRoomId) return 1;
-      }
-      return 0;
-    });
+        return 0;
+      });
+    }
 
     for (let teacher of participatingTeachers) {
       const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
@@ -14031,19 +14113,6 @@ async function runWaterfallScheduler() {
       });
 
       for (let room of sortedRooms) {
-        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue;
-        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
-
-        // If 'Any' room is selected, do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
-        if (!preferredRoomId) {
-          const rNameUpper = room.name.toUpperCase();
-          const isComLab = rNameUpper.includes('COMLAB');
-          const isCrimLab = rNameUpper.includes('CRIMLAB');
-          const isSpecial = isSpecialRoom(room.name);
-          if (isComLab || isCrimLab || isSpecial) {
-            continue;
-          }
-        }
 
         for (let day of sortedDays) {
           for (let slot of sortedSlots) {
@@ -14652,8 +14721,8 @@ async function runSingleTeacherScheduler() {
           subject_id: subject.id
         };
 
-        const availableRoom = db.rooms.find(r => {
-          if (isSpecialRoom(r.name)) return false; // prefer regular standard rooms
+        const roomsToTry = getPrioritizedRooms(subject, db.rooms);
+        const availableRoom = roomsToTry.find(r => {
           candidate.room_id = r.id;
           const validation = validateSchedule(candidate);
           if (validation.valid) {
@@ -14850,11 +14919,8 @@ async function runPerSectionScheduler() {
             subject_id: sub.id
           };
 
-          const availableRoom = db.rooms.find(r => {
-            if (sub.is_major && (sub.title_and_code.toLowerCase().includes('computer') || sub.title_and_code.toLowerCase().includes('programming'))) {
-              if (r.name.toUpperCase() !== 'COMLAB') return false;
-            }
-
+          const roomsToTry = getPrioritizedRooms(sub, db.rooms);
+          const availableRoom = roomsToTry.find(r => {
             candidate.room_id = r.id;
             const validation = validateSchedule(candidate);
             if (validation.valid) {
