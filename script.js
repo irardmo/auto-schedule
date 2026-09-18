@@ -14755,6 +14755,26 @@ function bulkDeleteRooms() {
 }
 
 // Per-Section Generator Logic
+function updateSectionBlockOptions() {
+  const yearEl = document.getElementById('section-year');
+  const blockEl = document.getElementById('section-block');
+  if (!yearEl || !blockEl) return;
+
+  const y = yearEl.value || '1';
+  const currentVal = blockEl.value;
+  const targetPrefix = y;
+
+  // Check if current options match year prefix
+  if (!blockEl.options[0] || !blockEl.options[0].value.startsWith(targetPrefix)) {
+    blockEl.innerHTML = `
+      <option value="${y}A" ${currentVal === y+'A' ? 'selected' : ''}>${y}A</option>
+      <option value="${y}B" ${currentVal === y+'B' ? 'selected' : ''}>${y}B</option>
+      <option value="${y}C" ${currentVal === y+'C' ? 'selected' : ''}>${y}C</option>
+      <option value="${y}D" ${currentVal === y+'D' ? 'selected' : ''}>${y}D</option>
+    `;
+  }
+}
+
 function loadSectionSubjects() {
   const courseEl = document.getElementById('section-course');
   const yearEl = document.getElementById('section-year');
@@ -14765,6 +14785,8 @@ function loadSectionSubjects() {
   const countEl = document.getElementById('section-subject-count');
 
   if (!courseEl || !yearEl || !listEl) return;
+
+  updateSectionBlockOptions();
 
   const course = courseEl.value;
   const year = parseInt(yearEl.value, 10);
@@ -15228,6 +15250,17 @@ async function runPerSectionScheduler() {
   renderSchedulesTable();
   updateStats();
 
+  const viewConflictsBtn = document.getElementById('viewSectionConflictsBtn');
+  const conflictCountSpan = document.getElementById('sectionConflictCount');
+
+  if (unscheduledCount > 0) {
+    if (viewConflictsBtn) viewConflictsBtn.classList.remove('d-none');
+    if (conflictCountSpan) conflictCountSpan.innerText = unscheduledCount;
+  } else {
+    if (viewConflictsBtn) viewConflictsBtn.classList.add('d-none');
+    if (conflictCountSpan) conflictCountSpan.innerText = '0';
+  }
+
   const isSuccess = unscheduledCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
   const alertTitle = isSuccess ? 'Per-Section Scheduling Successful!' : 'Per-Section Scheduling Finished with Conflicts';
@@ -15236,6 +15269,14 @@ async function runPerSectionScheduler() {
   
   showGlobalAlert(alertTitle, alertMsg, alertType);
   showToast(alertMsg, isSuccess ? 'success' : 'warning');
+}
+
+function scrollToSectionLog() {
+  const logContainer = document.getElementById('autoSchedulerResults');
+  if (logContainer) {
+    logContainer.classList.remove('d-none');
+    logContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // Initialize on document load

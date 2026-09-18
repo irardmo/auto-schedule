@@ -471,7 +471,10 @@
                       </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
+                    <div class="d-flex justify-content-end gap-2 align-items-center">
+                      <button type="button" class="btn btn-outline-danger d-none" id="viewSectionConflictsBtn" onclick="scrollToSectionLog()">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> View Conflicts (<span id="sectionConflictCount">0</span>)
+                      </button>
                       <button type="button" class="btn btn-primary" onclick="runPerSectionScheduler()">
                         <i class="bi bi-lightning-fill me-1"></i> Generate Section Schedule
                       </button>
