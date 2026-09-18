@@ -124,7 +124,7 @@
       <div class="row mb-4">
         <!-- Instructions Panel -->
         <div class="col-lg-5">
-          <div class="card border-0 shadow-sm h-100">
+          <div class="card border-0 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
               <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-fill me-2"></i>Auto-Schedule Generator</h5>
             </div>
@@ -132,7 +132,7 @@
               <p class="card-text text-muted">
                 The SIBT Intelligent Auto-Scheduler automatically compiles conflict-free timetables. It maps courses, rooms, teachers, days, and times using advanced heuristics that strictly enforce:
               </p>
-              <ul class="text-muted small ps-3">
+              <ul class="text-muted small ps-3 mb-0">
                 <li class="mb-1"><strong>Teacher Availability:</strong> Preventing double-bookings.</li>
                 <li class="mb-1"><strong>Teacher Load Limits:</strong> Licensed (27 units), Non-licensed (24 units), Admin (9 units), Director (15 units), Program Head (18 units).</li>
                 <li class="mb-1"><strong>Room Compatibility:</strong> Laboratory courses automatically match lab/ComLab rooms, and lecture courses fit appropriately.</li>
@@ -148,7 +148,7 @@
 
         <!-- Controller Panel -->
         <div class="col-lg-7">
-          <div class="card border-0 shadow-sm h-100">
+          <div class="card border-0 shadow-sm">
             <div class="card-header bg-white py-3 border-light">
               <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-cpu-fill me-2 text-primary"></i>Generate Schedule</h5>
             </div>
@@ -472,7 +472,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 align-items-center">
-                      <button type="button" class="btn btn-outline-danger d-none" id="viewSectionConflictsBtn" onclick="scrollToSectionLog()">
+                      <button type="button" class="btn btn-outline-danger d-none" id="viewSectionConflictsBtn" onclick="openConflictsModal()">
                         <i class="bi bi-exclamation-triangle-fill me-1"></i> View Conflicts (<span id="sectionConflictCount">0</span>)
                       </button>
                       <button type="button" class="btn btn-primary" onclick="runPerSectionScheduler()">
@@ -504,6 +504,31 @@
           Success!
         </div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conflicts Popup Modal -->
+  <div class="modal fade" id="conflictsModal" tabindex="-1" aria-labelledby="conflictsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title fw-bold" id="conflictsModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Scheduling Conflicts Observed
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-muted mb-3">
+            The auto-scheduler encountered constraints for the following items. Please review the reasons below for manual adjustment:
+          </p>
+          <div id="conflictsModalList" class="list-group list-group-flush border rounded overflow-auto" style="max-height: 350px;">
+            <!-- Dynamic conflict list -->
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>

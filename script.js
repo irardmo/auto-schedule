@@ -15094,6 +15094,7 @@ async function runPerSectionScheduler() {
 
   let scheduledCount = 0;
   let unscheduledCount = 0;
+  window.lastSectionConflictsList = [];
 
   for (let sel of selects) {
     const subId = sel.getAttribute('data-subject-id');
@@ -15236,10 +15237,18 @@ async function runPerSectionScheduler() {
 
     if (!scheduled) {
       unscheduledCount++;
+      const conflictMsg = `Subject "${sub.title_and_code}" (${course} ${year}${block}): Could not find a conflict-free slot.`;
+      const reasons = Array.from(sectionConflicts);
+      window.lastSectionConflictsList.push({
+        subject: sub.title_and_code,
+        message: conflictMsg,
+        reasons: reasons.length > 0 ? reasons : ["No available teacher/room timeslot combination satisfied constraints."]
+      });
+
       consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
       if (sectionConflicts.size > 0) {
         consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
-        Array.from(sectionConflicts).slice(0, 5).forEach(err => {
+        reasons.slice(0, 5).forEach(err => {
           consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
         });
       }
@@ -15271,12 +15280,44 @@ async function runPerSectionScheduler() {
   showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
-function scrollToSectionLog() {
-  const logContainer = document.getElementById('autoSchedulerResults');
-  if (logContainer) {
-    logContainer.classList.remove('d-none');
-    logContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function openConflictsModal() {
+  const modalList = document.getElementById('conflictsModalList');
+  if (!modalList) return;
+
+  const conflicts = window.lastSectionConflictsList || [];
+  if (conflicts.length === 0) {
+    modalList.innerHTML = `<div class="p-3 text-center text-muted">No specific conflicts recorded. All subjects scheduled cleanly.</div>`;
+  } else {
+    let html = '';
+    conflicts.forEach((c, idx) => {
+      html += `
+        <div class="list-group-item p-3">
+          <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+            <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-circle me-1"></i> ${c.subject}</h6>
+            <span class="badge bg-danger">Conflict #${idx + 1}</span>
+          </div>
+          <p class="mb-2 text-dark small fw-semibold">${c.message}</p>
+          <div class="bg-light p-2 rounded border">
+            <span class="text-muted small fw-bold d-block mb-1">Observed Constraint Breaches:</span>
+            <ul class="mb-0 ps-3 small text-secondary">
+              ${c.reasons.map(r => `<li>${r}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    });
+    modalList.innerHTML = html;
   }
+
+  const modalEl = document.getElementById('conflictsModal');
+  if (modalEl) {
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+  }
+}
+
+function scrollToSectionLog() {
+  openConflictsModal();
 }
 
 // Initialize on document load
