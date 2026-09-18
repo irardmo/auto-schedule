@@ -12547,66 +12547,66 @@ function isSpecialRoom(roomName) {
   return (normalized === 'LIBRARY1' || normalized === 'LIBRARY2' || normalized === 'TBLROOM');
 }
 
-// Check if subject is computer/IT related
+// Check if subject is computer/IT related (STRICTLY for COMLAB assignment)
 function isComputerSubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
-  const course = (subject.course || '').toUpperCase();
 
-  const exactComputerTitles = [
+  const exactComputerSubjects = [
     'COMPUTER PROGRAMMING 1',
     'INFORMATION TECHNOLOGY FUNDAMENTALS',
+    'IT FUNDAMENTALS',
     'COMPUTER PROGRAMMING 2',
     'OBJECT-ORIENTED PROGRAMMING',
-    'FUNDAMENTALS OF DATABASE SYSTEMS',
+    'OBJECT ORIENTED PROGRAMMING',
+    'FUNDAMENTALS OF DATABASE SYSTEM',
     'EVENT DRIVEN PROGRAMMING',
-    'DATA STRUCTURES AND ALGORITHMS',
+    'DATA STRUCTURES AND ALGORITHM',
     'INFORMATION MANAGEMENT',
     'INFO ASSURANCE AND SECURITY 1',
+    'INFORMATION ASSURANCE AND SECURITY 1',
     'APP DEV. & EMERGING TECHNOLOGIES',
+    'APP DEV. AND EMERGING TECHNOLOGIES',
+    'APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGY',
     'NETWORKING 1',
     'INTRO TO HUMAN-COMPUTER INTERACTION',
+    'INTRODUCTION TO HUMAN AND COMPUTER INTERACTION',
     'SYSTEM ADMIN & MAINTENANCE',
+    'SYSTEM ADMINISTRATION AND MAINTENANCE',
     'WEB SYSTEMS AND TECHNOLOGY',
     'INTEGRATIVE PROGRAMMING & TECHNOLOGIES',
+    'INTEGRATIVE PROGRAMMING AND TECHNOLOGY',
     'NETWORKING 2',
     'INFO ASSURANCE AND SECURITY 2',
+    'INFORMATION ASSURANCE AND SECURITY 2',
     'SYSTEM INTEGRATION AND ARCHITECTURE 1',
     'SYSTEM INTEGRATION AND ARCHITECTURE 2',
     'PLATFORM TECHNOLOGIES',
+    'PLATFORM TECHNOLOGY',
     'MULTIMEDIA AND ANIMATION',
-    'HUMAN-COMPUTER INTERACTION 2'
+    'HUMAN-COMPUTER INTERACTION 2',
+    'HUMAN COMPUTER INTERACTION 2'
   ];
 
-  if (exactComputerTitles.some(t => title.includes(t))) return true;
-
-  const computerPrefixes = ['CC', 'IT', 'COMP', 'PF', 'IM', 'NET', 'IAS', 'SA', 'SIA', 'WS', 'IPT', 'HCI', 'PT', 'CAP', 'PRAC'];
-  const computerKeywords = ['COMPUTER', 'PROGRAMMING', 'DATABASE', 'WEB', 'NETWORK', 'SOFTWARE', 'MULTIMEDIA', 'HARDWARE', 'INFORMATION MANAGEMENT', 'SYSTEM INTEGRATION', 'CAPSTONE', 'PLATFORM TECHNOLOGIES', 'INTEGRATIVE PROGRAMMING'];
-
-  if (computerPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
-  if (computerKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
-  if (course === 'BSIT' && (subject.lab_hours > 0 || subject.is_major)) return true;
-
-  return false;
+  return exactComputerSubjects.some(t => title.includes(t) || code.includes(t));
 }
 
-// Check if subject is criminology or specialized lab related
+// Check if subject is criminology or specialized lab related (STRICTLY for CRIMLAB assignment)
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
-  const exactSpecialLabCodes = ['HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124', 'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'];
-  if (exactSpecialLabCodes.some(c => code.includes(c))) return true;
+  const exactSpecialLabCodes = [
+    'HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124',
+    'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'
+  ];
 
-  const crimPrefixes = ['FORENSIC', 'CRIM', 'CDI', 'LEA', 'CLJ', 'CA', 'CFLM', 'HPC', 'HMPE'];
-  const crimKeywords = ['FORENSIC', 'CRIMINOLOGY', 'INVESTIGATION', 'LAW ENFORCEMENT', 'CRIMINAL', 'CORRECTIONS', 'BALLISTICS', 'LIE DETECTION', 'QUESTIONED DOCUMENTS', 'MARKSMANSHIP', 'ARMS', 'ARSON', 'CYBERCRIME', 'KITCHEN', 'FOOD SERVICE', 'CULINARY', 'FRONT OFFICE', 'ROOM DIVISION', 'EVENTS MGT'];
+  if (exactSpecialLabCodes.some(c => code.includes(c) || title.includes(c))) return true;
 
-  if (crimPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
-  if (crimKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
-  if (course === 'BSCRIM' && (subject.lab_hours > 0 || subject.is_major)) return true;
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || code.startsWith('FORENSIC'))) return true;
 
   return false;
 }
@@ -13357,14 +13357,17 @@ function renderSchedulesTable() {
   let filtered = db.schedules.filter(sch => {
     const t = db.instructors.find(i => i.id === sch.instructor_id);
     const sub = db.subjects.find(s => s.id === sch.subject_id);
+
+    const schCourse = sch.course || (sub ? sub.course : '');
+    const schYear = sch.year_level || (sub ? sub.year_level : 0);
+    const schBlock = sch.block_section || (sub ? sub.block_section : '');
     
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
     if (activeFilters.subject && (!sub || sub.title_and_code !== activeFilters.subject)) return false;
-    if (sub) {
-      if (activeFilters.course && sub.course !== activeFilters.course) return false;
-      if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
-      if (activeFilters.block && (sub.block_section || '') !== activeFilters.block) return false;
-    }
+    if (activeFilters.course && schCourse !== activeFilters.course) return false;
+    if (activeFilters.year && schYear !== parseInt(activeFilters.year, 10)) return false;
+    if (activeFilters.block && schBlock !== activeFilters.block && !schBlock.endsWith(activeFilters.block)) return false;
+
     return true;
   });
 
@@ -13411,9 +13414,10 @@ function renderSchedulesTable() {
     const subject = db.subjects.find(s => s.id === sch.subject_id);
 
     const subTitle = subject ? subject.title_and_code : 'Unknown';
-    const course = subject ? subject.course : '-';
-    const year = subject ? subject.year_level : '-';
-    const block = (subject && subject.block_section) ? subject.block_section : '-';
+    const course = sch.course || (subject ? subject.course : '-');
+    const year = sch.year_level || (subject ? subject.year_level : '-');
+    const rawBlock = sch.block_section || (subject && subject.block_section ? subject.block_section : '');
+    const blockDisplay = rawBlock ? (rawBlock.includes(course) ? rawBlock : `${course} ${rawBlock}`) : '-';
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
@@ -13451,7 +13455,7 @@ function renderSchedulesTable() {
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_start}" onchange="autoSaveSchedule('${sch.id}', 'time_start', this.value)"></td>
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_end}" onchange="autoSaveSchedule('${sch.id}', 'time_end', this.value)"></td>
         <td class="text-center">${year}</td>
-        <td>${course} ${block}</td>
+        <td>${blockDisplay}</td>
         <td>${subjectSelect}</td>
         <td>${course}</td>
         <td class="text-center fw-medium">${lec}</td>
@@ -15167,7 +15171,10 @@ async function runPerSectionScheduler() {
             day: day,
             time_start: slot.start,
             time_end: slot.end,
-            subject_id: sub.id
+            subject_id: sub.id,
+            course: course,
+            year_level: year,
+            block_section: `${year}${block}`
           };
 
           const roomsToTry = getPrioritizedRooms(sub, db.rooms);
@@ -15190,7 +15197,10 @@ async function runPerSectionScheduler() {
               day: day,
               time_start: slot.start,
               time_end: slot.end,
-              subject_id: sub.id
+              subject_id: sub.id,
+              course: course,
+              year_level: year,
+              block_section: block
             };
             db.schedules.push(newSch);
             scheduledCount++;
