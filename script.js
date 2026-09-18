@@ -12592,19 +12592,19 @@ function isComputerSubject(subject) {
   return exactComputerSubjects.some(t => title.includes(t) || code.includes(t));
 }
 
-// Check if subject is criminology or specialized lab related (STRICTLY for CRIMLAB assignment)
+// Check if subject is criminology lab related (STRICTLY for CRIMLAB assignment)
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
-  const exactSpecialLabCodes = [
+  const exactCrimLabCodes = [
     'HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124',
     'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'
   ];
 
-  if (exactSpecialLabCodes.some(c => code.includes(c) || title.includes(c))) return true;
+  if (exactCrimLabCodes.some(c => code.includes(c) || title.includes(c))) return true;
 
   if (course === 'BSCRIM' && (subject.lab_hours > 0 || code.startsWith('FORENSIC'))) return true;
 
