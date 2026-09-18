@@ -15,6 +15,7 @@ function getFilteredStandardDays(selectedSetting) {
 let db = {
   instructors: [],
   rooms: [],
+  sections: [],
   subjects: [],
   schedules: []
 };
@@ -23,11 +24,13 @@ let selectedScheduleIds = new Set();
 let selectedTeacherIds_manage = new Set();
 let selectedSubjectIds = new Set();
 let selectedRoomIds = new Set();
+let selectedSectionIds = new Set();
 
 let schedulesCurrentPage = 1;
 let instructorsCurrentPage = 1;
 let subjectsCurrentPage = 1;
 let roomsCurrentPage = 1;
+let sectionsCurrentPage = 1;
 const GENERAL_PAGE_SIZE = 20;
 
 function renderPaginationControls(totalItems, currentPage, pageSize, navElId, infoElId, changePageFuncName) {
@@ -139,6 +142,11 @@ function changeRoomsPage(page) {
   renderRoomsTable();
 }
 
+function changeSectionsPage(page) {
+  sectionsCurrentPage = page;
+  renderSectionsTable();
+}
+
 function updateBulkDeleteUI(type) {
   let selectedSet;
   let btnId, countId, checkAllId;
@@ -163,6 +171,11 @@ function updateBulkDeleteUI(type) {
     btnId = 'btn-bulk-delete-rooms';
     countId = 'selected-rooms-count';
     checkAllId = 'check-all-rooms';
+  } else if (type === 'sections') {
+    selectedSet = selectedSectionIds;
+    btnId = 'btn-bulk-delete-sections';
+    countId = 'selected-sections-count';
+    checkAllId = 'check-all-sections';
   }
 
   const btn = document.getElementById(btnId);
@@ -12282,6 +12295,48 @@ const demoData = {
                 "curriculum_type": "new"
         }
 ],
+    "sections": [
+        { "id": "sec_bsit_1a", "course": "BSIT", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsit_1b", "course": "BSIT", "year_level": 1, "section_name": "1B" },
+        { "id": "sec_bsit_2a", "course": "BSIT", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsit_2b", "course": "BSIT", "year_level": 2, "section_name": "2B" },
+        { "id": "sec_bsit_3a", "course": "BSIT", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsit_3b", "course": "BSIT", "year_level": 3, "section_name": "3B" },
+        { "id": "sec_bsit_4a", "course": "BSIT", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsit_4b", "course": "BSIT", "year_level": 4, "section_name": "4B" },
+        { "id": "sec_beed_1a", "course": "BEED", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_beed_2a", "course": "BEED", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_beed_3a", "course": "BEED", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_beed_4a", "course": "BEED", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsed_1a", "course": "BSED", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsed_2a", "course": "BSED", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsed_3a", "course": "BSED", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsed_4a", "course": "BSED", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsca_1a", "course": "BSCA", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsca_2a", "course": "BSCA", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsca_3a", "course": "BSCA", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsca_4a", "course": "BSCA", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bscrim_1a", "course": "BSCRIM", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bscrim_2a", "course": "BSCRIM", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bscrim_3a", "course": "BSCRIM", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bscrim_4a", "course": "BSCRIM", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bshm_1a", "course": "BSHM", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bshm_2a", "course": "BSHM", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bshm_3a", "course": "BSHM", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bshm_4a", "course": "BSHM", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsba_fm_1a", "course": "BSBA-FM", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsba_fm_2a", "course": "BSBA-FM", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsba_fm_3a", "course": "BSBA-FM", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsba_fm_4a", "course": "BSBA-FM", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsba_hrdm_1a", "course": "BSBA-HRDM", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsba_hrdm_2a", "course": "BSBA-HRDM", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsba_hrdm_3a", "course": "BSBA-HRDM", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsba_hrdm_4a", "course": "BSBA-HRDM", "year_level": 4, "section_name": "4A" },
+        { "id": "sec_bsba_mm_1a", "course": "BSBA-MM", "year_level": 1, "section_name": "1A" },
+        { "id": "sec_bsba_mm_2a", "course": "BSBA-MM", "year_level": 2, "section_name": "2A" },
+        { "id": "sec_bsba_mm_3a", "course": "BSBA-MM", "year_level": 3, "section_name": "3A" },
+        { "id": "sec_bsba_mm_4a", "course": "BSBA-MM", "year_level": 4, "section_name": "4A" }
+    ],
     "schedules": [
         {
             "id": "sch1",
@@ -12290,16 +12345,22 @@ const demoData = {
             "day": "W",
             "time_start": "08:00",
             "time_end": "11:00",
-            "subject_id": "s1"
+            "subject_id": "bsit_n1",
+            "course": "BSIT",
+            "year_level": 1,
+            "block_section": "1A"
         },
         {
             "id": "sch2",
-            "instructor_id": "t1",
+            "instructor_id": "t2",
             "room_id": "r1",
-            "day": "S",
-            "time_start": "12:00",
-            "time_end": "14:00",
-            "subject_id": "s2"
+            "day": "M",
+            "time_start": "13:00",
+            "time_end": "16:00",
+            "subject_id": "bsit_n2",
+            "course": "BSIT",
+            "year_level": 1,
+            "block_section": "1A"
         },
         {
             "id": "sch3",
@@ -12403,6 +12464,10 @@ async function loadDatabase() {
         max_units: parseInt(i.max_units, 10)
       }));
       db.rooms = result.rooms || [];
+      db.sections = (result.sections || []).map(sec => ({
+        ...sec,
+        year_level: parseInt(sec.year_level, 10)
+      }));
       db.subjects = (result.subjects || []).map(s => ({
         ...s,
         year_level: parseInt(s.year_level, 10),
@@ -12430,6 +12495,10 @@ async function loadDatabase() {
         if (parsed.subjects && parsed.subjects.length > 0) {
           db = parsed;
           db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
+          db.sections = (db.sections || demoData.sections || []).map(sec => ({
+            ...sec,
+            year_level: parseInt(sec.year_level, 10)
+          }));
           db.subjects = (db.subjects || []).map(s => ({
             ...s,
             year_level: parseInt(s.year_level, 10),
@@ -12444,6 +12513,11 @@ async function loadDatabase() {
         console.warn("Error parsing local storage DB:", parseErr);
       }
     }
+  }
+
+  // Ensure db.sections is initialized
+  if (!db.sections || db.sections.length === 0) {
+    db.sections = JSON.parse(JSON.stringify(demoData.sections || []));
   }
 
   // Final fallback: Seed demoData if still empty
@@ -13005,6 +13079,8 @@ function switchManageSubTab(subTab, el) {
     renderSubjectsTable();
   } else if (subTab === 'rooms') {
     renderRoomsTable();
+  } else if (subTab === 'sections') {
+    renderSectionsTable();
   }
 }
 
@@ -13063,6 +13139,8 @@ function updateStats() {
   if (subjEl) subjEl.innerText = db.subjects.length;
   const roomEl = document.getElementById('stat-rooms');
   if (roomEl) roomEl.innerText = db.rooms.length;
+  const secEl = document.getElementById('stat-sections');
+  if (secEl) secEl.innerText = (db.sections || []).length;
   const schEl = document.getElementById('stat-schedules');
   if (schEl) schEl.innerText = db.schedules.length;
 }
@@ -13295,6 +13373,7 @@ function renderAllViews() {
   renderInstructorsTable();
   renderSubjectsTable();
   renderRoomsTable();
+  renderSectionsTable();
 }
 
 // RENDER SCHEDULE RECORDS TABLE (With Custom Filter Logic)
@@ -13417,7 +13496,20 @@ function renderSchedulesTable() {
     const course = sch.course || (subject ? subject.course : '-');
     const year = sch.year_level || (subject ? subject.year_level : '-');
     const rawBlock = sch.block_section || (subject && subject.block_section ? subject.block_section : '');
-    const blockDisplay = rawBlock ? (rawBlock.includes(course) ? rawBlock : `${course} ${rawBlock}`) : '-';
+    const currentBlockName = rawBlock ? (rawBlock.includes(course) ? rawBlock.replace(course, '').trim() : rawBlock) : '';
+
+    const sectionOptions = (db.sections || [])
+      .filter(sec => !course || course === '-' || sec.course === course)
+      .map(sec => `<option value="${sec.section_name}" ${currentBlockName === sec.section_name ? 'selected' : ''}>${sec.course} ${sec.section_name}</option>`)
+      .join('');
+
+    const sectionSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold" style="min-width: 90px;" onchange="autoSaveSchedule('${sch.id}', 'block_section', this.value)">
+        <option value="" ${!currentBlockName ? 'selected' : ''}>- None -</option>
+        ${sectionOptions}
+      </select>
+    `;
+
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
@@ -13455,7 +13547,7 @@ function renderSchedulesTable() {
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_start}" onchange="autoSaveSchedule('${sch.id}', 'time_start', this.value)"></td>
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_end}" onchange="autoSaveSchedule('${sch.id}', 'time_end', this.value)"></td>
         <td class="text-center">${year}</td>
-        <td>${blockDisplay}</td>
+        <td>${sectionSelect}</td>
         <td>${subjectSelect}</td>
         <td>${course}</td>
         <td class="text-center fw-medium">${lec}</td>
@@ -13468,6 +13560,135 @@ function renderSchedulesTable() {
       </tr>
     `;
   });
+}
+
+// RENDER SECTIONS TABLE
+function renderSectionsTable() {
+  const table = document.getElementById('sectionsListTable');
+  if (!table) return;
+  table.innerHTML = '';
+
+  selectedSectionIds.clear();
+  const checkAll = document.getElementById('check-all-sections');
+  if (checkAll) checkAll.checked = false;
+  updateBulkDeleteUI('sections');
+
+  sectionsCurrentPage = renderPaginationControls(
+    (db.sections || []).length,
+    sectionsCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'sections-pagination',
+    'sections-page-info',
+    'changeSectionsPage'
+  );
+  const startIdx = (sectionsCurrentPage - 1) * GENERAL_PAGE_SIZE;
+  const pagedItems = (db.sections || []).slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
+
+  const courses = ['BSIT', 'BEED', 'BSED', 'BSCA', 'BSCRIM', 'BSHM', 'BSBA-FM', 'BSBA-HRDM', 'BSBA-MM'];
+
+  pagedItems.forEach(sec => {
+    const courseSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold" onchange="autoSaveSection('${sec.id}', 'course', this.value)">
+        ${courses.map(c => `<option value="${c}" ${sec.course === c ? 'selected' : ''}>${c}</option>`).join('')}
+      </select>
+    `;
+
+    const yearSelect = `
+      <select class="form-select form-select-sm border-0 bg-transparent editable-field text-center fw-bold" onchange="autoSaveSection('${sec.id}', 'year_level', this.value)">
+        <option value="1" ${sec.year_level === 1 ? 'selected' : ''}>1st Year</option>
+        <option value="2" ${sec.year_level === 2 ? 'selected' : ''}>2nd Year</option>
+        <option value="3" ${sec.year_level === 3 ? 'selected' : ''}>3rd Year</option>
+        <option value="4" ${sec.year_level === 4 ? 'selected' : ''}>4th Year</option>
+      </select>
+    `;
+
+    table.innerHTML += `
+      <tr>
+        <td><input type="checkbox" class="form-check-input chk-bulk-sections" value="${sec.id}" onchange="toggleItemSelection('sections', '${sec.id}', this.checked)"></td>
+        <td>${courseSelect}</td>
+        <td>${yearSelect}</td>
+        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${sec.section_name || ''}" onchange="autoSaveSection('${sec.id}', 'section_name', this.value)"></td>
+        <td class="text-end">
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSection('${sec.id}')" title="Delete Section">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function autoSaveSection(id, field, value) {
+  const sec = (db.sections || []).find(s => s.id === id);
+  if (!sec) return;
+
+  if (field === 'year_level') {
+    sec.year_level = parseInt(value, 10) || 1;
+  } else {
+    sec[field] = value;
+  }
+
+  saveDatabase();
+  showToast("Section updated successfully!");
+}
+
+function saveSection(e) {
+  if (e) e.preventDefault();
+  const id = document.getElementById('section-id') ? document.getElementById('section-id').value : '';
+  const course = document.getElementById('section-course-val') ? document.getElementById('section-course-val').value : 'BSIT';
+  const year_level = document.getElementById('section-year-val') ? parseInt(document.getElementById('section-year-val').value, 10) : 1;
+  const section_name = document.getElementById('section-name-val') ? document.getElementById('section-name-val').value.trim() : '';
+
+  if (!section_name) {
+    showToast("Please enter a section name.", "danger");
+    return;
+  }
+
+  if (id) {
+    const sec = (db.sections || []).find(s => s.id === id);
+    if (sec) {
+      sec.course = course;
+      sec.year_level = year_level;
+      sec.section_name = section_name;
+    }
+  } else {
+    const newSec = {
+      id: 'sec_' + uniqueId(),
+      course,
+      year_level,
+      section_name
+    };
+    if (!db.sections) db.sections = [];
+    db.sections.push(newSec);
+  }
+
+  saveDatabase();
+  clearSectionForm();
+  showToast("Section saved successfully!");
+}
+
+function deleteSection(id) {
+  if (confirm("Are you sure you want to delete this section?")) {
+    db.sections = (db.sections || []).filter(s => s.id !== id);
+    saveDatabase();
+    showToast("Section deleted successfully!", "danger");
+  }
+}
+
+function clearSectionForm() {
+  const form = document.getElementById('sectionForm');
+  if (form) form.reset();
+  if (document.getElementById('section-id')) document.getElementById('section-id').value = "";
+}
+
+function bulkDeleteSections() {
+  if (selectedSectionIds.size === 0) return;
+  if (confirm(`Are you sure you want to delete ${selectedSectionIds.size} selected section(s)?`)) {
+    db.sections = (db.sections || []).filter(s => !selectedSectionIds.has(s.id));
+    selectedSectionIds.clear();
+    saveDatabase();
+    showToast("Selected sections deleted successfully!", "danger");
+  }
 }
 
 // AUTO-SAVE HELPERS FOR MANAGE DATA INLINE EDITING
@@ -14756,16 +14977,28 @@ function bulkDeleteRooms() {
 
 // Per-Section Generator Logic
 function updateSectionBlockOptions() {
+  const courseEl = document.getElementById('section-course');
   const yearEl = document.getElementById('section-year');
   const blockEl = document.getElementById('section-block');
   if (!yearEl || !blockEl) return;
 
-  const y = yearEl.value || '1';
+  const course = courseEl ? courseEl.value : '';
+  const y = parseInt(yearEl.value, 10) || 1;
   const currentVal = blockEl.value;
-  const targetPrefix = y;
 
-  // Check if current options match year prefix
-  if (!blockEl.options[0] || !blockEl.options[0].value.startsWith(targetPrefix)) {
+  // Filter sections matching course and year level
+  const matchingSections = (db.sections || []).filter(sec => {
+    if (course && sec.course !== course) return false;
+    if (sec.year_level !== y) return false;
+    return true;
+  });
+
+  if (matchingSections.length > 0) {
+    blockEl.innerHTML = matchingSections.map(sec =>
+      `<option value="${sec.section_name}" ${currentVal === sec.section_name ? 'selected' : ''}>${sec.section_name}</option>`
+    ).join('');
+  } else {
+    // Fallback default options
     blockEl.innerHTML = `
       <option value="${y}A" ${currentVal === y+'A' ? 'selected' : ''}>${y}A</option>
       <option value="${y}B" ${currentVal === y+'B' ? 'selected' : ''}>${y}B</option>

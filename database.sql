@@ -262,6 +262,15 @@ CREATE TABLE IF NOT EXISTS bsba_mm_subject_old (
 
 
 -- 4. Schedules Table
+-- 4. Sections Table
+CREATE TABLE IF NOT EXISTS sections (
+    id VARCHAR(50) PRIMARY KEY,
+    course VARCHAR(100) NOT NULL,
+    year_level INT NOT NULL,
+    section_name VARCHAR(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 5. Schedules Table
 CREATE TABLE IF NOT EXISTS schedules (
     id VARCHAR(50) PRIMARY KEY,
     instructor_id VARCHAR(50),
@@ -270,6 +279,9 @@ CREATE TABLE IF NOT EXISTS schedules (
     time_start VARCHAR(10) NOT NULL,
     time_end VARCHAR(10) NOT NULL,
     subject_id VARCHAR(50),
+    course VARCHAR(100),
+    year_level INT,
+    block_section VARCHAR(50),
     FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -1336,6 +1348,48 @@ INSERT IGNORE INTO bsca_subject_new (id, title_and_code, course, year_level, sem
 ('bsca_n49', '6(600) - NONE', 'BSCA', 4, 1, 3, 3, 0, 1, 'new'),
 ('bsca_n50', 'TM 8 - Competencies Assessment in Tariff Management', 'BSCA', 4, 2, 5, 5, 0, 1, 'new');
 
-INSERT IGNORE INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
-('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
-('sch2', 't2', 'r1', 'M', '13:00', '16:00', 's2');
+INSERT IGNORE INTO sections (id, course, year_level, section_name) VALUES
+('sec_bsit_1a', 'BSIT', 1, '1A'),
+('sec_bsit_1b', 'BSIT', 1, '1B'),
+('sec_bsit_2a', 'BSIT', 2, '2A'),
+('sec_bsit_2b', 'BSIT', 2, '2B'),
+('sec_bsit_3a', 'BSIT', 3, '3A'),
+('sec_bsit_3b', 'BSIT', 3, '3B'),
+('sec_bsit_4a', 'BSIT', 4, '4A'),
+('sec_bsit_4b', 'BSIT', 4, '4B'),
+('sec_beed_1a', 'BEED', 1, '1A'),
+('sec_beed_2a', 'BEED', 2, '2A'),
+('sec_beed_3a', 'BEED', 3, '3A'),
+('sec_beed_4a', 'BEED', 4, '4A'),
+('sec_bsed_1a', 'BSED', 1, '1A'),
+('sec_bsed_2a', 'BSED', 2, '2A'),
+('sec_bsed_3a', 'BSED', 3, '3A'),
+('sec_bsed_4a', 'BSED', 4, '4A'),
+('sec_bsca_1a', 'BSCA', 1, '1A'),
+('sec_bsca_2a', 'BSCA', 2, '2A'),
+('sec_bsca_3a', 'BSCA', 3, '3A'),
+('sec_bsca_4a', 'BSCA', 4, '4A'),
+('sec_bscrim_1a', 'BSCRIM', 1, '1A'),
+('sec_bscrim_2a', 'BSCRIM', 2, '2A'),
+('sec_bscrim_3a', 'BSCRIM', 3, '3A'),
+('sec_bscrim_4a', 'BSCRIM', 4, '4A'),
+('sec_bshm_1a', 'BSHM', 1, '1A'),
+('sec_bshm_2a', 'BSHM', 2, '2A'),
+('sec_bshm_3a', 'BSHM', 3, '3A'),
+('sec_bshm_4a', 'BSHM', 4, '4A'),
+('sec_bsba_fm_1a', 'BSBA-FM', 1, '1A'),
+('sec_bsba_fm_2a', 'BSBA-FM', 2, '2A'),
+('sec_bsba_fm_3a', 'BSBA-FM', 3, '3A'),
+('sec_bsba_fm_4a', 'BSBA-FM', 4, '4A'),
+('sec_bsba_hrdm_1a', 'BSBA-HRDM', 1, '1A'),
+('sec_bsba_hrdm_2a', 'BSBA-HRDM', 2, '2A'),
+('sec_bsba_hrdm_3a', 'BSBA-HRDM', 3, '3A'),
+('sec_bsba_hrdm_4a', 'BSBA-HRDM', 4, '4A'),
+('sec_bsba_mm_1a', 'BSBA-MM', 1, '1A'),
+('sec_bsba_mm_2a', 'BSBA-MM', 2, '2A'),
+('sec_bsba_mm_3a', 'BSBA-MM', 3, '3A'),
+('sec_bsba_mm_4a', 'BSBA-MM', 4, '4A');
+
+INSERT IGNORE INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id, course, year_level, block_section) VALUES
+('sch1', 't1', 'r2', 'W', '08:00', '11:00', 'bsit_n1', 'BSIT', 1, '1A'),
+('sch2', 't2', 'r1', 'M', '13:00', '16:00', 'bsit_n2', 'BSIT', 1, '1A');

@@ -66,6 +66,14 @@ body {
   background: var(--sibt-blue-dark);
 }
 
+/* 5-column layout helper for stats row */
+@media (min-width: 768px) {
+  .col-md-20 {
+    flex: 0 0 auto;
+    width: 20%;
+  }
+}
+
 /* Custom styles for tables and forms */
 .fs-7 {
   font-size: 0.8rem;
