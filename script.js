@@ -12393,10 +12393,11 @@ function calculateTeacherTotalUnits(teacherId) {
 
 // Load DB from MySQL with LocalStorage fallback
 async function loadDatabase() {
+  let loadedSuccessfully = false;
   try {
     const response = await fetch(`${API_URL}?action=get_all`);
     const result = await response.json();
-    if (result && result.status === 'success') {
+    if (result && result.status === 'success' && result.subjects && result.subjects.length > 0) {
       db.instructors = (result.instructors || []).map(i => ({
         ...i,
         max_units: parseInt(i.max_units, 10)
@@ -12412,37 +12413,45 @@ async function loadDatabase() {
       }));
       db.schedules = result.schedules || [];
       
-      // Keep local storage copy updated for complete sync
       localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
       console.log("Database successfully synced with XAMPP MySQL backend.");
-    } else {
-      throw new Error("API returned non-success status");
+      loadedSuccessfully = true;
     }
   } catch (e) {
-    console.warn("Could not sync with MySQL database. Using offline local storage mode instead.", e);
+    console.warn("Could not sync with MySQL database. Trying local storage fallback.", e);
+  }
+
+  if (!loadedSuccessfully) {
     // Offline local storage fallback
     const saved = localStorage.getItem('sibt_scheduling_db');
     if (saved) {
       try {
-        db = JSON.parse(saved);
-        // Ensure values are numbers in localstorage too
-        db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
-        db.subjects = (db.subjects || []).map(s => ({
-          ...s,
-          year_level: parseInt(s.year_level, 10),
-          units: parseInt(s.units, 10),
-          lec_hours: parseInt(s.lec_hours, 10),
-          lab_hours: parseInt(s.lab_hours, 10),
-          is_major: parseInt(s.is_major || 0, 10)
-        }));
+        const parsed = JSON.parse(saved);
+        if (parsed.subjects && parsed.subjects.length > 0) {
+          db = parsed;
+          db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
+          db.subjects = (db.subjects || []).map(s => ({
+            ...s,
+            year_level: parseInt(s.year_level, 10),
+            units: parseInt(s.units, 10),
+            lec_hours: parseInt(s.lec_hours, 10),
+            lab_hours: parseInt(s.lab_hours, 10),
+            is_major: parseInt(s.is_major || 0, 10)
+          }));
+          loadedSuccessfully = true;
+        }
       } catch (parseErr) {
-        db = JSON.parse(JSON.stringify(demoData));
+        console.warn("Error parsing local storage DB:", parseErr);
       }
-    } else {
-      db = JSON.parse(JSON.stringify(demoData));
     }
   }
-  
+
+  // Final fallback: Seed demoData if still empty
+  if (!db.subjects || db.subjects.length === 0) {
+    db = JSON.parse(JSON.stringify(demoData));
+    localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
+  }
+
   updateStats();
   renderAllViews();
 }
@@ -13048,10 +13057,14 @@ function showToast(message, type = "success") {
 
 // Core DB Stats Display
 function updateStats() {
-  document.getElementById('stat-instructors').innerText = db.instructors.length;
-  document.getElementById('stat-subjects').innerText = db.subjects.length;
-  document.getElementById('stat-rooms').innerText = db.rooms.length;
-  document.getElementById('stat-schedules').innerText = db.schedules.length;
+  const instEl = document.getElementById('stat-instructors');
+  if (instEl) instEl.innerText = db.instructors.length;
+  const subjEl = document.getElementById('stat-subjects');
+  if (subjEl) subjEl.innerText = db.subjects.length;
+  const roomEl = document.getElementById('stat-rooms');
+  if (roomEl) roomEl.innerText = db.rooms.length;
+  const schEl = document.getElementById('stat-schedules');
+  if (schEl) schEl.innerText = db.schedules.length;
 }
 
 // Populate Dropdowns dynamically
@@ -13075,10 +13088,12 @@ function populateFormSelects() {
 
   // Room selector
   const roomSel = document.getElementById('input-room');
-  roomSel.innerHTML = '<option value="">Select Room...</option>';
-  db.rooms.forEach(r => {
-    roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
-  });
+  if (roomSel) {
+    roomSel.innerHTML = '<option value="">Select Room...</option>';
+    db.rooms.forEach(r => {
+      roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
+    });
+  }
 
   // Subject selector (decoupled unique subject title list)
   const subSel = document.getElementById('input-subject');
@@ -13096,26 +13111,32 @@ function populateFormSelects() {
 
   // Filters selectors on the schedule board page
   const filterTeacher = document.getElementById('filter-teacher');
-  filterTeacher.innerHTML = '<option value="">All Teachers</option>';
-  db.instructors.forEach(t => {
-    filterTeacher.innerHTML += `<option value="${t.id}">${t.name}</option>`;
-  });
+  if (filterTeacher) {
+    filterTeacher.innerHTML = '<option value="">All Teachers</option>';
+    db.instructors.forEach(t => {
+      filterTeacher.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+  }
 
   // Course Selector filter
   const filterCourse = document.getElementById('filter-course');
-  filterCourse.innerHTML = '<option value="">All Courses</option>';
-  const courses = [...new Set(db.subjects.map(s => s.course))];
-  courses.forEach(c => {
-    filterCourse.innerHTML += `<option value="${c}">${c}</option>`;
-  });
+  if (filterCourse) {
+    filterCourse.innerHTML = '<option value="">All Courses</option>';
+    const courses = [...new Set(db.subjects.map(s => s.course))];
+    courses.forEach(c => {
+      filterCourse.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
 
   // Blocks filter
   const filterBlock = document.getElementById('filter-block');
-  filterBlock.innerHTML = '<option value="">All Blocks</option>';
-  const blocks = [...new Set(db.subjects.map(s => s.block_section).filter(Boolean))];
-  blocks.forEach(b => {
-    filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
-  });
+  if (filterBlock) {
+    filterBlock.innerHTML = '<option value="">All Blocks</option>';
+    const blocks = [...new Set(db.subjects.map(s => s.block_section).filter(Boolean))];
+    blocks.forEach(b => {
+      filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
+    });
+  }
 
   // Subject filter
   const filterSubject = document.getElementById('filter-subject');
@@ -13347,16 +13368,20 @@ function renderSchedulesTable() {
     return true;
   });
 
-  document.getElementById('filtered-count').innerText = `Showing ${filtered.length} records`;
+  const countBadgeEl = document.getElementById('filtered-count');
+  if (countBadgeEl) countBadgeEl.innerText = `Showing ${filtered.length} records`;
+
+  const noSchedEl = document.getElementById('noSchedulesMsg');
+  const tableEl = document.getElementById('scheduleTable');
 
   if (filtered.length === 0) {
-    document.getElementById('noSchedulesMsg').style.display = 'block';
-    document.getElementById('scheduleTable').style.display = 'none';
+    if (noSchedEl) noSchedEl.style.display = 'block';
+    if (tableEl) tableEl.style.display = 'none';
     return;
   }
 
-  document.getElementById('noSchedulesMsg').style.display = 'none';
-  document.getElementById('scheduleTable').style.display = 'table';
+  if (noSchedEl) noSchedEl.style.display = 'none';
+  if (tableEl) tableEl.style.display = 'table';
 
   // Sort by day, time start
   const dayOrder = { "M": 1, "T": 2, "W": 3, "TH": 4, "F": 5, "S": 6, "MT": 1.5, "MW": 1.6, "MF": 1.7, "TF": 2.2, "WF": 3.5, "TTH": 2.5, "MWF": 1.2, "Monday-Friday": 0.5 };
@@ -13671,8 +13696,10 @@ function renderRoomsTable() {
 // --- FORM ADD / EDIT / DELETE ACTIONS ---
 
 // SCHEDULE
-document.getElementById('scheduleForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+const schedFormEl = document.getElementById('scheduleForm');
+if (schedFormEl) {
+  schedFormEl.addEventListener('submit', function(e) {
+    e.preventDefault();
   
   const id = document.getElementById('edit-id').value;
   const instructor_id = document.getElementById('input-teacher').value;
@@ -13722,7 +13749,8 @@ document.getElementById('scheduleForm').addEventListener('submit', function(e) {
   saveDatabase();
   clearForm();
   switchTab('board');
-});
+  });
+}
 
 function editSchedule(id) {
   const sch = db.schedules.find(s => s.id === id);
