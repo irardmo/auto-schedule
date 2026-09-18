@@ -49,7 +49,7 @@ function renderPaginationControls(totalItems, currentPage, pageSize, navElId, in
 
   navEl.innerHTML = '';
   if (totalPages <= 1) {
-    return adjustedPage; 
+    return adjustedPage;
   }
 
   // Prev Button
@@ -12380,7 +12380,7 @@ function calculateTeacherTotalUnits(teacherId) {
   let totalUnits = 0;
   const teacherSchedules = db.schedules.filter(s => s.instructor_id === teacherId);
   const matchedSubjectIds = new Set();
-  
+
   teacherSchedules.forEach(sch => {
     const sub = db.subjects.find(s => s.id === sch.subject_id);
     if (sub && !matchedSubjectIds.has(sub.id)) {
@@ -12412,7 +12412,7 @@ async function loadDatabase() {
         is_major: parseInt(s.is_major || 0, 10)
       }));
       db.schedules = result.schedules || [];
-      
+
       localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
       console.log("Database successfully synced with XAMPP MySQL backend.");
       loadedSuccessfully = true;
@@ -12460,7 +12460,7 @@ async function loadDatabase() {
 async function saveDatabase() {
   // Sync to Local Storage first
   localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
-  
+
   try {
     const response = await fetch(`${API_URL}?action=save_database`, {
       method: 'POST',
@@ -12523,20 +12523,20 @@ function daysOverlap(day1, day2) {
 function isHighSchoolRoom(roomName) {
   if (!roomName) return false;
   const normalized = roomName.toUpperCase().replace(/\s+|-/g, ''); // normalize "HS-101" to "HS101", etc.
-  
+
   // check for numeric 205 to 208
   if (/^\d+$/.test(normalized)) {
     const val = parseInt(normalized, 10);
     if (val >= 205 && val <= 208) return true;
   }
-  
+
   // check for HS101 to HS110
   const hsMatch = normalized.match(/^HS(\d+)$/);
   if (hsMatch) {
     const val = parseInt(hsMatch[1], 10);
     if (val >= 101 && val <= 110) return true;
   }
-  
+
   return false;
 }
 
@@ -12547,66 +12547,66 @@ function isSpecialRoom(roomName) {
   return (normalized === 'LIBRARY1' || normalized === 'LIBRARY2' || normalized === 'TBLROOM');
 }
 
-// Check if subject is computer/IT related (STRICTLY for COMLAB assignment)
+// Check if subject is computer/IT related
 function isComputerSubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
+  const course = (subject.course || '').toUpperCase();
 
-  const exactComputerSubjects = [
+  const exactComputerTitles = [
     'COMPUTER PROGRAMMING 1',
     'INFORMATION TECHNOLOGY FUNDAMENTALS',
-    'IT FUNDAMENTALS',
     'COMPUTER PROGRAMMING 2',
     'OBJECT-ORIENTED PROGRAMMING',
-    'OBJECT ORIENTED PROGRAMMING',
-    'FUNDAMENTALS OF DATABASE SYSTEM',
+    'FUNDAMENTALS OF DATABASE SYSTEMS',
     'EVENT DRIVEN PROGRAMMING',
-    'DATA STRUCTURES AND ALGORITHM',
+    'DATA STRUCTURES AND ALGORITHMS',
     'INFORMATION MANAGEMENT',
     'INFO ASSURANCE AND SECURITY 1',
-    'INFORMATION ASSURANCE AND SECURITY 1',
     'APP DEV. & EMERGING TECHNOLOGIES',
-    'APP DEV. AND EMERGING TECHNOLOGIES',
-    'APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGY',
     'NETWORKING 1',
     'INTRO TO HUMAN-COMPUTER INTERACTION',
-    'INTRODUCTION TO HUMAN AND COMPUTER INTERACTION',
     'SYSTEM ADMIN & MAINTENANCE',
-    'SYSTEM ADMINISTRATION AND MAINTENANCE',
     'WEB SYSTEMS AND TECHNOLOGY',
     'INTEGRATIVE PROGRAMMING & TECHNOLOGIES',
-    'INTEGRATIVE PROGRAMMING AND TECHNOLOGY',
     'NETWORKING 2',
     'INFO ASSURANCE AND SECURITY 2',
-    'INFORMATION ASSURANCE AND SECURITY 2',
     'SYSTEM INTEGRATION AND ARCHITECTURE 1',
     'SYSTEM INTEGRATION AND ARCHITECTURE 2',
     'PLATFORM TECHNOLOGIES',
-    'PLATFORM TECHNOLOGY',
     'MULTIMEDIA AND ANIMATION',
-    'HUMAN-COMPUTER INTERACTION 2',
-    'HUMAN COMPUTER INTERACTION 2'
+    'HUMAN-COMPUTER INTERACTION 2'
   ];
 
-  return exactComputerSubjects.some(t => title.includes(t) || code.includes(t));
+  if (exactComputerTitles.some(t => title.includes(t))) return true;
+
+  const computerPrefixes = ['CC', 'IT', 'COMP', 'PF', 'IM', 'NET', 'IAS', 'SA', 'SIA', 'WS', 'IPT', 'HCI', 'PT', 'CAP', 'PRAC'];
+  const computerKeywords = ['COMPUTER', 'PROGRAMMING', 'DATABASE', 'WEB', 'NETWORK', 'SOFTWARE', 'MULTIMEDIA', 'HARDWARE', 'INFORMATION MANAGEMENT', 'SYSTEM INTEGRATION', 'CAPSTONE', 'PLATFORM TECHNOLOGIES', 'INTEGRATIVE PROGRAMMING'];
+
+  if (computerPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
+  if (computerKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
+  if (course === 'BSIT' && (subject.lab_hours > 0 || subject.is_major)) return true;
+
+  return false;
 }
 
-// Check if subject is criminology lab related (STRICTLY for CRIMLAB assignment)
+// Check if subject is criminology or specialized lab related
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
-  const exactCrimLabCodes = [
-    'HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124',
-    'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'
-  ];
+  const exactSpecialLabCodes = ['HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124', 'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'];
+  if (exactSpecialLabCodes.some(c => code.includes(c))) return true;
 
-  if (exactCrimLabCodes.some(c => code.includes(c) || title.includes(c))) return true;
+  const crimPrefixes = ['FORENSIC', 'CRIM', 'CDI', 'LEA', 'CLJ', 'CA', 'CFLM', 'HPC', 'HMPE'];
+  const crimKeywords = ['FORENSIC', 'CRIMINOLOGY', 'INVESTIGATION', 'LAW ENFORCEMENT', 'CRIMINAL', 'CORRECTIONS', 'BALLISTICS', 'LIE DETECTION', 'QUESTIONED DOCUMENTS', 'MARKSMANSHIP', 'ARMS', 'ARSON', 'CYBERCRIME', 'KITCHEN', 'FOOD SERVICE', 'CULINARY', 'FRONT OFFICE', 'ROOM DIVISION', 'EVENTS MGT'];
 
-  if (course === 'BSCRIM' && (subject.lab_hours > 0 || code.startsWith('FORENSIC'))) return true;
+  if (crimPrefixes.some(p => code.startsWith(p + ' ') || code.startsWith(p + '1') || code.startsWith(p + '0') || code.startsWith(p + '2'))) return true;
+  if (crimKeywords.some(kw => code.includes(kw) || title.includes(kw))) return true;
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || subject.is_major)) return true;
 
   return false;
 }
@@ -12663,11 +12663,11 @@ function isHighSchoolRoomTimeAllowed(day, startStr, endStr) {
   const constituents = getConstituentDays(day);
   const startMins = parseTimeToMinutes(startStr);
   const endMins = parseTimeToMinutes(endStr);
-  
+
   for (let d of constituents) {
     let allowedStart = null;
     let allowedEnd = null;
-    
+
     if (d === 'M' || d === 'T' || d === 'W') {
       allowedStart = parseTimeToMinutes("16:00"); // 4:00 PM
       allowedEnd = parseTimeToMinutes("19:00");   // 7:00 PM
@@ -12681,7 +12681,7 @@ function isHighSchoolRoomTimeAllowed(day, startStr, endStr) {
       // Sunday is not permitted
       return false;
     }
-    
+
     if (startMins < allowedStart || endMins > allowedEnd) {
       return false;
     }
@@ -12711,7 +12711,7 @@ function validateSchedule(candidate) {
   if (teacher && subject) {
     const currentUnits = calculateTeacherTotalUnits(candidate.instructor_id);
     const isNewSubject = !db.schedules.some(s => s.instructor_id === candidate.instructor_id && s.subject_id === candidate.subject_id && s.id !== candidate.id);
-    
+
     const candidateUnits = isNewSubject ? currentUnits + subject.units : currentUnits;
     const baseLimit = teacher.max_units;
     const hardLimit = baseLimit + 2;
@@ -12753,7 +12753,7 @@ function validateSchedule(candidate) {
     if (daysOverlap(existing.day, candidate.day)) {
       // Check if time blocks overlap
       if (timesOverlap(existing.time_start, existing.time_end, candidate.time_start, candidate.time_end)) {
-        
+
         // Conflict 1: Instructor Double Booking
         if (existing.instructor_id === candidate.instructor_id) {
           const t = db.instructors.find(i => i.id === candidate.instructor_id);
@@ -12771,9 +12771,9 @@ function validateSchedule(candidate) {
         // Conflict 3: Section/Block Student Overlap
         if (subject) {
           const existingSubject = db.subjects.find(s => s.id === existing.subject_id);
-          if (existingSubject && 
-              existingSubject.course === subject.course && 
-              existingSubject.year_level === subject.year_level && 
+          if (existingSubject &&
+              existingSubject.course === subject.course &&
+              existingSubject.year_level === subject.year_level &&
               (existingSubject.block_section || '') === (subject.block_section || '')) {
             errors.push(`Section/Block Conflict: Section ${subject.course} ${subject.year_level}${subject.block_section} already has a class on ${existing.day} at ${existing.time_start} - ${existing.time_end}.`);
           }
@@ -12793,15 +12793,15 @@ function validateSchedule(candidate) {
 function calculateTimeEnd() {
   const startVal = document.getElementById('input-time-start').value;
   const durationVal = parseFloat(document.getElementById('input-duration').value) || 2;
-  
+
   if (!startVal) return;
 
   const [hrs, mins] = startVal.split(':').map(Number);
   let totalMins = hrs * 60 + mins + (durationVal * 60);
-  
+
   const endHrs = Math.floor(totalMins / 60) % 24;
   const endMins = Math.round(totalMins % 60);
-  
+
   const pad = (n) => String(n).padStart(2, '0');
   document.getElementById('input-time-end').value = `${pad(endHrs)}:${pad(endMins)}`;
   checkRealtimeConflict();
@@ -12910,7 +12910,7 @@ function checkRealtimeConflict() {
   };
 
   const validation = validateSchedule(candidate);
-  
+
   if (validation.valid) {
     monitor.innerHTML = `
       <div class="card border-0 bg-success bg-opacity-10 text-success p-3 rounded-3 text-center">
@@ -13050,7 +13050,7 @@ function showToast(message, type = "success") {
 
   msgEl.innerText = message;
   toastEl.className = `toast align-items-center text-white border-0 ${type === 'success' ? 'bg-success' : (type === 'warning' ? 'bg-warning text-dark' : 'bg-danger')}`;
-  
+
   const toast = new bootstrap.Toast(toastEl);
   toast.show();
 }
@@ -13240,7 +13240,7 @@ function renderWaterfallTeachers() {
   if (!waterfallTeachersDiv) return;
 
   const filteredTeachers = db.instructors.filter(t => {
-    return t.name.toLowerCase().includes(waterfallTeacherSearchQuery) || 
+    return t.name.toLowerCase().includes(waterfallTeacherSearchQuery) ||
            t.designation.toLowerCase().includes(waterfallTeacherSearchQuery);
   });
 
@@ -13358,16 +13358,13 @@ function renderSchedulesTable() {
     const t = db.instructors.find(i => i.id === sch.instructor_id);
     const sub = db.subjects.find(s => s.id === sch.subject_id);
 
-    const schCourse = sch.course || (sub ? sub.course : '');
-    const schYear = sch.year_level || (sub ? sub.year_level : 0);
-    const schBlock = sch.block_section || (sub ? sub.block_section : '');
-    
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
     if (activeFilters.subject && (!sub || sub.title_and_code !== activeFilters.subject)) return false;
-    if (activeFilters.course && schCourse !== activeFilters.course) return false;
-    if (activeFilters.year && schYear !== parseInt(activeFilters.year, 10)) return false;
-    if (activeFilters.block && schBlock !== activeFilters.block && !schBlock.endsWith(activeFilters.block)) return false;
-
+    if (sub) {
+      if (activeFilters.course && sub.course !== activeFilters.course) return false;
+      if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
+      if (activeFilters.block && (sub.block_section || '') !== activeFilters.block) return false;
+    }
     return true;
   });
 
@@ -13396,11 +13393,11 @@ function renderSchedulesTable() {
 
   // Page slice
   schedulesCurrentPage = renderPaginationControls(
-    filtered.length, 
-    schedulesCurrentPage, 
-    GENERAL_PAGE_SIZE, 
-    'schedules-pagination', 
-    'schedules-page-info', 
+    filtered.length,
+    schedulesCurrentPage,
+    GENERAL_PAGE_SIZE,
+    'schedules-pagination',
+    'schedules-page-info',
     'changeSchedulesPage'
   );
   const startIdx = (schedulesCurrentPage - 1) * GENERAL_PAGE_SIZE;
@@ -13414,10 +13411,9 @@ function renderSchedulesTable() {
     const subject = db.subjects.find(s => s.id === sch.subject_id);
 
     const subTitle = subject ? subject.title_and_code : 'Unknown';
-    const course = sch.course || (subject ? subject.course : '-');
-    const year = sch.year_level || (subject ? subject.year_level : '-');
-    const rawBlock = sch.block_section || (subject && subject.block_section ? subject.block_section : '');
-    const blockDisplay = rawBlock ? (rawBlock.includes(course) ? rawBlock : `${course} ${rawBlock}`) : '-';
+    const course = subject ? subject.course : '-';
+    const year = subject ? subject.year_level : '-';
+    const block = (subject && subject.block_section) ? subject.block_section : '-';
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
@@ -13455,7 +13451,7 @@ function renderSchedulesTable() {
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_start}" onchange="autoSaveSchedule('${sch.id}', 'time_start', this.value)"></td>
         <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_end}" onchange="autoSaveSchedule('${sch.id}', 'time_end', this.value)"></td>
         <td class="text-center">${year}</td>
-        <td>${blockDisplay}</td>
+        <td>${course} ${block}</td>
         <td>${subjectSelect}</td>
         <td>${course}</td>
         <td class="text-center fw-medium">${lec}</td>
@@ -13704,7 +13700,7 @@ const schedFormEl = document.getElementById('scheduleForm');
 if (schedFormEl) {
   schedFormEl.addEventListener('submit', function(e) {
     e.preventDefault();
-  
+
   const id = document.getElementById('edit-id').value;
   const instructor_id = document.getElementById('input-teacher').value;
   const room_id = document.getElementById('input-room').value;
@@ -13777,13 +13773,13 @@ function editSchedule(id) {
     const sub = db.subjects.find(s => s.id === sch.subject_id);
     if (sub) {
       document.getElementById('input-subject').value = sub.title_and_code;
-      
+
       // Populate block list dynamically first
       autofillSubjectDetails();
-      
+
       // Set the block selection to the exact subject ID
       document.getElementById('input-block').value = sub.id;
-      
+
       // Populate fields
       document.getElementById('input-course').value = sub.course;
       document.getElementById('input-year').value = sub.year_level;
@@ -13808,7 +13804,7 @@ function deleteSchedule(id) {
 function clearForm() {
   document.getElementById('scheduleForm').reset();
   document.getElementById('edit-id').value = "";
-  
+
   const blockSel = document.getElementById('input-block');
   if (blockSel) {
     blockSel.innerHTML = '<option value="">Select Block...</option>';
@@ -13879,7 +13875,7 @@ function importInstructorsCSV(e) {
       }
 
       const headers = rows[0].map(h => h.toUpperCase().replace(/[^A-Z0-9#\s]/g, '').trim());
-      
+
       const findColIndex = (keywords) => {
         return headers.findIndex(h => keywords.some(k => h.includes(k)));
       };
@@ -14185,7 +14181,7 @@ async function runWaterfallScheduler() {
   // e.g. "bsit:4, bscs:2" or "bsit, bscs"
   const defaultSections = parseInt(document.getElementById('batch-sections-count').value, 10) || 10;
   const courseParts = courseInput.split(',').map(part => part.trim()).filter(Boolean);
-  
+
   const coursesToProcess = [];
   courseParts.forEach(part => {
     if (part.includes(':')) {
@@ -14217,20 +14213,20 @@ async function runWaterfallScheduler() {
   // We'll create distinct section codes like A, B, C, D... etc based on sections count per course
   const createdSubjects = [];
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  
+
   coursesToProcess.forEach(item => {
     const cName = item.courseName;
     const sCount = item.sections;
-    
+
     for (let i = 0; i < sCount; i++) {
       const sectionLetter = alphabet[i] || String(i + 1);
       const sectionCode = `${yearLevel}${sectionLetter}`;
 
       // Look if already exists in db.subjects to prevent duplicate creation
-      let existingSub = db.subjects.find(s => 
-        s.title_and_code === subjectTitle && 
-        s.course === cName && 
-        s.year_level === yearLevel && 
+      let existingSub = db.subjects.find(s =>
+        s.title_and_code === subjectTitle &&
+        s.course === cName &&
+        s.year_level === yearLevel &&
         s.block_section === sectionCode
       );
 
@@ -14279,7 +14275,7 @@ async function runWaterfallScheduler() {
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
-    
+
     // 2 Hour blocks (7:00 AM to 7:00 PM)
     { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
@@ -14298,7 +14294,7 @@ async function runWaterfallScheduler() {
     { start: "14:30", end: "16:00", dur: 1.5 },
     { start: "16:00", end: "17:30", dur: 1.5 },
     { start: "17:30", end: "19:00", dur: 1.5 },
-    
+
     // 1 Hour blocks (7:00 AM to 7:00 PM)
     { start: "07:00", end: "08:00", dur: 1 },
     { start: "08:00", end: "09:00", dur: 1 },
@@ -14320,7 +14316,7 @@ async function runWaterfallScheduler() {
   for (let subject of subjectsToSchedule) {
     let isScheduled = false;
     let conflictsEncountered = new Set();
-    
+
     // Waterfall logic: Sort participating teachers dynamically for each section by their current workload unit counts (ascending)
     const participatingTeachers = db.instructors
       .filter(t => selectedTeacherIds.includes(t.id))
@@ -14366,7 +14362,7 @@ async function runWaterfallScheduler() {
 
         for (let day of sortedDays) {
           for (let slot of sortedSlots) {
-            
+
             const candidate = {
               id: 'temp_' + uniqueId(),
               instructor_id: teacher.id,
@@ -14415,7 +14411,7 @@ async function runWaterfallScheduler() {
   const isSuccess = failedCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
   const alertTitle = isSuccess ? 'Batch Generator Completed Successfully!' : 'Batch Generator Finished with Conflicts';
-  const alertMsg = `Successfully scheduled ${successfullyScheduled} out of ${subjectsToSchedule.length} section(s).` + 
+  const alertMsg = `Successfully scheduled ${successfullyScheduled} out of ${subjectsToSchedule.length} section(s).` +
     (!isSuccess ? ` ${failedCount} section(s) encountered conflicts (teacher load/availability, room, or section overlap). See execution logs below for conflict breakdown.` : '');
 
   showGlobalAlert(alertTitle, alertMsg, alertType);
@@ -14463,7 +14459,7 @@ function renderOfficialPrintout() {
   teacherSchedules.forEach(sch => {
     const sub = db.subjects.find(s => s.id === sch.subject_id);
     const rm = db.rooms.find(r => r.id === sch.room_id);
-    
+
     const subjectName = sub ? sub.title_and_code : 'Administrative Service';
     const section = sub ? `${sub.course} ${sub.block_section}` : 'N/A';
     const day = sch.day;
@@ -14502,7 +14498,7 @@ function renderOfficialPrintout() {
 
   const collegeLoad = totalLec + totalLab;
   const adminHrs = teacher.admin_load ? 40 : 0;
-  
+
   const htmlContent = `
     <!-- Top SIBT Official Header logo -->
     <div class="d-flex align-items-center mb-4 border-bottom pb-3">
@@ -14755,26 +14751,6 @@ function bulkDeleteRooms() {
 }
 
 // Per-Section Generator Logic
-function updateSectionBlockOptions() {
-  const yearEl = document.getElementById('section-year');
-  const blockEl = document.getElementById('section-block');
-  if (!yearEl || !blockEl) return;
-
-  const y = yearEl.value || '1';
-  const currentVal = blockEl.value;
-  const targetPrefix = y;
-
-  // Check if current options match year prefix
-  if (!blockEl.options[0] || !blockEl.options[0].value.startsWith(targetPrefix)) {
-    blockEl.innerHTML = `
-      <option value="${y}A" ${currentVal === y+'A' ? 'selected' : ''}>${y}A</option>
-      <option value="${y}B" ${currentVal === y+'B' ? 'selected' : ''}>${y}B</option>
-      <option value="${y}C" ${currentVal === y+'C' ? 'selected' : ''}>${y}C</option>
-      <option value="${y}D" ${currentVal === y+'D' ? 'selected' : ''}>${y}D</option>
-    `;
-  }
-}
-
 function loadSectionSubjects() {
   const courseEl = document.getElementById('section-course');
   const yearEl = document.getElementById('section-year');
@@ -14785,8 +14761,6 @@ function loadSectionSubjects() {
   const countEl = document.getElementById('section-subject-count');
 
   if (!courseEl || !yearEl || !listEl) return;
-
-  updateSectionBlockOptions();
 
   const course = courseEl.value;
   const year = parseInt(yearEl.value, 10);
@@ -14900,10 +14874,10 @@ async function runSingleTeacherScheduler() {
     const sectionLetter = alphabet[i] || String(i + 1);
     const sectionCode = `${yearLevel}${sectionLetter}`;
 
-    let existingSub = db.subjects.find(s => 
-      s.title_and_code.toLowerCase() === subjectTitle.toLowerCase() && 
-      s.course.toLowerCase() === courseInput.toLowerCase() && 
-      s.year_level === yearLevel && 
+    let existingSub = db.subjects.find(s =>
+      s.title_and_code.toLowerCase() === subjectTitle.toLowerCase() &&
+      s.course.toLowerCase() === courseInput.toLowerCase() &&
+      s.year_level === yearLevel &&
       s.block_section === sectionCode
     );
 
@@ -14934,7 +14908,7 @@ async function runSingleTeacherScheduler() {
     { start: "08:00", end: "11:00", dur: 3 },
     { start: "13:00", end: "16:00", dur: 3 },
     { start: "16:00", end: "19:00", dur: 3 },
-    
+
     // 2 Hour blocks
     { start: "07:00", end: "09:00", dur: 2 },
     { start: "08:00", end: "10:00", dur: 2 },
@@ -15048,9 +15022,9 @@ async function runSingleTeacherScheduler() {
   const isSuccess = failedCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
   const alertTitle = isSuccess ? 'Single Teacher Generator Successful!' : 'Single Teacher Generator Finished with Conflicts';
-  const alertMsg = `Scheduled ${scheduledCount} out of ${sectionsCount} section(s) for instructor ${teacher.name}.` + 
+  const alertMsg = `Scheduled ${scheduledCount} out of ${sectionsCount} section(s) for instructor ${teacher.name}.` +
     (!isSuccess ? ` ${failedCount} section(s) encountered conflicts.` : '');
-  
+
   showGlobalAlert(alertTitle, alertMsg, alertType);
   showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
@@ -15094,7 +15068,6 @@ async function runPerSectionScheduler() {
 
   let scheduledCount = 0;
   let unscheduledCount = 0;
-  window.lastSectionConflictsList = [];
 
   for (let sel of selects) {
     const subId = sel.getAttribute('data-subject-id');
@@ -15143,7 +15116,7 @@ async function runPerSectionScheduler() {
       { start: "08:00", end: "11:00", dur: 3 },
       { start: "13:00", end: "16:00", dur: 3 },
       { start: "16:00", end: "19:00", dur: 3 },
-      
+
       // 2 Hour blocks
       { start: "07:00", end: "09:00", dur: 2 },
       { start: "08:00", end: "10:00", dur: 2 },
@@ -15194,10 +15167,7 @@ async function runPerSectionScheduler() {
             day: day,
             time_start: slot.start,
             time_end: slot.end,
-            subject_id: sub.id,
-            course: course,
-            year_level: year,
-            block_section: `${year}${block}`
+            subject_id: sub.id
           };
 
           const roomsToTry = getPrioritizedRooms(sub, db.rooms);
@@ -15220,10 +15190,7 @@ async function runPerSectionScheduler() {
               day: day,
               time_start: slot.start,
               time_end: slot.end,
-              subject_id: sub.id,
-              course: course,
-              year_level: year,
-              block_section: block
+              subject_id: sub.id
             };
             db.schedules.push(newSch);
             scheduledCount++;
@@ -15237,18 +15204,10 @@ async function runPerSectionScheduler() {
 
     if (!scheduled) {
       unscheduledCount++;
-      const conflictMsg = `Subject "${sub.title_and_code}" (${course} ${year}${block}): Could not find a conflict-free slot.`;
-      const reasons = Array.from(sectionConflicts);
-      window.lastSectionConflictsList.push({
-        subject: sub.title_and_code,
-        message: conflictMsg,
-        reasons: reasons.length > 0 ? reasons : ["No available teacher/room timeslot combination satisfied constraints."]
-      });
-
       consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
       if (sectionConflicts.size > 0) {
         consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
-        reasons.slice(0, 5).forEach(err => {
+        Array.from(sectionConflicts).slice(0, 5).forEach(err => {
           consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
         });
       }
@@ -15259,65 +15218,14 @@ async function runPerSectionScheduler() {
   renderSchedulesTable();
   updateStats();
 
-  const viewConflictsBtn = document.getElementById('viewSectionConflictsBtn');
-  const conflictCountSpan = document.getElementById('sectionConflictCount');
-
-  if (unscheduledCount > 0) {
-    if (viewConflictsBtn) viewConflictsBtn.classList.remove('d-none');
-    if (conflictCountSpan) conflictCountSpan.innerText = unscheduledCount;
-  } else {
-    if (viewConflictsBtn) viewConflictsBtn.classList.add('d-none');
-    if (conflictCountSpan) conflictCountSpan.innerText = '0';
-  }
-
   const isSuccess = unscheduledCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
   const alertTitle = isSuccess ? 'Per-Section Scheduling Successful!' : 'Per-Section Scheduling Finished with Conflicts';
-  const alertMsg = `Scheduled ${scheduledCount} out of ${selects.length} subjects for section ${course} ${year}${block}.` + 
+  const alertMsg = `Scheduled ${scheduledCount} out of ${selects.length} subjects for section ${course} ${year}${block}.` +
     (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled due to teacher, room, time, or section conflicts.` : '');
-  
+
   showGlobalAlert(alertTitle, alertMsg, alertType);
   showToast(alertMsg, isSuccess ? 'success' : 'warning');
-}
-
-function openConflictsModal() {
-  const modalList = document.getElementById('conflictsModalList');
-  if (!modalList) return;
-
-  const conflicts = window.lastSectionConflictsList || [];
-  if (conflicts.length === 0) {
-    modalList.innerHTML = `<div class="p-3 text-center text-muted">No specific conflicts recorded. All subjects scheduled cleanly.</div>`;
-  } else {
-    let html = '';
-    conflicts.forEach((c, idx) => {
-      html += `
-        <div class="list-group-item p-3">
-          <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-            <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-circle me-1"></i> ${c.subject}</h6>
-            <span class="badge bg-danger">Conflict #${idx + 1}</span>
-          </div>
-          <p class="mb-2 text-dark small fw-semibold">${c.message}</p>
-          <div class="bg-light p-2 rounded border">
-            <span class="text-muted small fw-bold d-block mb-1">Observed Constraint Breaches:</span>
-            <ul class="mb-0 ps-3 small text-secondary">
-              ${c.reasons.map(r => `<li>${r}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-      `;
-    });
-    modalList.innerHTML = html;
-  }
-
-  const modalEl = document.getElementById('conflictsModal');
-  if (modalEl) {
-    const bsModal = new bootstrap.Modal(modalEl);
-    bsModal.show();
-  }
-}
-
-function scrollToSectionLog() {
-  openConflictsModal();
 }
 
 // Initialize on document load
@@ -15328,7 +15236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   populateFormSelects();
   updateStats();
   renderAllViews();
-  
+
   // Tab switch listener for Per-Section tab
   const secTab = document.getElementById('tab-mode-section');
   if (secTab) {
