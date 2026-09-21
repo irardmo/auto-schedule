@@ -63,32 +63,6 @@
         }
       }
     },
-    "sections": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "course",
-          "year_level",
-          "section_name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "course": {
-            "type": "string"
-          },
-          "year_level": {
-            "type": "integer"
-          },
-          "section_name": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "rooms": {
       "type": "array",
       "items": {
@@ -210,15 +184,6 @@
             "type": "string"
           },
           "subject_id": {
-            "type": "string"
-          },
-          "course": {
-            "type": "string"
-          },
-          "year_level": {
-            "type": "integer"
-          },
-          "block_section": {
             "type": "string"
           }
         }

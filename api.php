@@ -58,14 +58,6 @@ try {
         room_type VARCHAR(50) NOT NULL
     ) ENGINE=InnoDB;");
 
-    // Create Sections
-    $conn->exec("CREATE TABLE IF NOT EXISTS sections (
-        id VARCHAR(50) PRIMARY KEY,
-        course VARCHAR(100) NOT NULL,
-        year_level INT NOT NULL,
-        section_name VARCHAR(50) NOT NULL
-    ) ENGINE=InnoDB;");
-
     // Create Course-Specific Subject Tables
     foreach ($courseTables as $tbl) {
         $conn->exec("CREATE TABLE IF NOT EXISTS {$tbl} (
@@ -91,9 +83,6 @@ try {
         time_start VARCHAR(10) NOT NULL,
         time_end VARCHAR(10) NOT NULL,
         subject_id VARCHAR(50),
-        course VARCHAR(100),
-        year_level INT,
-        block_section VARCHAR(50),
         FOREIGN KEY (instructor_id) REFERENCES instructors(id) ON DELETE CASCADE,
         FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
     ) ENGINE=InnoDB;");
@@ -108,7 +97,6 @@ switch ($action) {
         // Retrieve whole SIBT database package
         $instructors = $conn ? $conn->query("SELECT * FROM instructors")->fetchAll(PDO::FETCH_ASSOC) : [];
         $rooms = $conn ? $conn->query("SELECT * FROM rooms")->fetchAll(PDO::FETCH_ASSOC) : [];
-        $sections = $conn ? $conn->query("SELECT * FROM sections")->fetchAll(PDO::FETCH_ASSOC) : [];
         $schedules = $conn ? $conn->query("SELECT * FROM schedules")->fetchAll(PDO::FETCH_ASSOC) : [];
 
         $subjects = [];
@@ -127,7 +115,6 @@ switch ($action) {
             "status" => "success",
             "instructors" => $instructors,
             "rooms" => $rooms,
-            "sections" => $sections,
             "subjects" => $subjects,
             "schedules" => $schedules
         ]);
@@ -141,7 +128,6 @@ switch ($action) {
             try {
                 // Clear state
                 $conn->exec("DELETE FROM schedules");
-                $conn->exec("DELETE FROM sections");
                 foreach ($courseTables as $tbl) {
                     try {
                         $conn->exec("DELETE FROM {$tbl}");
@@ -170,13 +156,6 @@ switch ($action) {
                     }
                 }
 
-                if (isset($data['sections']) && is_array($data['sections'])) {
-                    $stmt = $conn->prepare("INSERT INTO sections (id, course, year_level, section_name) VALUES (?, ?, ?, ?)");
-                    foreach ($data['sections'] as $sec) {
-                        $stmt->execute([$sec['id'], $sec['course'], $sec['year_level'], $sec['section_name']]);
-                    }
-                }
-
                 if (isset($data['subjects']) && is_array($data['subjects'])) {
                     foreach ($data['subjects'] as $sub) {
                         $c = strtolower(str_replace(['-', ' '], '_', $sub['course'] ?? 'bsit'));
@@ -197,12 +176,11 @@ switch ($action) {
                 }
 
                 if (isset($data['schedules']) && is_array($data['schedules'])) {
-                    $stmt = $conn->prepare("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id, course, year_level, block_section) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $conn->prepare("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['schedules'] as $sch) {
                         $stmt->execute([
                             $sch['id'], $sch['instructor_id'], $sch['room_id'], 
-                            $sch['day'], $sch['time_start'], $sch['time_end'], $sch['subject_id'],
-                            $sch['course'] ?? '', $sch['year_level'] ?? 1, $sch['block_section'] ?? ''
+                            $sch['day'], $sch['time_start'], $sch['time_end'], $sch['subject_id']
                         ]);
                     }
                 }

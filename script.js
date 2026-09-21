@@ -1,10 +1,10 @@
 
 function getFilteredStandardDays(selectedSetting) {
-  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF", "WF", "MW", "MF", "TF"];
+  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
   if (!selectedSetting || selectedSetting === 'all') return allDays;
   const count = parseInt(selectedSetting, 10);
   if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
-  if (count === 2) return ["MT", "TTH", "WF", "MW", "MF", "TF"];
+  if (count === 2) return ["MT", "TTH"];
   if (count === 3) return ["MWF"];
   return allDays;
 }
@@ -15,7 +15,6 @@ function getFilteredStandardDays(selectedSetting) {
 let db = {
   instructors: [],
   rooms: [],
-  sections: [],
   subjects: [],
   schedules: []
 };
@@ -24,13 +23,11 @@ let selectedScheduleIds = new Set();
 let selectedTeacherIds_manage = new Set();
 let selectedSubjectIds = new Set();
 let selectedRoomIds = new Set();
-let selectedSectionIds = new Set();
 
 let schedulesCurrentPage = 1;
 let instructorsCurrentPage = 1;
 let subjectsCurrentPage = 1;
 let roomsCurrentPage = 1;
-let sectionsCurrentPage = 1;
 const GENERAL_PAGE_SIZE = 20;
 
 function renderPaginationControls(totalItems, currentPage, pageSize, navElId, infoElId, changePageFuncName) {
@@ -63,52 +60,14 @@ function renderPaginationControls(totalItems, currentPage, pageSize, navElId, in
     </li>
   `;
 
-  // Determine pages to display: First page, 3 middle pages (around current), Last page
-  let pagesToDisplay = [];
-  if (totalPages <= 7) {
-    for (let i = 1; i <= totalPages; i++) pagesToDisplay.push(i);
-  } else {
-    pagesToDisplay.push(1); // First page
-
-    let midStart = adjustedPage - 1;
-    let midEnd = adjustedPage + 1;
-
-    if (adjustedPage <= 3) {
-      midStart = 2;
-      midEnd = 4;
-    } else if (adjustedPage >= totalPages - 2) {
-      midStart = totalPages - 3;
-      midEnd = totalPages - 1;
-    }
-
-    for (let i = midStart; i <= midEnd; i++) {
-      if (i > 1 && i < totalPages) {
-        pagesToDisplay.push(i);
-      }
-    }
-
-    pagesToDisplay.push(totalPages); // Last page
-  }
-
-  pagesToDisplay = Array.from(new Set(pagesToDisplay)).sort((a, b) => a - b);
-
-  let prevNum = 0;
-  for (let i = 0; i < pagesToDisplay.length; i++) {
-    const pageNum = pagesToDisplay[i];
-    if (prevNum > 0 && pageNum - prevNum > 1) {
-      navEl.innerHTML += `
-        <li class="page-item disabled">
-          <span class="page-link">...</span>
-        </li>
-      `;
-    }
-    const activeClass = pageNum === adjustedPage ? 'active' : '';
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const activeClass = i === adjustedPage ? 'active' : '';
     navEl.innerHTML += `
       <li class="page-item ${activeClass}">
-        <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${pageNum})">${pageNum}</a>
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${changePageFuncName}(${i})">${i}</a>
       </li>
     `;
-    prevNum = pageNum;
   }
 
   // Next Button
@@ -142,11 +101,6 @@ function changeRoomsPage(page) {
   renderRoomsTable();
 }
 
-function changeSectionsPage(page) {
-  sectionsCurrentPage = page;
-  renderSectionsTable();
-}
-
 function updateBulkDeleteUI(type) {
   let selectedSet;
   let btnId, countId, checkAllId;
@@ -171,11 +125,6 @@ function updateBulkDeleteUI(type) {
     btnId = 'btn-bulk-delete-rooms';
     countId = 'selected-rooms-count';
     checkAllId = 'check-all-rooms';
-  } else if (type === 'sections') {
-    selectedSet = selectedSectionIds;
-    btnId = 'btn-bulk-delete-sections';
-    countId = 'selected-sections-count';
-    checkAllId = 'check-all-sections';
   }
 
   const btn = document.getElementById(btnId);
@@ -403,11939 +352,10233 @@ const demoData = {
     ],
     "subjects": [
         {
-                "id": "bsca_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN THE MODERN WORLD",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o5",
-                "title_and_code": "GE EL 101 - ENTREPRENEURIAL MIND",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o7",
-                "title_and_code": "SIBTECH 101 - SOCIAL ARTS 1",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o8",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o9",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o10",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o11",
-                "title_and_code": "TM 1 - FUNDAMENTALS OF CUSTOMS AND TARIFF MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o12",
-                "title_and_code": "SCM 1 - INTRO TO SUPPLY CHAIN MGT",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o13",
-                "title_and_code": "ELC 1 - ENTREPRENEURIAL MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o14",
-                "title_and_code": "CM 1 - BORDER CONTROL & SECURITY",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o15",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o16",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o17",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o18",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o19",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o20",
-                "title_and_code": "GE 108 - BUSINESS ETHICS",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o21",
-                "title_and_code": "GE 107 - THE CONTEMPORARY WORLD",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o22",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o23",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o24",
-                "title_and_code": "SBEC 1 - OBLIGATION AND CONTRACT",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o25",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o26",
-                "title_and_code": "SBEC 2 - TAXATION (INCOME AND BUSINESS TAXATION)",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o27",
-                "title_and_code": "SCM 2 - WAREHOUSE OPERATIONNS MGT",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o28",
-                "title_and_code": "SCM 3 - PROCUREMENT AND INVENTORY MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o29",
-                "title_and_code": "CM 2 - CUSTOMS OPERATIONS & CARGO HANDLING",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o30",
-                "title_and_code": "TM 3 - CUSTOMS VALUATION SYSTEM",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o31",
-                "title_and_code": "TM 2 - COMMODIY CLASSIFICATION SYSTEM",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o32",
-                "title_and_code": "CM 3 - CUSTOMS WAREHOUSING",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o33",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o34",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o35",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o36",
-                "title_and_code": "GE 112 - GENDER AND SOCIETY",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o38",
-                "title_and_code": "CM 5 - CUSTOMS PROCEEDING",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o39",
-                "title_and_code": "SCM 4 - TRANSPORTATION MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o40",
-                "title_and_code": "TM 5 - EXCISE TAXES, LIQUIDATION OF DUTY AND SURCHARGES",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o41",
-                "title_and_code": "CM 4 - CUSTOMS CLEARANCE",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o42",
-                "title_and_code": "EL 3 - INTERNATIONAL MARKETING",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o43",
-                "title_and_code": "CMBE 1 - OPERATIONS MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o44",
-                "title_and_code": "RES 2 - THESIS WRITING 2",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o45",
-                "title_and_code": "TM 4 - CUSTOMS APPRAISAL AND ASSESSMENT",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o46",
-                "title_and_code": "CMBE 2 - STRATEGIC MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o47",
-                "title_and_code": "RES 1 - THESIS WRITING 1",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o48",
-                "title_and_code": "CM 6 - CUSTOMS POST CLEARANCE AUDIT AND FRAUD DETECTION",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o49",
-                "title_and_code": "EL 2 - FINANCIAL MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o50",
-                "title_and_code": "INTERN - INTERNSHIP/PRACTICUM FOR CUSTOMS ADMINISTRATION (400HRS)",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 3,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o51",
-                "title_and_code": "CM 7 - ETHICS AND STANDARDS OF THE CUSTOMS BROKER",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o52",
-                "title_and_code": "CM 8 - COMPETENCIES ASSESSMENT IN CUSTOMS MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o53",
-                "title_and_code": "TM6 - SPECIAL DUTIES AND TRADE REMEDIES",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o54",
-                "title_and_code": "TM 8 - COMPETENCIES ASSESSMENT IN TARIFF MANAGEMENT",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsca_o55",
-                "title_and_code": "TM7 - INTERNATIONAL TRADE ORGNIZATIONS, AGREEMENT AND RULES OF ORIGIN",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o5",
-                "title_and_code": "MGT 1 - PRINCIPLES OF MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o6",
-                "title_and_code": "FIN 1 - BASIC FINANCE",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o7",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o8",
-                "title_and_code": "ACCTG 1 - FUNDAMENTALS OF ACCOUNTING",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o9",
-                "title_and_code": "SIBTECH 101 - SOCIAL ARTS 1",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o10",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o11",
-                "title_and_code": "BUS CORE 111 - BASIC MICROECONOMICS",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o12",
-                "title_and_code": "MGT 2 - HUMAN BEHAVIOR IN ORGANIZATION",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o13",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o14",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o15",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o16",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o17",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o18",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o19",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o20",
-                "title_and_code": "GE 108 - BUSINESS ETHICS",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o21",
-                "title_and_code": "GE 107 - THE CONTEMPORARY WORLD",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o22",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o23",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o24",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o25",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o26",
-                "title_and_code": "HRDM 3 - RECRUITMENT AND SELECTION",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o27",
-                "title_and_code": "MGT 3 - HUMAN RESOURCE MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o28",
-                "title_and_code": "TAX 1 - INCOME TAXATION",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o29",
-                "title_and_code": "HRDM 1 - ADMINISTRATIVE AND OFFICE  MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o30",
-                "title_and_code": "ACCTG 2 - FINANCIAL ACCOUNTING",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o31",
-                "title_and_code": "HRDM 2 - LABOR LAW AND LEGISLATION",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o32",
-                "title_and_code": "MKTG 1 - PRINCIPLES OF MARKETING",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o33",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o34",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o35",
-                "title_and_code": "GE 111 - BUSINESS STATISTICS",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o36",
-                "title_and_code": "HRDM ELEC 2 - PROJECT MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o38",
-                "title_and_code": "GE EL 105 - GENDER AND SOCIETY",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o39",
-                "title_and_code": "PSYCHO - GENERAL PSYCHOLOGY",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o40",
-                "title_and_code": "BUS CORE 112 - BUSINESS LAW (OBLIGATION AND CONTRACT)",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o41",
-                "title_and_code": "ENG 1 - BASIC COMMUNICATION SKILLS",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o42",
-                "title_and_code": "ENG 2 - BUSINESS ENGLISH AND CORRESPONDENCE",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o43",
-                "title_and_code": "HRDM ELEC 3 - SPECIAL TOPICS IN HRDM",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o44",
-                "title_and_code": "HRDM ELEC 1 - MARKETING MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o45",
-                "title_and_code": "HRDM 5 - COMPENSATION AND ADMINISTRATION",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o46",
-                "title_and_code": "HRDM 4 - TRAINING AND DEVELOPMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o47",
-                "title_and_code": "THESIS 1 - THESIS WRITING 1",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o48",
-                "title_and_code": "BUS CORE 113 - GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o49",
-                "title_and_code": "HRDM 6 - STRATEGIC HUMAN RESOURCE MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o50",
-                "title_and_code": "INT - INTERNSHIP",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o51",
-                "title_and_code": "HRDM 7 - ORGANIZATION AND DEVELOPMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o52",
-                "title_and_code": "GE EL 104 - ENVIRONMENTAL SCIENCE",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o53",
-                "title_and_code": "HRDM ELEC 4 - ENTREPENEURIAL MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o54",
-                "title_and_code": "HRDM ELEC 5 - OPERATIONS MANAGEMENT",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_hrdm_o55",
-                "title_and_code": "THESIS 2 - THESIS WRITING 2",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o1",
-                "title_and_code": "GE 101 - Understanding the Self",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o3",
-                "title_and_code": "GE 102 - Basic English Grammar",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o5",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o6",
-                "title_and_code": "EL 103 - Principles and Theories of Language Acquisition and Learning",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o7",
-                "title_and_code": "EL 100 - Introduction to Linguistics",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o8",
-                "title_and_code": "EL 104 - Language Programs and Policies in Multilingual Societies",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o9",
-                "title_and_code": "EL 101 - Language, Culture and Society",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o10",
-                "title_and_code": "EL 105 - Preparation of Language Learning Materials",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o11",
-                "title_and_code": "EL 102 - Structures of English",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o12",
-                "title_and_code": "EL 106 - The Child and Adolescent Learner and Learning Principles",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o13",
-                "title_and_code": "PATHFIT 1 - Movement Competency Training",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o14",
-                "title_and_code": "PATHFIT 2 - Exercise-Based Fitness Activities",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o15",
-                "title_and_code": "SIBTECH 101 - Social Arts 1",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o16",
-                "title_and_code": "SIBTECH 102 - Social Arts 2",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o17",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o18",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o19",
-                "title_and_code": "Comp 101 - Computer 1",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o20",
-                "title_and_code": "GE 106 - Science, Technology and Society",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o21",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o22",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o23",
-                "title_and_code": "GE 109 - Readings on Philippine History",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o24",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o25",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o26",
-                "title_and_code": "EL 107 - Speech and Theater Arts",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o27",
-                "title_and_code": "GE 105 - Public Speaking and Debate",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o28",
-                "title_and_code": "EL 108 - The Teaching Profession",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o29",
-                "title_and_code": "EL 110 - The Teacher and the Community, School Culture and Organizational Leadership",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o30",
-                "title_and_code": "ELT 1 - Teaching and Assessment of Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o31",
-                "title_and_code": "LIT 1 - Children and Adolescent Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o32",
-                "title_and_code": "ELT 2 - Teaching and Assessment of the Microskills",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o33",
-                "title_and_code": "LIT 2 - Mythology and Folklore",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o34",
-                "title_and_code": "ELT 3 - Teaching and Assessment of Grammar",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o35",
-                "title_and_code": "LIT 3 - Survey of Philippine Literature in English",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o36",
-                "title_and_code": "PATHFIT 3 - Group Exercises (Aerobics, Yoga, etc.)",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o37",
-                "title_and_code": "PATHFIT 4 - Sports",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o38",
-                "title_and_code": "RZL - Life and Works of Rizal",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o39",
-                "title_and_code": "EL 113 - Campus Journalism",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o40",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o41",
-                "title_and_code": "EL 114 - Stylistics and Discourse Analysis",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o42",
-                "title_and_code": "EL 111 - Foundation of Special and Inclusive Education",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o43",
-                "title_and_code": "EL 115 - Remedial Instruction",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o44",
-                "title_and_code": "EL 112 - Assessment of Learning 1",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o45",
-                "title_and_code": "EL 116 - Assessment of Learning 2",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o46",
-                "title_and_code": "ELT 4 - Technical Writing",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o47",
-                "title_and_code": "EL 117 - The Teacher and the School Curriculum",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o48",
-                "title_and_code": "LIT 4 - Survey of Afro-Asian Literature",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o49",
-                "title_and_code": "EL 118 - Building and Enhancing New Literacies Across the Curriculum",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o50",
-                "title_and_code": "LIT 5 - Survey of English and American Literature",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o51",
-                "title_and_code": "ELT 5 - Facilitating Learner-Centered Teaching",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o52",
-                "title_and_code": "LIT 6 - Contemporary and Popular Literature",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o53",
-                "title_and_code": "TTL1 - Technology for Teaching and Learning 1",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o54",
-                "title_and_code": "LIT 7 - Literary Criticism",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o55",
-                "title_and_code": "TTL 2 - Technology for Teaching and Learning 2  (Teaching in Language Education)",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o56",
-                "title_and_code": "EL-FS 1 - FIELD STUDY 1 (Observations of Teaching)",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o57",
-                "title_and_code": "EL-TIB - TEACHING INTERNSHIP",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o58",
-                "title_and_code": "EL-FS 2 - FIELD STUDY 2 (Participation and Teaching Assistanship)",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o59",
-                "title_and_code": "RES 2 - Language Research 2",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsed_o60",
-                "title_and_code": "RES 1 - Language Research 1",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o5",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o7",
-                "title_and_code": "SIBTECH 103 - SOCIAL ARTS 1",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o8",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o9",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o10",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o11",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o12",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o13",
-                "title_and_code": "CC 101 - INTRODUCTION TO COMPUTING",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o14",
-                "title_and_code": "CC 102 - COMPUTER PROGRAMMING 1",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o15",
-                "title_and_code": "MS 101 - DISCRETE MATHEMATICS",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o16",
-                "title_and_code": "MS 102 - QUANTITATIVE METHODS (INCLUDING MODELLING AND SIMULATION)",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o17",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o18",
-                "title_and_code": "GE 108 - Business ETHICS",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o19",
-                "title_and_code": "GE 107 - THE COMTEMPORARY WORLD",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o20",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o21",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o22",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o23",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o24",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o25",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o26",
-                "title_and_code": "CC 104 - DATA STRUCTURES AND ALGORITHM",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o27",
-                "title_and_code": "CC 103 - COMPUTER PROGRAMMING 2",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o28",
-                "title_and_code": "CC 105 - INFORMATION MANAGEMENT",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o29",
-                "title_and_code": "IM 101 - FUNDAMENTALS OF DATABASE SYSTEM",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o30",
-                "title_and_code": "HCI 101 - INTRODUCTION TO HUMAN AND COMPUTER INTERACTION",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o31",
-                "title_and_code": "PF 101 - OBJECT ORIENTED PROGRAMMING",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o32",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o33",
-                "title_and_code": "WS 101 - WEB SYSTEMS AND TECHNOLOGY",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o34",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o35",
-                "title_and_code": "IPT 101 - INTEGRATIVE PROGRAMMING AND TECHNOLOGY",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o36",
-                "title_and_code": "CC 106 - APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGY",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o37",
-                "title_and_code": "NET 102 - NETWORKING 2",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o38",
-                "title_and_code": "NET 101 - NETWORKING 1",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o39",
-                "title_and_code": "IAS 102 - INFORMATION ASSURANCE AND SECURITY 2",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o40",
-                "title_and_code": "IAS 101 - INFORMATION ASSURANCE AND SECURITY 1",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o41",
-                "title_and_code": "SIA 101 - SYSTEM INTERGRATION AND ARCHITECTURE 1",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o42",
-                "title_and_code": "SA 101 - SYSTEM ADMINISTRATION AND MAINTENANCE",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o43",
-                "title_and_code": "CAP 101 - CAPSTONE PROJECT AND RESEARCH 1",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o44",
-                "title_and_code": "SP 101 - SOCIAL AND PROFESSIONAL ISSUES",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o45",
-                "title_and_code": "SIA 102 - SYSTEM INTERGRATION AND ARCHITECTURE 2",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o46",
-                "title_and_code": "PRAC 101 - PRACTICUM",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o47",
-                "title_and_code": "PT 101 - PLATFORM TECHNOLOGY",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o48",
-                "title_and_code": "IT 101 - MULTIMEDIA AND ANIMATION",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o49",
-                "title_and_code": "HCI 102 - HUMAN COMPUTER INTERACTION 2",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsit_o50",
-                "title_and_code": "CAP 102 - CAPSTONE PROJECT AND RESERCH 2",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o5",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o7",
-                "title_and_code": "SIBTECH - SOCIAL ARTS 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o8",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o9",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o10",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o11",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o12",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o13",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o14",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o15",
-                "title_and_code": "PROF ED 1 - THE CHILD AND ADOLESCENT LEARNERS AND LEARNING PRINCIPLES",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o16",
-                "title_and_code": "PROF ED 2 - THE TEACHING PROFESSION",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o17",
-                "title_and_code": "ENG 1 - TEACHING ENGLISH IN THE ELEMENTARY GRADES (LANGUAGE ARTS)",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o18",
-                "title_and_code": "EHC 1 - EDUCATION ENHANCEMENT COURSE 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o19",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o20",
-                "title_and_code": "GE 108 - ETHICS",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o21",
-                "title_and_code": "GE 107 - THE COMTEMPORARY WORLD",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o22",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o23",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o24",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o25",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o26",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o27",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o28",
-                "title_and_code": "PROF ED 4 - FOUNDATION OF SPECIAL AND INCLUSIVE EDUCATION",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o29",
-                "title_and_code": "PROF ED 3 - THE TEACHER AND THE COMMUNITY, SCHOOL CULTURE AND ORGANIZATIONAL LEADERSHIP",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o30",
-                "title_and_code": "PROF ED 5 - FACILITATING LEARNER-CENTERED TEACHING",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o31",
-                "title_and_code": "MATH 1 - TEACHING MATH IN THE PRIMARY GRADES",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o32",
-                "title_and_code": "SCI 1 - TEACHING SCIENCE IN THE ELEMENTARY GRADES (BIOLOGY AND CHEMISTRY)",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o33",
-                "title_and_code": "ENG 2 - TEACHING ENGLISH IN THE ELEMENTARY GRADES THROUGH LITERATURE",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o34",
-                "title_and_code": "MATH 2 - TEACHING MATH IN THE INTERMEDIATE GRADES",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o35",
-                "title_and_code": "EHC 2 - EDUCATION ENHANCEMENT COURSE 2",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o36",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o37",
-                "title_and_code": "PROF ED 8 - ASSESSMENT IN LEARNING 2",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o38",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o39",
-                "title_and_code": "PROF ED 9 - THE TEACHER AND THE SCHOOL CURRICULUM",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o40",
-                "title_and_code": "MTB-MLE - CONTENT AND PEDAGOGY IN THE MOTHER TONGUE",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o41",
-                "title_and_code": "SSC 2 - TEACHING SOCIAL STUDIES IN THE ELEMENTARY GRADES (CULTURE AND GEOGRAPHY)",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o42",
-                "title_and_code": "PROF ED 6 - ASSESSMENT IN LEARNING 1",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o43",
-                "title_and_code": "FIL - PAGTUTURO AND FILIPINO SA ELEMENTARYA - PANITIKAN NG PILIPINAS",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o44",
-                "title_and_code": "PROF ED 7 - TE CHNOLOGY FOR TEACHING AND  LEARNING",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o45",
-                "title_and_code": "TLE - EDUKASYONG PANTAHANAN AT PANGKABUHAYAN WITH ENTREPRENEURSHIP",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o46",
-                "title_and_code": "SSC 1 - TEACHING SOCIAL STUDIES IN THE ELEMENTARY GRADES (PHILIPPINE HISTORY AND GOVERNMENT)",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o47",
-                "title_and_code": "MUSIC - TEACHING MUSIC IN THE ELEMENTARY GRADES",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o48",
-                "title_and_code": "FIL - PAGTUTURO NG FILIPINO SA ELEMENTARYA - ESTRAKTURA AT GAMIT NG WIKANG FILIPINO",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o49",
-                "title_and_code": "FS 1 - FIELD STUDY 1",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o50",
-                "title_and_code": "TLE - EDUKASYONG PANTAHANAN AT PANGKABUHAYAN",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o51",
-                "title_and_code": "PEH - TEACHING PE AND HEALTH IN THE ELEMENTARY GRADES",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o52",
-                "title_and_code": "SCI 2 - TEACHING SCIENCE IN THE ELEMENTARY GRADES (PHYSICS, SPACE AND EARTH SCIENCE)",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o53",
-                "title_and_code": "EHC3 - Educational Enhancement Course 3",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o54",
-                "title_and_code": "PROF ED 10 - BUILDING AND ENHANCING NEW  LITERACIES ACROSS THE CURRI.",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o55",
-                "title_and_code": "EDUC RES 2 - EDUCATIONAL RESEARCH 2",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o56",
-                "title_and_code": "VED - GOOD MANNERS AND RIGHT CONDUCT",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o57",
-                "title_and_code": "PT - TEACHING INTERNSHIP",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o58",
-                "title_and_code": "TTL - TECHNOLOGY FOR TEACHING AND ELEMENTARY GRADES",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o59",
-                "title_and_code": "EHC 4 - Mock Board Course",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o60",
-                "title_and_code": "ARTS - TEACHING ARTS IN THE ELEMENTARY GRADES",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o61",
-                "title_and_code": "FS - FIELD STUDY 2",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o62",
-                "title_and_code": "ED ELEC - TEACHING MULTIGRADE CLASSES",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o63",
-                "title_and_code": "EDUC RES 1 - EDUCATIONAL RESEARCH 1",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o64",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "beed_o65",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o1",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o2",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o3",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o4",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o5",
-                "title_and_code": "SIBTECH 101 - SOCIAL ARTS 1",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o6",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o7",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o8",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o9",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o10",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o11",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o12",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o13",
-                "title_and_code": "THC 111 - PHILIPPINE CULTURE AND TOURISM GEOGRAPHY",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o14",
-                "title_and_code": "THC 112 - RISK MANAGEMENT AS APPLIED TO SAFETY, SECURITY AND SANITATION",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o15",
-                "title_and_code": "(NABMB 151) - ORGANIZATION AND MANAGEMENT",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o16",
-                "title_and_code": "(NABMB 152) - BUSINESS MARKETING",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o17",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o18",
-                "title_and_code": "GE 108 - Business ETHICS",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o19",
-                "title_and_code": "GE 107 - THE COMTEMPORARY WORLD",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o20",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o21",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o22",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o23",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o24",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o25",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o26",
-                "title_and_code": "THC 114 - LEGAL ASPECTS IN TOURISM AND HOSPITALITY",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o27",
-                "title_and_code": "THC 113 - QUALITY SERVICE MANAGEMENT IN TOURISM AND HOSPITALITY",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o28",
-                "title_and_code": "HPC 122 - FUNDAMENTALS IN FOOD SERVICE OPERATION",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 1,
-                "lab_hours": 2,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o29",
-                "title_and_code": "HPC 121 - KITCHEN ESSENTIALS AND BASIC FOOD PREPARATIONS",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o30",
-                "title_and_code": "HMPE 131 - CULINARY FUNDAMENTALS",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o31",
-                "title_and_code": "BME 141 - OPERATIONS MANAGEMENT (TQM)",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o32",
-                "title_and_code": "BME 142 - STRATEGIC MANAGEMENT",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o33",
-                "title_and_code": "(NABMB 153) - BUSINESS FINANCE (FOR NON-ABM)",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o34",
-                "title_and_code": "(NABMB 154) - APPLIED ECONOMICS (FOR NON-ABM)",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o35",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o36",
-                "title_and_code": "THC 117 - MULTICULTURAL DIVERSITY IN WORKPLACE FOR THE TOURISM PROFESSIONAL",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o38",
-                "title_and_code": "THC 118 - MICRO PERSPECTIVE OF TOURISM AND HOSPITALITY",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o39",
-                "title_and_code": "THC 115 - MACRO PERSPECTIVE OF TOURISM AND HOSPITALITY",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o40",
-                "title_and_code": "HPC 124 - APPLIED BUSINESS TOOLS AND TECHNOLOGIES",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o41",
-                "title_and_code": "THC 116 - PROFESSIONAL DEVELOPMENT AND APPLIED ETHICS",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o42",
-                "title_and_code": "HMPE 134 - FRONT OFFICE OPERATION",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o43",
-                "title_and_code": "HPC 123 - FUNDAMENTALS IN LODGING OPERATIONS",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o44",
-                "title_and_code": "HMPE 135 - ROOM DIVISION MANAGEMENT",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o45",
-                "title_and_code": "HMPE 132 - FOOD AND BEVERAGE OPERATION",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o46",
-                "title_and_code": "HPC 125 - SUPPLY CHAIN MANAGEMENT IN HOSPITALITY INDUSTRY",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o47",
-                "title_and_code": "HMPE 3 - HOUSEKEEPING OPERATIONS",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o48",
-                "title_and_code": "HPC 128 - FOREIGN LANGUAGE 1 (SPANISH)",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o49",
-                "title_and_code": "NABMB 155 - FUNDAMENTALS OF ACCOUNTING (FOR NON- ABM)",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o50",
-                "title_and_code": "RESEARCH 1 - HOSPITALITY RESEARCH 1",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o51",
-                "title_and_code": "HPC 126 - Introduction to Meetings, Incentives, Conferences and Events Management (MICE) (Events Mgt. - NC III)",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o52",
-                "title_and_code": "INT - INTERNSHIP/PRACTICUM",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o53",
-                "title_and_code": "HPC 127 - ERGONOMETRIC AND FACILITIES PLANNING FOR THE HOSPITALITY INDUSTRY",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o54",
-                "title_and_code": "HPC 129 - FOREIGN LANGUAGE 2 (SPANISH)",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o55",
-                "title_and_code": "THC 119 - TOURISM AND HOSPITALITY MARKETING",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o56",
-                "title_and_code": "THC 120 - ENTREPRENEURSHIP IN TOURISM AND HOSPITALITY",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_o57",
-                "title_and_code": "RESEARCH 2 - HOSPITALITY RESEARCH 2",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o5",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o7",
-                "title_and_code": "SIBTECH 101 - SOCIAL ARTS 1",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o8",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o9",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o10",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o11",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o12",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o13",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o14",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o15",
-                "title_and_code": "BUS CORE 1 - BASIC MICROECONOMICS",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o16",
-                "title_and_code": "BUS CORE 112 - BUSINESS LAW (OBLIGATION AND CONTRACTS)",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o17",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o18",
-                "title_and_code": "GE 108 - BUSINESS ETHICS",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o19",
-                "title_and_code": "GE 107 - THE CONTEMPORARY WORLD",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o20",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o21",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o22",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o23",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o24",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o25",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o26",
-                "title_and_code": "PATHFIT 1&2 - BUS CORE 114",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o27",
-                "title_and_code": "BUS CORE 113 - GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o28",
-                "title_and_code": "BUS CORE 112 - PROF COR MM 123",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o29",
-                "title_and_code": "PROF COR MM 121 - PROFESSIONAL SALESMANSHIP",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o30",
-                "title_and_code": "PROF COR MM 124 - ADVERTISING",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o31",
-                "title_and_code": "PROF COR MM 122 - MARKETING MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o32",
-                "title_and_code": "MM ELEC 131 - PERSONAL FINANCE",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o33",
-                "title_and_code": "BME 141 - OPERATIONS MANAGEMENT (TQM)",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o34",
-                "title_and_code": "BME 142 - STRATEGIC MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o35",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o36",
-                "title_and_code": "PROF COR MM 126 - RETAIL MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o38",
-                "title_and_code": "PROF COR MM 127 - PRICING STRATEGY",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o39",
-                "title_and_code": "BUS CORE 115 - HUMAN RESOURCE MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o40",
-                "title_and_code": "PROF COR MM 128 - MARKETING RESEARCH",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o41",
-                "title_and_code": "BUS CORE 116 - BUSINESS RESEARCH",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o42",
-                "title_and_code": "MM ELEC 135 - CONSUMER BEHAVIOR",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o43",
-                "title_and_code": "PROF COR MM 125 - PRODUCT MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o44",
-                "title_and_code": "PROF COR MM 122 - MM ELEC 136",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o45",
-                "title_and_code": "MM ELEC 132 - CUSTOMER SERVICE MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o46",
-                "title_and_code": "BME 142 - MM ELEC 137",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o47",
-                "title_and_code": "MM ELEC 133 - FRANCHISING",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o48",
-                "title_and_code": "MM ELEC 131 - MM ELEC 138",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o49",
-                "title_and_code": "MM ELEC 134 - COOPERATIVE MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o50",
-                "title_and_code": "MMC ELEC 131 - THESIS 1",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o51",
-                "title_and_code": "BUS CORE 117 - INTERNATIONAL BUSINESS AND TRADE",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o52",
-                "title_and_code": "MM ELEC 138 - INT",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o53",
-                "title_and_code": "MM ELEC 139 - ENTREPRENEURIAL MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o54",
-                "title_and_code": "MM ELEC 140 - SPECIAL TOPICS IN MARKETING MANAGEMENT",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o55",
-                "title_and_code": "COMP 103 - INTRODUCTION TO COMPUTING",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o56",
-                "title_and_code": "COMP 104 - WEB DEVELOPMENT",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_mm_o57",
-                "title_and_code": "THESIS 2 - RESEARCH 2",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o1",
-                "title_and_code": "GE 101 - UNDERSTANDING THE SELF",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o2",
-                "title_and_code": "GE 103 - MATHEMATICS IN MODERN WORLD",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o3",
-                "title_and_code": "GE 102 - SINING NG PAKIKIPAGTALASTASAN",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o4",
-                "title_and_code": "GE 104 - PURPOSIVE COMMUNICATION",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o5",
-                "title_and_code": "GE EL 101 - ENTREPREURIAL MIND",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o7",
-                "title_and_code": "SIBTECH 101 - SOCIAL ARTS 1",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o8",
-                "title_and_code": "SIBTECH 102 - SOCIAL ARTS 2",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o9",
-                "title_and_code": "COMP 101 - COMPUTER 1",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o10",
-                "title_and_code": "COMP 102 - ADVANCE COMPUTER",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o11",
-                "title_and_code": "PATHFIT 1 - MOVEMENT COMPETENCY TRAINING",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o12",
-                "title_and_code": "PATHFIT 2 - EXERCISE-BASED FITNESS ACTIVITIES",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o13",
-                "title_and_code": "NSTP 1 - NATIONAL SERVICE TRAINING PROGRAM 1",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o14",
-                "title_and_code": "NSTP 2 - NATIONAL SERVICE TRAINING PROGRAM 2",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o15",
-                "title_and_code": "BUS CORE 1 - BASIC MICROECONOMICS",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o16",
-                "title_and_code": "BUS CORE 112 - BUSINESS LAW (OBLIGATION AND CONTRACTS)",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o17",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o18",
-                "title_and_code": "GE 108 - Business ETHICS",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o19",
-                "title_and_code": "GE 107 - THE COMTEMPORARY WORLD",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o20",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o21",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o22",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o23",
-                "title_and_code": "GE EL 103 - INDIGENOUS CREATIVE ARTS",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o24",
-                "title_and_code": "PATHFIT 4 - SPORTS",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o25",
-                "title_and_code": "PATHFIT 3 - GROUP EXERCISE (AEROBICS, YOGA, ETC.)",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o26",
-                "title_and_code": "BUS CORE 4 - INCOME TAXATION",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o27",
-                "title_and_code": "BUS CORE 113 - GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o28",
-                "title_and_code": "PROF COR FM 123 - INVESTMENT AND PORTFOLIO MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o29",
-                "title_and_code": "PROF COR FM 121 - FINANCIAL MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o30",
-                "title_and_code": "PROF COR FM 124 - CAPITAL MARKET",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o31",
-                "title_and_code": "PROF COR FM 122 - BANKING AND FINANCIAL INSTITUTION",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o32",
-                "title_and_code": "FM ELEC 131 - PERSONAL FINANCE",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o33",
-                "title_and_code": "BME 141 - OPERATIONS MANAGEMENT (TQM)",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o34",
-                "title_and_code": "BME 142 - STRATEGIC MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o35",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o36",
-                "title_and_code": "PROF COR FM 126 - CREDIT AND COLLECTION",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o38",
-                "title_and_code": "PROF COR FM 127 - MONETARY POLICY AND CENTRAL BANKING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o39",
-                "title_and_code": "BUS CORE 115 - HUMAN RESOURCE MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o40",
-                "title_and_code": "PROF COR FM 128 - SPECIAL TOPICS IN FINANCIAL MANGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o41",
-                "title_and_code": "BUS CORE 116 - BUSINESS RESEARCH",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o42",
-                "title_and_code": "FM ELEC 135 - BEHAVIORAL FINANCE",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o43",
-                "title_and_code": "PROF COR FM 125 - FINANCIAL ANALYSIS AND REPORTING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o44",
-                "title_and_code": "FM ELEC 136 - TREASURY MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o45",
-                "title_and_code": "FM ELEC 132 - CUSTOMER SERVICE MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o46",
-                "title_and_code": "FM ELEC 137 - MUTUAL FUND",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o47",
-                "title_and_code": "FM ELEC 133 - FRANCHISING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o48",
-                "title_and_code": "FM ELEC 138 - PROJECT MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o49",
-                "title_and_code": "FM ELEC 134 - COOPERATIVE MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o50",
-                "title_and_code": "THESIS 1 - RESEARCH 1",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o51",
-                "title_and_code": "BUS CORE 117 - INTERNATIONAL BUSINESS AND TRADE",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o52",
-                "title_and_code": "INT - INTERNSHIP",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o53",
-                "title_and_code": "FM ELEC 139 - ENTREPRENEURIAL MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o54",
-                "title_and_code": "FM ELEC 140 - RISK MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o55",
-                "title_and_code": "COMP 103 - INTRODUCTION TO COMPUTING",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o56",
-                "title_and_code": "COMP 104 - COMPUTER PROGRAMMING 1",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bsba_fm_o57",
-                "title_and_code": "THESIS 2 - RESEARCH 2",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o1",
-                "title_and_code": "GE 101 - Understanding The Self (General Psychology)",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o2",
-                "title_and_code": "GE 103 - Mathematics in Modern World (Plane Trigonometry)",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o3",
-                "title_and_code": "GE 102 - Sining ng Pakikipagtalastasan",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o5",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o6",
-                "title_and_code": "GE 105 - PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o7",
-                "title_and_code": "GE EL 103 - Environmental Science",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o8",
-                "title_and_code": "CDI 131 - Fundamentals of Investigation and Intelligence",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o9",
-                "title_and_code": "GE EL 104 - Gender and Society",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o10",
-                "title_and_code": "LEA 151 - Law Enforcement Organization and Administration",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o11",
-                "title_and_code": "CRIM 111 - Introduction to Criminology",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o12",
-                "title_and_code": "LEA 152 - Comparative Models in  Policing",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o13",
-                "title_and_code": "CLJ 121 - Introduction to Philippine Criminal Justice",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o14",
-                "title_and_code": "NSTP 2 - Reserve Officers' Training Corps 2",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o15",
-                "title_and_code": "NSTP 1 - Reserve Officers' Training Corps 1",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o16",
-                "title_and_code": "PE 182 - Arnis and Disarming Technique",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o17",
-                "title_and_code": "PE 181 - Fundamentals of Martial Arts",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o18",
-                "title_and_code": "EHC 171 - ENHANCEMENT COURSE 1",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o19",
-                "title_and_code": "GE 106 - SCIENCE, TECHNOLOGY AND SOCIETY",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o20",
-                "title_and_code": "GE 108 - ETHICS",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o21",
-                "title_and_code": "GE 107 - THE CONTEMPORARY WORLD",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o22",
-                "title_and_code": "GE 109 - READINGS ON PHILIPPINE HISTORY",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o23",
-                "title_and_code": "GE EL 102 - PHILIPPINE LITERATURE",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o24",
-                "title_and_code": "GE 110 - ART APPRECIATION",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o25",
-                "title_and_code": "FORENSIC 141 - Forensic Photography",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o26",
-                "title_and_code": "ADGE - General Chemistry (Organic)",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o27",
-                "title_and_code": "CA 161 - Institutional Corrections",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o28",
-                "title_and_code": "FORENSIC 142 - Personal Identification Techniques",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o29",
-                "title_and_code": "CFLM-1 - Character Formation, Nationalism and Patriotism",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o30",
-                "title_and_code": "CRIM 113 - Human Behavior and Victimology",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o31",
-                "title_and_code": "CRIM 112 - Theories of Crime Causation",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o32",
-                "title_and_code": "LEA 153 - Introduction to Industrial Security Concepts",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o33",
-                "title_and_code": "CDI 132 - Specialized Crime Investigation 1 with Legal Medicine",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o34",
-                "title_and_code": "PE 184 - Fundamentals of Marksmanship",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o35",
-                "title_and_code": "PE 183 - First Aid and Water Safety",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o36",
-                "title_and_code": "EHC 172 - ENHANCEMENT COURSE 2",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o37",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o38",
-                "title_and_code": "CA 162 - Non-Institutional Corrections",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o39",
-                "title_and_code": "CFLM-2 - Character Formation with Leadership, Decision Making, Management and Administration",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o40",
-                "title_and_code": "CLJ 124 - Criminal Law (Book 2)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o41",
-                "title_and_code": "CLJ 122 - Human Rights Education",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o42",
-                "title_and_code": "CRIM 114 - Professional Conduct and Ethical Standards",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o43",
-                "title_and_code": "CLJ 123 - Criminal Law (Book 1)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o44",
-                "title_and_code": "CRIM 115 - Juvenile Delinquency and Juvenile Justice System",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o45",
-                "title_and_code": "FORENSIC 143 - Forensic Chemistry and Toxicology",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 3,
-                "lab_hours": 2,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o46",
-                "title_and_code": "FORENSIC 114 - Questioned Documents Examination",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o47",
-                "title_and_code": "CDI 133 - Specialized Crime Investigation 2 with Simulation on Interrogation and Interview",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o48",
-                "title_and_code": "FORENSIC 115 - Lie Detection Techniques",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o49",
-                "title_and_code": "CDI 134 - Traffic Management and Accident Investigation with Driving",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o50",
-                "title_and_code": "CDI 135 - Technical English 1 (Technical Report Writing and Presentation)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o51",
-                "title_and_code": "LEA 154 - Law Enforcement Operations and Planning with Crime Mapping",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o52",
-                "title_and_code": "EHC 3 - ENHANCEMENT COURSE 3",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o53",
-                "title_and_code": "CA 163 - Therapeutic Modalities",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o54",
-                "title_and_code": "CLJ 126 - Criminal Procedure and Court Testimony",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o55",
-                "title_and_code": "CLJ 125 - Evidence",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o56",
-                "title_and_code": "FORENSIC 146 - Forensic Ballistics",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o57",
-                "title_and_code": "CRIM 116 - Dispute Resolution and Crises/Incidents Management",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o58",
-                "title_and_code": "CRIM 118 - Criminological Research 2(Thesis Writing and Presentation",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o59",
-                "title_and_code": "CRIM 117 - Criminological Research1 (Research Methods with Applied Statistics)",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o60",
-                "title_and_code": "CDI 138 - Technical English 2 (Legal Forms)",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o61",
-                "title_and_code": "CDI 136 - Fire Protection and Arson Investigation",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o62",
-                "title_and_code": "CDI 139 - Introduction to Cybercrime and Environmental Laws and Protection",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o63",
-                "title_and_code": "CDI 137 - Vice and Drug Education and Control",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o64",
-                "title_and_code": "CP 192 - Internship (On-the Job Training)",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bscrim_o65",
-                "title_and_code": "CP 191 - Internship (On-the Job Training)",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "old"
-        },
-        {
-                "id": "bshm_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n2",
-                "title_and_code": "GE 103 - Mathematics In The Modern World",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n3",
-                "title_and_code": "GE 102 - Sining Ng Pakikipagtalastasan",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n5",
-                "title_and_code": "GE EL 101 - Entrepreurial Mind",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n6",
-                "title_and_code": "GE 105 - Pagbasa At Pagsulat Sa Ibat-Ibang Disiplina",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n7",
-                "title_and_code": "(NABMB 153) - Business Finance (For Non-Abm)",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n8",
-                "title_and_code": "HPC 121 - Kitchen Essentials And Basic Food Preparations",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n9",
-                "title_and_code": "COMP 101 - Computer 1",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n10",
-                "title_and_code": "COMP 102 - Advance Computer",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n11",
-                "title_and_code": "PTHFIT 1 - Physical Fitness",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n12",
-                "title_and_code": "PATHFIT 2 - Rhytmic Activities",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n13",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n14",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n15",
-                "title_and_code": "THC 111 - Philippine Culture and Tourism Geography",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n16",
-                "title_and_code": "THC 112 - Risk Management As Applied To Safety, Security And Sanitation",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n17",
-                "title_and_code": "BME 141 - Operations Management",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n18",
-                "title_and_code": "(NABMB 152) - Business Marketing",
-                "course": "BSHM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n19",
-                "title_and_code": "GE 106 - Science, Technology and Society",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n20",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n21",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n22",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n23",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n24",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n25",
-                "title_and_code": "GE EL 103 - Indigenous Creative Arts",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n26",
-                "title_and_code": "PATHFIT 4 - Team Sports And Games",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n27",
-                "title_and_code": "PATHFIT 3 - Dual Sports and Games",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n28",
-                "title_and_code": "THC 114 - Legal Aspects in Tourism and Hospitality",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n29",
-                "title_and_code": "THC 113 - Quality Service Management in Tourism and Hospitality",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n30",
-                "title_and_code": "HPC 122 - Fundamentals In Food Service Operation",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 1,
-                "lab_hours": 2,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n31",
-                "title_and_code": "(NABMB 154) - Applied Economics (For Non-Abm)",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n32",
-                "title_and_code": "HMPE 131 - Culinary Fundamentals",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n33",
-                "title_and_code": "RZL - Life And Works Of Rizal",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n34",
-                "title_and_code": "BME 142 - Strategic Management",
-                "course": "BSHM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n35",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n36",
-                "title_and_code": "THC 117 - Multicultural Diversity in Workplace for The Tourism Professional",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n37",
-                "title_and_code": "THC 115 - Macro Perspective of Tourism and Hospitality",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n38",
-                "title_and_code": "THC 118 - Micro Perspective of Tourism and Hospitality",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n39",
-                "title_and_code": "THC 116 - Professional Development and Applied Ethics",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n40",
-                "title_and_code": "HPC 124 - Applied Business Tools and Technologies",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n41",
-                "title_and_code": "HPC 123 - Fundamentals In Lodging Operations",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n42",
-                "title_and_code": "HMPE 134 - Front Office Operation",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n43",
-                "title_and_code": "HMPE 132 - Food And Beverage Operation",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n44",
-                "title_and_code": "HMPE 135 - Room Division Management",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n45",
-                "title_and_code": "HMPE 133 - Housekeeping Operations",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n46",
-                "title_and_code": "HPC 125 - Supply Chain Management in Hospitality Industry",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n47",
-                "title_and_code": "NABMB 155 - Fundamentals Of Accounting (For Non- Abm)",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n48",
-                "title_and_code": "HPC 128 - Foreign Language 1 (Spanish)",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n49",
-                "title_and_code": "RESEARCH 1 - Hospitality Research 1",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n50",
-                "title_and_code": "RESEARCH 2 - Hospitality Research 2",
-                "course": "BSHM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n51",
-                "title_and_code": "HPC 126 - Introduction To Meetings, Incentives, Conferences and Events Management (MICE) (Events Mgt. - NC III)",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n52",
-                "title_and_code": "INT - INTERNSHIP/PRACTICUM",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n53",
-                "title_and_code": "600 HRS - HMPE 134  HMPE 135",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n54",
-                "title_and_code": "HPC 127 - Ergonometric And Facilities Planning for The Hospitality Industry",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n55",
-                "title_and_code": "HPC 129 - Foreign Language 2 (Spanish)",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n56",
-                "title_and_code": "THC 119 - Tourism And Hospitality Marketing",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bshm_n57",
-                "title_and_code": "THC 120 - Entrepreneurship In Tourism and Hospitality",
-                "course": "BSHM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n1",
-                "title_and_code": "GE 101 - Understanding the Self (General Psychology)",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n2",
-                "title_and_code": "GE 103 - Mathematics In Modern World (Plane Trigonometry)",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n3",
-                "title_and_code": "GE 106 - Science, Technology, and Society",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n5",
-                "title_and_code": "LEA 1 - Law Enforcement Organization and Administration",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n6",
-                "title_and_code": "GE EL 1 - Advanced Computer",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n7",
-                "title_and_code": "CFLM-1 - Character Formation, Nationalism and Patriotism",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n8",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n9",
-                "title_and_code": "GE EL 105 - Gender and Society",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n10",
-                "title_and_code": "CRIM 3 - Human Behavior and Victimology",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n11",
-                "title_and_code": "CRIM 1 - Introduction To Criminology",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n12",
-                "title_and_code": "LEA 2 - Comparative Models in Policing",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n13",
-                "title_and_code": "CLJ 1 - Introduction To Philippine Criminal Justice System",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n14",
-                "title_and_code": "CDI 1 - Fundamentals Of Investigation and Intelligence",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n15",
-                "title_and_code": "NSTP 1 - Reserve Officers’ Training Corps 1",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n16",
-                "title_and_code": "NSTP 2 - Reserve Officers’ Training Corps 2",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n17",
-                "title_and_code": "PATHFIT 1 - Fundamentals Of Martial Arts",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n18",
-                "title_and_code": "PATHFIT 2 - Arnis And Disarming Technique",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n19",
-                "title_and_code": "CRIM 2 - Theories of Crime Causation",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n20",
-                "title_and_code": "CFLM 2 - Character Formation w/ Leadership, Decision Making Management & Administration",
-                "course": "BSCRIM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n21",
-                "title_and_code": "LEA 3 - Introduction to Industrial Security Concepts",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n22",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n23",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n24",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n25",
-                "title_and_code": "CRIM 4 - Professional Conduct and Ethical Standards",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n26",
-                "title_and_code": "GE EL 2 - Information Assistance & Security",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n27",
-                "title_and_code": "CA 1 - Institutional Corrections",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n28",
-                "title_and_code": "ADGE - General Chemistry (Organic)",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n29",
-                "title_and_code": "FORENSIC 1 - Forensic Photography",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n30",
-                "title_and_code": "FORENSIC 2 - Personal Identification Techniques",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n31",
-                "title_and_code": "CDI 2 - Specialized Crime Investigation 1 with Legal Medicine",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n32",
-                "title_and_code": "CDI 3 - Specialized Crime Investigation 2 With Simulation on Interrogation and Interview",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n33",
-                "title_and_code": "CRIM 5 - Juvenile Delinquency and Juvenile Justice System",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n34",
-                "title_and_code": "CA2 - Non-Institutional Corrections",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n35",
-                "title_and_code": "LEA 4 - Law Enforcement Operations and Planning with Crime Mapping",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n36",
-                "title_and_code": "CDI 4 - Traffic Management and Accident Investigation with Driving",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n37",
-                "title_and_code": "PATHFIT 3 - First Aid and Water Safety",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n38",
-                "title_and_code": "PATHFIT 4 - Fundamentals of Marksmanship",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n39",
-                "title_and_code": "RZL - Life and Works of Rizal",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n40",
-                "title_and_code": "CDI 5 - Technical English 1 (Technical Report Writing and Presentation)",
-                "course": "BSCRIM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n41",
-                "title_and_code": "CLJ 2 - Human Rights Education",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n42",
-                "title_and_code": "CRIM 8 - Criminological Research 2(Thesis Writing and Presentation",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n43",
-                "title_and_code": "CLJ 3 - Criminal Law (Book 1)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n44",
-                "title_and_code": "CLJ 4 - Criminal Law (Book 2)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 4,
-                "lec_hours": 4,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n45",
-                "title_and_code": "FORENSIC 5 - Lie Detection Techniques",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n46",
-                "title_and_code": "CRIM 6 - Dispute Resolution and Crises/Incidents Management",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n47",
-                "title_and_code": "STAT 111 - Statistics",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n48",
-                "title_and_code": "FORENSIC 6 - Forensic Ballistics",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n49",
-                "title_and_code": "FORENSIC 3 - Forensic Chemistry and Toxicology",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 3,
-                "lab_hours": 2,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n50",
-                "title_and_code": "CDI 6 - Fire Protection and Arson Investigation",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n51",
-                "title_and_code": "CRIM 7 - Criminological Research1 (Research Methods with Applied Statistics)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n52",
-                "title_and_code": "CDI 9 - Introduction To Cybercrime and Environmental Laws and Protection",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n53",
-                "title_and_code": "CA 3 - Therapeutic Modalities",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n54",
-                "title_and_code": "EHC 2 - Criminology Enhancement Course 2",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n55",
-                "title_and_code": "FORENSIC 4 - Questioned Documents Examination",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n56",
-                "title_and_code": "CDI 7 - Vice And Drug Education and Control",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n57",
-                "title_and_code": "EHC 1 - Criminology Enhancement Course 1",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n58",
-                "title_and_code": "CDI 8 - Technical English 2 (Legal Forms)",
-                "course": "BSCRIM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n59",
-                "title_and_code": "CLJ 5 - Evidence",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n60",
-                "title_and_code": "CLJ 6 - Criminal Procedure And Court Testimony",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n61",
-                "title_and_code": "CP 1 - Internship (On-The Job Training) 270 hrs",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bscrim_n62",
-                "title_and_code": "CP 2 - Internship (On-The Job Training) 270 hrs",
-                "course": "BSCRIM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n1",
-                "title_and_code": "GE 101 - Understanding the Self",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n3",
-                "title_and_code": "GE 102 - Basic English Grammar",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n5",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n6",
-                "title_and_code": "PROF ED 1 - The Child and Adolescent Learner and Learning Principles",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n7",
-                "title_and_code": "EL 100 - Introduction to Linguistics",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n8",
-                "title_and_code": "EL 104 - Language Programs and Policies in Multilingual Societies",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n9",
-                "title_and_code": "EL 101 - Language, Culture and Society",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n10",
-                "title_and_code": "EL 105 - Language Learning Materials Development",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n11",
-                "title_and_code": "Comp 101 - Computer 1",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n12",
-                "title_and_code": "PROFED2 - The Teaching Profession",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n13",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n14",
-                "title_and_code": "PATHFIT 2 - Rhythmic Activities",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n15",
-                "title_and_code": "EL 102 - Structures of English",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n16",
-                "title_and_code": "EL106 - Teaching and Assessment of Literature Studies",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n17",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n18",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n19",
-                "title_and_code": "EL 103 - Principles and Theories of Language Acquisition and Learning",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n20",
-                "title_and_code": "GE 106 - Science, Technology and Society",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n21",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n22",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n23",
-                "title_and_code": "GE 109 - Readings on Philippine History",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n24",
-                "title_and_code": "EL107 - Teaching and Assessment of the Macro skills",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n25",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n26",
-                "title_and_code": "EL108 - Teaching and Assessment of Grammar",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n27",
-                "title_and_code": "PROFED3 - The Teacher and the Community, School Culture and Organizational Leadership",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n28",
-                "title_and_code": "EL 109 - Speech and Theater Arts",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n29",
-                "title_and_code": "EL113 - Survey of Philippine Literature in English",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n30",
-                "title_and_code": "EL111 - Children and Adolescent Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n31",
-                "title_and_code": "EL114 - Survey of Afro-Asian Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n32",
-                "title_and_code": "EL112 - Mythology and Folklore",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n33",
-                "title_and_code": "PATHFIT 4 - Team Sport and Games",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n34",
-                "title_and_code": "GE 105 - Public Speaking and Debate",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n35",
-                "title_and_code": "EL115 - Survey of English and American Literature",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n36",
-                "title_and_code": "PATHFIT 3 - Dual Sports and Games",
-                "course": "BSED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n37",
-                "title_and_code": "EL116 - Contemporary and Popular Literature",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n38",
-                "title_and_code": "RZL - Life and Works of Rizal",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n39",
-                "title_and_code": "ELEC1 - Stylistics and Discourse Analysis",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n40",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n41",
-                "title_and_code": "FS2 - FIELD STUDY 2 (Participation and Teaching Assistanship)",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n42",
-                "title_and_code": "PROFED4 - Foundation of Special and Inclusive Education",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n43",
-                "title_and_code": "ELEC2 - Remedial Instruction",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n44",
-                "title_and_code": "PROF ED 5 - Facilitating Learner-Centered Teaching",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n45",
-                "title_and_code": "PROF ED7 - Assessment of Learning 2",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n46",
-                "title_and_code": "EL117 - Literary Criticism",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n47",
-                "title_and_code": "PROF ED 9 - The Teacher and the School Curriculum",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n48",
-                "title_and_code": "EL118 - Technical Writing",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n49",
-                "title_and_code": "EL 119 - Campus Journalism",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n50",
-                "title_and_code": "PROFED 6 - Assessment of Learning 1",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n51",
-                "title_and_code": "PROF ED 10 - Building and Enhancing New Literacies Across the Curriculum",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n52",
-                "title_and_code": "FS1 - FIELD STUDY 1 (Observations of Teaching)",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n53",
-                "title_and_code": "PROF ED 8 - Technology for Teaching and Learning 1",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n54",
-                "title_and_code": "RES 1 - Language Research 1",
-                "course": "BSED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n55",
-                "title_and_code": "RES 2 - Language Research 2",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n56",
-                "title_and_code": "EHC2 - Educational Enhancement Course 2",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n57",
-                "title_and_code": "EL-TIB - TEACHING INTERNSHIP",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n58",
-                "title_and_code": "600HRS - FS 1 & 2",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsed_n59",
-                "title_and_code": "EL120 - Technology for Teaching and Learning 2  (Teaching in Language Education)",
-                "course": "BSED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n1",
-                "title_and_code": "GE 101 - Understanding the Self",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n3",
-                "title_and_code": "GE 102 - Sining ng Pakikipagtalastasan",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n5",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n6",
-                "title_and_code": "GE 105 - Pagbasa at Pagsulat sa Iba’t Ibang Disiplina",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n7",
-                "title_and_code": "CC 102 - Computer Programming 1",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n8",
-                "title_and_code": "CC 104 - Information Technology Fundamentals",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n9",
-                "title_and_code": "PATHFIT 1 - Movement Competency Training",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n10",
-                "title_and_code": "PATHFIT 2 - Exercise-Based Fitness Activities",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n11",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n12",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n13",
-                "title_and_code": "CC 101 - Introduction to Computing",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n14",
-                "title_and_code": "CC 103 - Computer Programming 2",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n15",
-                "title_and_code": "MS 101 - Discrete Mathematics",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n16",
-                "title_and_code": "MS 102 - Quantitative Methods",
-                "course": "BSIT",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n17",
-                "title_and_code": "GE 106 - Science, Technology, and Society",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n18",
-                "title_and_code": "GE 108 - Business Ethics",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n19",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n20",
-                "title_and_code": "GE 109 - Readings in Philippine History",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n21",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n22",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n23",
-                "title_and_code": "GE EL 103 - Indigenous Creative Arts",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n24",
-                "title_and_code": "PATHFIT 4 - Sports",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n25",
-                "title_and_code": "PATHFIT 3 - Group Exercise",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n26",
-                "title_and_code": "PATHFIT 2 - CC 106",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n27",
-                "title_and_code": "PF 102 - Event Driven Programming",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n28",
-                "title_and_code": "CC 103 - CC 105",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n29",
-                "title_and_code": "IM 101 - Fundamentals of Database Systems",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n30",
-                "title_and_code": "CC 102 - IAS 101",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n31",
-                "title_and_code": "PF 101 - Object-Oriented Programming",
-                "course": "BSIT",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n32",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n33",
-                "title_and_code": "WS 101 - Web Systems and Technology",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n34",
-                "title_and_code": "RZL - Life and Works of Rizal",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n35",
-                "title_and_code": "IPT 101 - Integrative Programming & Technologies",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n36",
-                "title_and_code": "CC 107 - App Dev. & Emerging Technologies",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n37",
-                "title_and_code": "IM 101 - NET 102",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n38",
-                "title_and_code": "NET 101 - Networking 1",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n39",
-                "title_and_code": "CC 105 - IAS 102",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n40",
-                "title_and_code": "HCI 101 - Intro to Human-Computer Interaction",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n41",
-                "title_and_code": "CC 103 - SIA 101",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n42",
-                "title_and_code": "SP 101 - Social and Professional Issues",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n43",
-                "title_and_code": "SIA 102 - System Integration and Architecture 2",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n44",
-                "title_and_code": "SIA 101 - PRAC 101",
-                "course": "BSIT",
-                "year_level": 3,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n45",
-                "title_and_code": "PT 101 - Platform Technologies",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n46",
-                "title_and_code": "IT 101 - Multimedia and Animation",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n47",
-                "title_and_code": "HCI 102 - Human-Computer Interaction 2",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsit_n48",
-                "title_and_code": "CAP 102 - Capstone Project and Research 2",
-                "course": "BSIT",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n3",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n5",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n6",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n7",
-                "title_and_code": "BUS CORE 111 - Basic Microeconomics",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n8",
-                "title_and_code": "BUS CORE 112 - Business Law (Obligation And Contracts)",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n9",
-                "title_and_code": "PROF COR MM 121 - Professional Salesmanship",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n10",
-                "title_and_code": "MM ELEC 131 - Personal Finance",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n11",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n12",
-                "title_and_code": "PATHFIT 2 - Rhytmic Activities",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n13",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n14",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSBA-MM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n15",
-                "title_and_code": "GE 106 - Science, Technology And Society",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n16",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n17",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n18",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n19",
-                "title_and_code": "GE EL 103 - Indigenous Creative Arts",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n20",
-                "title_and_code": "BUS CORE 114 - Income Taxation",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n21",
-                "title_and_code": "BME 141 - Operations Management (Tqm)",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n22",
-                "title_and_code": "BME 142 - Strategic Management",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n23",
-                "title_and_code": "BUS CORE 113 - Good Governance And Social Responsibility",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n24",
-                "title_and_code": "PROF COR MM 123 - Distribution Management",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n25",
-                "title_and_code": "PROF COR MM 122 - Marketing Management",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n26",
-                "title_and_code": "PROF COR MM 124 - Advertising",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n27",
-                "title_and_code": "PATHFIT 3 - Dual Sports And Games",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n28",
-                "title_and_code": "PATHFIT 4 - Team Sports And Games",
-                "course": "BSBA-MM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n29",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n30",
-                "title_and_code": "PROF COR MM 126 - Retail Management",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n31",
-                "title_and_code": "RZL - Life And Works Of Rizal",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n32",
-                "title_and_code": "PROF COR MM 127 - Pricing Strategy",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n33",
-                "title_and_code": "BUS CORE 115 - Human Resource Management",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n34",
-                "title_and_code": "PROF COR MM 128 - Marketing Research",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n35",
-                "title_and_code": "BUS CORE 116 - Business Research",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n36",
-                "title_and_code": "MM ELEC 133 - Consumer Behavior",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n37",
-                "title_and_code": "PROF COR MM 125 - Product Management",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n38",
-                "title_and_code": "MM ELEC 134 - Sales Management",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n39",
-                "title_and_code": "MM ELEC 132 - Franchising",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n40",
-                "title_and_code": "MM ELEC 135 - Industrial/Agricultural Marketing",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n41",
-                "title_and_code": "COMP 104 - Web Development",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n42",
-                "title_and_code": "THESIS 1 - Research 1",
-                "course": "BSBA-MM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n43",
-                "title_and_code": "BUS CORE 117 - International Business And Trade",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n44",
-                "title_and_code": "INT - INTERNSHIP",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n45",
-                "title_and_code": "MM ELEC 136 - Special Topics In Marketing Management",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_mm_n46",
-                "title_and_code": "THESIS 2 - Research 2",
-                "course": "BSBA-MM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n3",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n5",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n6",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n7",
-                "title_and_code": "PROF COR FM 121 - Financial Management",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n8",
-                "title_and_code": "FM ELEC 131 - Personal Finance",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n9",
-                "title_and_code": "BUS CORE 111 - Basic Microeconomics",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n10",
-                "title_and_code": "BUS CORE 112 - Business Law (Obligation And Contracts)",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n11",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n12",
-                "title_and_code": "PATHFIT 2 - Rhythmic Activities",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n13",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n14",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSBA-FM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n15",
-                "title_and_code": "GE 106 - Science, Technology, and Society",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n16",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n17",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n18",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n19",
-                "title_and_code": "GE EL 103 - Indigenous Creative Arts",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n20",
-                "title_and_code": "BUSCORE 114 - Income Taxation",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n21",
-                "title_and_code": "PROF COR FM 122 - Banking And Financial Institution",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n22",
-                "title_and_code": "PROF COR FM 123 - Investment And Portfolio Management",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n23",
-                "title_and_code": "BME 141 - Operations Management (Tqm)",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n24",
-                "title_and_code": "PROF COR FM 124 - Capital Market",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n25",
-                "title_and_code": "BUS CORE 113 - Good Governance And Social Responsibility",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n26",
-                "title_and_code": "BME 142 - Strategic Management",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n27",
-                "title_and_code": "PATHFIT 3 - Dual Sports And Games",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n28",
-                "title_and_code": "PATHFIT 4 - Team Sports And Games",
-                "course": "BSBA-FM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n29",
-                "title_and_code": "GE 111 - STATISTICS",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n30",
-                "title_and_code": "PROF COR FM 127 - MONETARY POLICY AND CENTRAL BANKING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n31",
-                "title_and_code": "RZL - LIFE AND WORKS OF RIZAL",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n32",
-                "title_and_code": "PROF COR FM 128 - SPECIAL TOPICS IN FINANCIAL MANGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n33",
-                "title_and_code": "BUS CORE 115 - HUMAN RESOURCE MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n34",
-                "title_and_code": "FM ELEC 132 - BEHAVIORAL FINANCE",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n35",
-                "title_and_code": "BUS CORE 116 - BUSINESS RESEARCH",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n36",
-                "title_and_code": "FM ELEC 133 - TREASURY MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n37",
-                "title_and_code": "PROF COR FM 125 - FINANCIAL ANALYSIS AND REPORTING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n38",
-                "title_and_code": "FM ELEC 134 - MUTUAL FUND",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n39",
-                "title_and_code": "PROF COR FM 126 - CREDIT AND COLLECTION",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n40",
-                "title_and_code": "THESIS 1 - RESEARCH 1",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n41",
-                "title_and_code": "COMP 104 - INTRODUCTION  TO COMPUTING",
-                "course": "BSBA-FM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n42",
-                "title_and_code": "BUS CORE 117 - INTERNATIONAL BUSINESS AND TRADE",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n43",
-                "title_and_code": "INT - INTERNSHIP",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n44",
-                "title_and_code": "FM ELEC 135 - ENTREPRENEURIAL MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n45",
-                "title_and_code": "FM ELEC 136 - RISK MANAGEMENT",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_fm_n46",
-                "title_and_code": "THESIS 2 - RESEARCH 2",
-                "course": "BSBA-FM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n2",
-                "title_and_code": "GE 103 - Mathematics In Modern World",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n3",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n5",
-                "title_and_code": "MGT 1 - Human Resource Management",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n6",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n7",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n8",
-                "title_and_code": "BUSCORE 112 - Business Law (Obligation And Contract)",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n9",
-                "title_and_code": "BUS CORE 111 - Basic Microeconomics",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n10",
-                "title_and_code": "HRM ELEC 1 - Personal Finance",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n11",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n12",
-                "title_and_code": "PATHFIT 2 - Rhytmic Activities",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n13",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n14",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSBA-HRDM",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n15",
-                "title_and_code": "GE 106 - Science, Technology, and Society",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n16",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n17",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n18",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n19",
-                "title_and_code": "HRM 1 - Administrative And Office  Management",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n20",
-                "title_and_code": "BUS CORE 114 - Income Taxation",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n21",
-                "title_and_code": "HRM 2 - Labor Law And Legislation",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n22",
-                "title_and_code": "COMP 102 - Advance Computer",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n23",
-                "title_and_code": "BUS CORE 113 - Good Governance And Social Responsibility",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n24",
-                "title_and_code": "HRM 3 - Recruitment And Selection",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n25",
-                "title_and_code": "BME 141 - Operations Management",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n26",
-                "title_and_code": "BME 142 - Strategic  Management",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n27",
-                "title_and_code": "PATHFIT 3 - Dual Sports And Games",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n28",
-                "title_and_code": "PATHFIT 4 - Team Sports And Games",
-                "course": "BSBA-HRDM",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n29",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n30",
-                "title_and_code": "ENG 2 - Business English And Correspondence",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n31",
-                "title_and_code": "RZL - Life And Works Of Rizal",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n32",
-                "title_and_code": "HRM ELEC 3 - Project Management",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n33",
-                "title_and_code": "GE EL 104 - Environmental Science",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n34",
-                "title_and_code": "HRM 5 - Compensation And Administration",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n35",
-                "title_and_code": "HRM ELEC 2 - Marketing Management",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n36",
-                "title_and_code": "HRM 6 - Labor Relations And Negotiations",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n37",
-                "title_and_code": "HRM 4 - Training And Development",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n38",
-                "title_and_code": "HRM  7 - Special Topics In HRDM",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n39",
-                "title_and_code": "BUS CORE 116 - Business Research",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n40",
-                "title_and_code": "THESIS 1 - Thesis Writing 1",
-                "course": "BSBA-HRDM",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n41",
-                "title_and_code": "HRM 8 - Organizational Development",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n42",
-                "title_and_code": "INT - INTERNSHIP",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n43",
-                "title_and_code": "600hrs - NONE",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n44",
-                "title_and_code": "BUS CORE 117 - International Business and Trade",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n45",
-                "title_and_code": "HRM ELEC 4 - Entrepreneurial Management",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsba_hrdm_n46",
-                "title_and_code": "THESIS 2 - Thesis Writing 2",
-                "course": "BSBA-HRDM",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n2",
-                "title_and_code": "GE 103 - Mathematics in the Modern World",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n3",
-                "title_and_code": "VED - Good Manners And Right Conduct",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n5",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n6",
-                "title_and_code": "GE 105 - Pagbasa At Pagsulat Sa Ibat-Ibang Disiplina",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n7",
-                "title_and_code": "MATH 1 - Teaching Math In The Primary Grades",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n8",
-                "title_and_code": "SCI 1 - Teaching Science In The Elementary Grades (Biology And Chemistry)",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n9",
-                "title_and_code": "COMP 101 - Computer 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n10",
-                "title_and_code": "MATH 2 - Teaching Math In The Intermediate Grades",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n11",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n12",
-                "title_and_code": "PATHFIT 2 - Rhythmic Activities",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n13",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n14",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n15",
-                "title_and_code": "PROF ED 1 - The Child And Adolescent Learners And Learning Principles",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n16",
-                "title_and_code": "PROF ED 2 - The Teaching Profession",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n17",
-                "title_and_code": "ENG 1 - Teaching English In The Elementary Grades (Language Arts)",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n18",
-                "title_and_code": "MUSIC - Teaching Music In The Elementary Grades",
-                "course": "BEED",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n19",
-                "title_and_code": "GE 106 - Science, Technology And Society",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n20",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n21",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n22",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n23",
-                "title_and_code": "PROF ED 4 - Foundation Of Special And Inclusive Education",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n24",
-                "title_and_code": "GE 110 - Art Appreciation",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n25",
-                "title_and_code": "RZL - Life And Works Of Rizal",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n26",
-                "title_and_code": "PATHFIT 4 - Team Sports And Games",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n27",
-                "title_and_code": "PATHFIT 3 - Dual Sports And Games",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n28",
-                "title_and_code": "PROF ED 5 - Facilitating Learner-Centered Teaching",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n29",
-                "title_and_code": "PROF ED 3 - The Teacher And The Community, School Culture And Organizational Leadership",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n30",
-                "title_and_code": "PROF ED 6 - Assessment In Learning 1",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n31",
-                "title_and_code": "ENG 2 - Teaching English In The Elementary Grades Through Literature",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n32",
-                "title_and_code": "TTL - Technology For Teaching And Elementary Grades",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n33",
-                "title_and_code": "FIL - Pagtuturo Ng Filipino Sa Elementarya - Estraktura At Gamit Ng Wikang Filipino",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n34",
-                "title_and_code": "MTB-MLE - Content And Pedagogy In The Mother Tongue",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n35",
-                "title_and_code": "SCI 2 - Teaching Science In The Elementary Grades (Physics, Space And Earth Science)",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n36",
-                "title_and_code": "FIL - Pagtuturo And Filipino Sa Elementarya - Panitikan Ng Pilipinas",
-                "course": "BEED",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n37",
-                "title_and_code": "GE  111 - Statistics",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n38",
-                "title_and_code": "EHC 1 - Educational Enhancement Course",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n39",
-                "title_and_code": "EDUC RES 1 - Educational Research 1",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n40",
-                "title_and_code": "PROF ED 9 - The Teacher And The School Curriculum",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n41",
-                "title_and_code": "SSC 1 - Teaching Social Studies In The Elementary Grades (Philippine History And Government)",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n42",
-                "title_and_code": "SSC 2 - Teaching Social Studies In The Elementary Grades (Culture And Geography)",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n43",
-                "title_and_code": "PROF ED 7 - Assessment In Learning 2",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n44",
-                "title_and_code": "PEH - Teaching Pe And Health In The Elementary Grades",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n45",
-                "title_and_code": "PROF ED 8 - Technology For Teaching And  Learning",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n46",
-                "title_and_code": "TLE - Edukasyong Pantahanan At Pangkabuhayan With Entrepreneurship",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n47",
-                "title_and_code": "TLE - Edukasyong Pantahanan At Pangkabuhayan",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n48",
-                "title_and_code": "FS - Field Study 2",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n49",
-                "title_and_code": "ARTS - Teaching Arts In The Elementary Grades",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n50",
-                "title_and_code": "PROF ED 10 - Building And Enhancing New  Literacies Across The Curriculum.",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n51",
-                "title_and_code": "FS 1 - Field Study 1",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n52",
-                "title_and_code": "EDUC RES 2 - Educational Research 2",
-                "course": "BEED",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n53",
-                "title_and_code": "EHC 2 - Educational Enhancement Course 2",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n54",
-                "title_and_code": "PT - Teaching Internship",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 6,
-                "lec_hours": 6,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n55",
-                "title_and_code": "600hrs - FS 1 and 2",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "beed_n56",
-                "title_and_code": "ED ELEC - Teaching Multigrade Classes",
-                "course": "BEED",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n1",
-                "title_and_code": "GE 101 - Understanding The Self",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n2",
-                "title_and_code": "GE 103 - Mathematics In the Modern World",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n3",
-                "title_and_code": "GE EL 101 - Entrepreneurial Mind",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n4",
-                "title_and_code": "GE 104 - Purposive Communication",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n5",
-                "title_and_code": "TM 1 - Fundamentals Of Customs And Tariff Management",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n6",
-                "title_and_code": "COMP 102 - Advance Computer",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 2,
-                "lab_hours": 1,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n7",
-                "title_and_code": "ELC 1 - Entrepreneurial Management",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n8",
-                "title_and_code": "SCM 2 - Warehouse Operations Mgt",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n9",
-                "title_and_code": "PATHFIT 1 - Physical Fitness",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n10",
-                "title_and_code": "CM 2 - Customs Operations & Cargo Handling",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n11",
-                "title_and_code": "SCM 1 - Intro To Supply Chain Mgt",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n12",
-                "title_and_code": "PATHFIT 2 - Exercise-Based Fitness Activities",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n13",
-                "title_and_code": "CM 1 - Border Control & Security",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n14",
-                "title_and_code": "TM 2 - Commodiy Classification System",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n15",
-                "title_and_code": "GE EL 102 - Philippine Literature",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n16",
-                "title_and_code": "SBEC 1 - Obligation And Contract",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n17",
-                "title_and_code": "NSTP 1 - National Service Training Program 1",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n18",
-                "title_and_code": "NSTP 2 - National Service Training Program 2",
-                "course": "BSCA",
-                "year_level": 1,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n19",
-                "title_and_code": "GE 106 - Science, Technology, and Society",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n20",
-                "title_and_code": "GE 108 - Ethics",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n21",
-                "title_and_code": "GE 107 - The Contemporary World",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n22",
-                "title_and_code": "GE 109 - Readings On Philippine History",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n23",
-                "title_and_code": "SBEC 2 - Taxation (Income and Business Taxation)",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n24",
-                "title_and_code": "SCM 4 - Transportation Management",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n25",
-                "title_and_code": "GE EL 103 - Indigenous Creative Arts",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n26",
-                "title_and_code": "CM 4 - Customs Clearance",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n27",
-                "title_and_code": "SCM 3 - Procurement And Inventory Management",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n28",
-                "title_and_code": "CMBE 1 - Operations Management",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n29",
-                "title_and_code": "TM 3 - Customs Valuation System",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n30",
-                "title_and_code": "TM 4 - Customs Appraisal And Assessment",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n31",
-                "title_and_code": "CM 3 - Customs Warehousing",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n32",
-                "title_and_code": "EL 2 - Financial Management",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n33",
-                "title_and_code": "PATHFIT 3 - Group Exercise (Aerobics, Yoga, Etc.)",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 1,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n34",
-                "title_and_code": "PATHFIT 4 - Sports",
-                "course": "BSCA",
-                "year_level": 2,
-                "semester": 2,
-                "units": 2,
-                "lec_hours": 2,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n35",
-                "title_and_code": "GE 111 - Statistics",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n36",
-                "title_and_code": "GE 112 - Gender And Society",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 0,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n37",
-                "title_and_code": "RZL - Life And Works of Rizal",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n38",
-                "title_and_code": "CM 6 - Customs Post Clearance Audit and Fraud Detection",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n39",
-                "title_and_code": "CM 5 - Customs Proceeding",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n40",
-                "title_and_code": "TM6 - Special Duties and Trade Remedies",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n41",
-                "title_and_code": "TM 5 - Excise Taxes, Liquidation of Duty and Surcharges",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n42",
-                "title_and_code": "TM7 - International Trade Organizations, Agreements, and Rules of Origin",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n43",
-                "title_and_code": "EL 3 - International Marketing",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n44",
-                "title_and_code": "RES 2 - Thesis Writing 2",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n45",
-                "title_and_code": "CMBE 2 - Strategic Management",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n46",
-                "title_and_code": "CM 7 - Ethics And Standards of The Customs Broker",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n47",
-                "title_and_code": "RES 1 - Thesis Writing 1",
-                "course": "BSCA",
-                "year_level": 3,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n48",
-                "title_and_code": "INTERN - Internship/Practicum for Customs Administration (600HRS)",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 2,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n49",
-                "title_and_code": "6(600) - NONE",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 1,
-                "units": 3,
-                "lec_hours": 3,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
-        },
-        {
-                "id": "bsca_n50",
-                "title_and_code": "TM 8 - Competencies Assessment in Tariff Management",
-                "course": "BSCA",
-                "year_level": 4,
-                "semester": 2,
-                "units": 5,
-                "lec_hours": 5,
-                "lab_hours": 0,
-                "is_major": 1,
-                "curriculum_type": "new"
+            "id": "s1",
+            "title_and_code": "Computer Programming 1 CC 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s1b",
+            "title_and_code": "Introduction to Computing CC 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s2",
+            "title_and_code": "SYSTEM ADMIN AND MAINTENANCE SA 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s3",
+            "title_and_code": "Social and Professional Issues SP 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s4",
+            "title_and_code": "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s5",
+            "title_and_code": "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s6",
+            "title_and_code": "OBJECT ORIENTED PROGRAMMING PF 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s7",
+            "title_and_code": "OBJECT ORIENTED PROGRAMMING PF 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s8",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s9",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s10",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s11",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s12",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s13",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s14",
+            "title_and_code": "Physical Education PE 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s15",
+            "title_and_code": "Information Assurance & Security IAS 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s16",
+            "title_and_code": "Web Systems and Technologies WS 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s17",
+            "title_and_code": "Capstone Project 1 CAP 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "s18",
+            "title_and_code": "Capstone Project 2 CAP 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+
+        {
+            "id": "crim_n101",
+            "title_and_code": "GE 101 Understanding the Self (General Psychology)",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n102",
+            "title_and_code": "GE 106 Science, Technology, and Society",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n103",
+            "title_and_code": "LEA 1 Law Enforcement Organization and Administration",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n104",
+            "title_and_code": "CFLM-1 Character Formation, Nationalism and Patriotism",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n105",
+            "title_and_code": "GE EL 105 Gender and Society",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n106",
+            "title_and_code": "CRIM 1 Introduction To Criminology",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n107",
+            "title_and_code": "CLJ 1 Introduction To Philippine Criminal Justice System",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n108",
+            "title_and_code": "NSTP 1 Reserve Officers’ Training Corps 1",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n109",
+            "title_and_code": "PATHFIT 1 Fundamentals Of Martial Arts",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n110",
+            "title_and_code": "CRIM 2 Theories of Crime Causation",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n111",
+            "title_and_code": "GE 103 Mathematics In Modern World (Plane Trigonometry)",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n112",
+            "title_and_code": "GE 104 Purposive Communication",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n113",
+            "title_and_code": "GE EL 1 Advanced Computer",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n114",
+            "title_and_code": "GE 108 Ethics",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n115",
+            "title_and_code": "CRIM 3 Human Behavior and Victimology",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n116",
+            "title_and_code": "LEA 2 Comparative Models in Policing",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n117",
+            "title_and_code": "CDI 1 Fundamentals Of Investigation and Intelligence",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n118",
+            "title_and_code": "NSTP 2 Reserve Officers’ Training Corps 2",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n119",
+            "title_and_code": "PATHFIT 2 Arnis And Disarming Technique",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n120",
+            "title_and_code": "CFLM 2 Character Formation w/ Leadership, Decision Making Management & Administration",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n121",
+            "title_and_code": "LEA 3 Introduction to Industrial Security Concepts",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n122",
+            "title_and_code": "GE 107 The Contemporary World",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n123",
+            "title_and_code": "CRIM 4 Professional Conduct and Ethical Standards",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n124",
+            "title_and_code": "CA 1 Institutional Corrections",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n125",
+            "title_and_code": "FORENSIC 1 Forensic Photography",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n126",
+            "title_and_code": "CDI 2 Specialized Crime Investigation 1 with Legal Medicine",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n127",
+            "title_and_code": "CRIM 5 Juvenile Delinquency and Juvenile Justice System",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n128",
+            "title_and_code": "LEA 4 Law Enforcement Operations and Planning with Crime Mapping",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n129",
+            "title_and_code": "PATHFIT 3 First Aid and Water Safety",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n130",
+            "title_and_code": "RZL Life and Works of Rizal",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n131",
+            "title_and_code": "GE 109 Readings On Philippine History",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n132",
+            "title_and_code": "GE 110 Art Appreciation",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n133",
+            "title_and_code": "GE EL 2 Information Assistance & Security",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n134",
+            "title_and_code": "ADGE General Chemistry (Organic)",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n135",
+            "title_and_code": "FORENSIC 2 Personal Identification Techniques",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n136",
+            "title_and_code": "CDI 3 Specialized Crime Investigation 2 With Simulation on Interrogation and Interview",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n137",
+            "title_and_code": "CA2 Non-Institutional Corrections",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n138",
+            "title_and_code": "CDI 4 Traffic Management and Accident Investigation with Driving",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n139",
+            "title_and_code": "PATHFIT 4 Fundamentals of Marksmanship",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n140",
+            "title_and_code": "CDI 5 Technical English 1 (Technical Report Writing and Presentation)",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n141",
+            "title_and_code": "CLJ 2 Human Rights Education",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n142",
+            "title_and_code": "CLJ 3 Criminal Law (Book 1)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n143",
+            "title_and_code": "FORENSIC 5 Lie Detection Techniques",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n144",
+            "title_and_code": "STAT 111 Statistics",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n145",
+            "title_and_code": "FORENSIC 3 Forensic Chemistry and Toxicology",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 5,
+            "lec_hours": 3,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n146",
+            "title_and_code": "CRIM 7 Criminological Research1 (Research Methods with Applied Statistics)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n147",
+            "title_and_code": "CA 3 Therapeutic Modalities",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n148",
+            "title_and_code": "FORENSIC 4 Questioned Documents Examination",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n149",
+            "title_and_code": "EHC 1 Criminology Enhancement Course 1",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n150",
+            "title_and_code": "CRIM 8 Criminological Research 2(Thesis Writing and Presentation",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n151",
+            "title_and_code": "CLJ 4 Criminal Law (Book 2)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n152",
+            "title_and_code": "CRIM 6 Dispute Resolution and Crises/Incidents Management",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n153",
+            "title_and_code": "FORENSIC 6 Forensic Ballistics",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n154",
+            "title_and_code": "CDI 6 Fire Protection and Arson Investigation",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n155",
+            "title_and_code": "CDI 9 Introduction To Cybercrime and Environmental Laws and Protection",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n156",
+            "title_and_code": "EHC 2 Criminology Enhancement Course 2",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n157",
+            "title_and_code": "CDI 7 Vice And Drug Education and Control",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n158",
+            "title_and_code": "CDI 8 Technical English 2 (Legal Forms)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n159",
+            "title_and_code": "CLJ 5 Evidence",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "crim_n160",
+            "title_and_code": "CP 1 Internship (On-The Job Training) 270 hrs",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 0,
+            "lab_hours": 3,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n161",
+            "title_and_code": "CLJ 6 Criminal Procedure And Court Testimony",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "crim_n162",
+            "title_and_code": "CP 2 Internship (On-The Job Training) 270 hrs",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 0,
+            "lab_hours": 3,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n1",
+            "title_and_code": "Understanding the Self GE 101",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n2",
+            "title_and_code": "Basic English Grammar GE 102",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n3",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n4",
+            "title_and_code": "Introduction to Linguistics EL 100",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n5",
+            "title_and_code": "Language, Culture and Society EL 101",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n6",
+            "title_and_code": "Computer 1 Comp 101",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n7",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n8",
+            "title_and_code": "Structures of English EL 102",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n9",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n10",
+            "title_and_code": "Principles and Theories of Language Acquisition and Learning EL 103",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n11",
+            "title_and_code": "Mathematics in the Modern World GE 103",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n12",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n13",
+            "title_and_code": "The Child and Adolescent Learner and Learning Principles PROF ED 1",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n14",
+            "title_and_code": "Language Programs and Policies in Multilingual Societies EL 104",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n15",
+            "title_and_code": "Language Learning Materials Development EL 105",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n16",
+            "title_and_code": "The Teaching Profession PROFED2",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n17",
+            "title_and_code": "Rhythmic Activities PATHFIT 2",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n18",
+            "title_and_code": "Teaching and Assessment of Literature Studies EL106",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n19",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n20",
+            "title_and_code": "Science, Technology and Society GE 106",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n21",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n22",
+            "title_and_code": "Teaching and Assessment of the Macro skills EL107",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n23",
+            "title_and_code": "Teaching and Assessment of Grammar EL108",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n24",
+            "title_and_code": "Speech and Theater Arts EL 109",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n25",
+            "title_and_code": "Children and Adolescent Literature EL111",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n26",
+            "title_and_code": "Mythology and Folklore EL112",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n27",
+            "title_and_code": "Public Speaking and Debate GE 105",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n28",
+            "title_and_code": "Dual Sports and Games PATHFIT 3",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n29",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n30",
+            "title_and_code": "Readings on Philippine History GE 109",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n31",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n32",
+            "title_and_code": "The Teacher and the Community, School Culture and Organizational Leadership PROFED3",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n33",
+            "title_and_code": "Survey of Philippine Literature in English EL113",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n34",
+            "title_and_code": "Survey of Afro-Asian Literature EL114",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n35",
+            "title_and_code": "Team Sport and Games PATHFIT 4",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n36",
+            "title_and_code": "Survey of English and American Literature EL115",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n37",
+            "title_and_code": "Contemporary and Popular Literature EL116",
+            "course": "BSED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n38",
+            "title_and_code": "Life and Works of Rizal RZL",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n39",
+            "title_and_code": "Statistics GE 111",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n40",
+            "title_and_code": "Foundation of Special and Inclusive Education PROFED4",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n41",
+            "title_and_code": "Facilitating Learner-Centered Teaching PROF ED 5",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n42",
+            "title_and_code": "Literary Criticism EL117",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n43",
+            "title_and_code": "Technical Writing EL118",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n44",
+            "title_and_code": "Assessment of Learning 1 PROFED 6",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n45",
+            "title_and_code": "FIELD STUDY 1 (Observations of Teaching) FS1",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n46",
+            "title_and_code": "Language Research 1 RES 1",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n47",
+            "title_and_code": "Stylistics and Discourse Analysis ELEC1",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n48",
+            "title_and_code": "FIELD STUDY 2 (Participation and Teaching Assistanship) FS2",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n49",
+            "title_and_code": "Remedial Instruction ELEC2",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n50",
+            "title_and_code": "Assessment of Learning 2 PROF ED7",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n51",
+            "title_and_code": "The Teacher and the School Curriculum PROF ED 9",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n52",
+            "title_and_code": "Campus Journalism EL 119",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n53",
+            "title_and_code": "Building and Enhancing New Literacies Across the Curriculum PROF ED 10",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n54",
+            "title_and_code": "Technology for Teaching and Learning 1 PROF ED 8",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n55",
+            "title_and_code": "Language Research 2 RES 2",
+            "course": "BSED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsed_n56",
+            "title_and_code": "Educational Enhancement Course 2 EHC2",
+            "course": "BSED",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n57",
+            "title_and_code": "Technology for Teaching and Learning 2 (Teaching in Language Education) EL120",
+            "course": "BSED",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsed_n58",
+            "title_and_code": "TEACHING INTERNSHIP EL-TIB",
+            "course": "BSED",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+            {"id": "bsed_o1", "title_and_code": "Understanding the Self GE 101", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o2", "title_and_code": "Basic English Grammar GE 102", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o3", "title_and_code": "Entrepreneurial Mind GE EL 101", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o4", "title_and_code": "Introduction to Linguistics EL 100", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o5", "title_and_code": "Language, Culture and Society EL 101", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o6", "title_and_code": "Structures of English EL 102", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o7", "title_and_code": "Movement Competency Training PATHFIT 1", "course": "BSED", "year_level": 1, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o8", "title_and_code": "Social Arts 1 SIBTECH 101", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o9", "title_and_code": "National Service Training Program 1 NSTP 1", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o10", "title_and_code": "Computer 1 Comp 101", "course": "BSED", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 2, "lab_hours": 1, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o11", "title_and_code": "Mathematics in the Modern World GE 103", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o12", "title_and_code": "Purposive Communication GE 104", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o13", "title_and_code": "Principles and Theories of Language Acquisition and Learning EL 103", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o14", "title_and_code": "Language Programs and Policies in Multilingual Societies EL 104", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o15", "title_and_code": "Preparation of Language Learning Materials EL 105", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o16", "title_and_code": "The Child and Adolescent Learner and Learning Principles EL 106", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o17", "title_and_code": "Exercise-Based Fitness Activities PATHFIT 2", "course": "BSED", "year_level": 1, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o18", "title_and_code": "Social Arts 2 SIBTECH 102", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o19", "title_and_code": "National Service Training Program 2 NSTP 2", "course": "BSED", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o20", "title_and_code": "Science, Technology and Society GE 106", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o21", "title_and_code": "The Contemporary World GE 107", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o22", "title_and_code": "Philippine Literature GE EL 102", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o23", "title_and_code": "Speech and Theater Arts EL 107", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o24", "title_and_code": "The Teaching Profession EL 108", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o25", "title_and_code": "Teaching and Assessment of Literature ELT 1", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o26", "title_and_code": "Teaching and Assessment of the Microskills ELT 2", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o27", "title_and_code": "Teaching and Assessment of Grammar ELT 3", "course": "BSED", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o28", "title_and_code": "Group Exercises (Aerobics, Yoga, etc.) PATHFIT 3", "course": "BSED", "year_level": 2, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o29", "title_and_code": "Ethics GE 108", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o30", "title_and_code": "Readings on Philippine History GE 109", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o31", "title_and_code": "Art Appreciation GE 110", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o32", "title_and_code": "Public Speaking and Debate GE 105", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o33", "title_and_code": "The Teacher and the Community, School Culture and Organizational Leadership EL 110", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o34", "title_and_code": "Children and Adolescent Literature LIT 1", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o35", "title_and_code": "Mythology and Folklore LIT 2", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o36", "title_and_code": "Survey of Philippine Literature in English LIT 3", "course": "BSED", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o37", "title_and_code": "Sports PATHFIT 4", "course": "BSED", "year_level": 2, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o38", "title_and_code": "Life and Works of Rizal RZL", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o39", "title_and_code": "Statistics GE 111", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsed_o40", "title_and_code": "Foundation of Special and Inclusive Education EL 111", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o41", "title_and_code": "Assessment of Learning 1 EL 112", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o42", "title_and_code": "Technical Writing ELT 4", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o43", "title_and_code": "Survey of Afro-Asian Literature LIT 4", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o44", "title_and_code": "Survey of English and American Literature LIT 5", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o45", "title_and_code": "Contemporary and Popular Literature LIT 6", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o46", "title_and_code": "Literary Criticism LIT 7", "course": "BSED", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o47", "title_and_code": "Campus Journalism EL 113", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o48", "title_and_code": "Stylistics and Discourse Analysis EL 114", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o49", "title_and_code": "Remedial Instruction EL 115", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o50", "title_and_code": "Assessment of Learning 2 EL 116", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o51", "title_and_code": "The Teacher and the School Curriculum EL 117", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o52", "title_and_code": "Building and Enhancing New Literacies Across the Curriculum EL 118", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o53", "title_and_code": "Facilitating Learner-Centered Teaching ELT 5", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o54", "title_and_code": "Technology for Teaching and Learning 1 TTL1", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o55", "title_and_code": "Technology for Teaching and Learning 2 (Teaching in Language Education) TTL 2", "course": "BSED", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o56", "title_and_code": "FIELD STUDY 1 (Observations of Teaching) EL-FS 1", "course": "BSED", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o57", "title_and_code": "FIELD STUDY 2 (Participation and Teaching Assistanship) EL-FS 2", "course": "BSED", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o58", "title_and_code": "Language Research 1 RES 1", "course": "BSED", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o59", "title_and_code": "TEACHING INTERNSHIP EL-TIB", "course": "BSED", "year_level": 4, "semester": 2, "units": 6, "lec_hours": 6, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsed_o60", "title_and_code": "Language Research 2 RES 2", "course": "BSED", "year_level": 4, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+        {
+            "id": "bsca_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n2",
+            "title_and_code": "Entrepreneurial Mind GE EL 101",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n3",
+            "title_and_code": "Fundamentals Of Customs And Tariff Management TM 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n4",
+            "title_and_code": "Entrepreneurial Management ELC 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n5",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n6",
+            "title_and_code": "Intro To Supply Chain Mgt SCM 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n7",
+            "title_and_code": "Border Control & Security CM 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n8",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n9",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n10",
+            "title_and_code": "Mathematics In the Modern World GE 103",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n11",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n12",
+            "title_and_code": "Advance Computer COMP 102",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n13",
+            "title_and_code": "Warehouse Operations Mgt SCM 2",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n14",
+            "title_and_code": "Customs Operations & Cargo Handling CM 2",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n15",
+            "title_and_code": "Exercise-Based Fitness Activities PATHFIT 2",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n16",
+            "title_and_code": "Commodiy Classification System TM 2",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n17",
+            "title_and_code": "Obligation And Contract SBEC 1",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n18",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSCA",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n19",
+            "title_and_code": "Science, Technology, and Society GE 106",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n20",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n21",
+            "title_and_code": "Taxation (Income and Business Taxation) SBEC 2",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n22",
+            "title_and_code": "Indigenous Creative Arts GE EL 103",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n23",
+            "title_and_code": "Procurement And Inventory Management SCM 3",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n24",
+            "title_and_code": "Customs Valuation System TM 3",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n25",
+            "title_and_code": "Customs Warehousing CM 3",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n26",
+            "title_and_code": "Group Exercise (Aerobics, Yoga, Etc.) PATHFIT 3",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n27",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n28",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n29",
+            "title_and_code": "Transportation Management SCM 4",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n30",
+            "title_and_code": "Customs Clearance CM 4",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n31",
+            "title_and_code": "Operations Management CMBE 1",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n32",
+            "title_and_code": "Customs Appraisal And Assessment TM 4",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n33",
+            "title_and_code": "Financial Management EL 2",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n34",
+            "title_and_code": "Sports PATHFIT 4",
+            "course": "BSCA",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n35",
+            "title_and_code": "Statistics GE 111",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n36",
+            "title_and_code": "Life And Works of Rizal RZL",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n37",
+            "title_and_code": "Customs Proceeding CM 5",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n38",
+            "title_and_code": "Excise Taxes, Liquidation of Duty and Surcharges TM 5",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n39",
+            "title_and_code": "International Marketing EL 3",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n40",
+            "title_and_code": "Strategic Management CMBE 2",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n41",
+            "title_and_code": "Thesis Writing 1 RES 1",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n42",
+            "title_and_code": "Gender And Society GE 112",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n43",
+            "title_and_code": "Customs Post Clearance Audit and Fraud Detection CM 6",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n44",
+            "title_and_code": "Special Duties and Trade Remedies TM6",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n45",
+            "title_and_code": "International Trade Organizations, Agreements, and Rules of Origin TM7",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n46",
+            "title_and_code": "Thesis Writing 2 RES 2",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n47",
+            "title_and_code": "Ethics And Standards of The Customs Broker CM 7",
+            "course": "BSCA",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsca_n48",
+            "title_and_code": "Competencies Assessment in Customs Management CM 8",
+            "course": "BSCA",
+            "year_level": 4,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n49",
+            "title_and_code": "Competencies Assessment in Tariff Management TM 8",
+            "course": "BSCA",
+            "year_level": 4,
+            "units": 5,
+            "lec_hours": 5,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsca_n50",
+            "title_and_code": "Internship/Practicum for Customs Administration (600HRS) INTERN",
+            "course": "BSCA",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+            {"id": "bsca_o1", "title_and_code": "UNDERSTANDING THE SELF GE 101", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o2", "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o3", "title_and_code": "ENTREPRENEURIAL MIND GE EL 101", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o4", "title_and_code": "SOCIAL ARTS 1 SIBTECH 101", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o5", "title_and_code": "COMPUTER 1 COMP 101", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 2, "lab_hours": 1, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o6", "title_and_code": "FUNDAMENTALS OF CUSTOMS AND TARIFF MANAGEMENT TM 1", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o7", "title_and_code": "ENTREPRENEURIAL MANAGEMENT ELC 1", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o8", "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1", "course": "BSCA", "year_level": 1, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o9", "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1", "course": "BSCA", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o10", "title_and_code": "MATHEMATICS IN THE MODERN WORLD GE 103", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o11", "title_and_code": "PURPOSIVE COMMUNICATION GE 104", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o12", "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o13", "title_and_code": "SOCIAL ARTS 2 SIBTECH 102", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o14", "title_and_code": "ADVANCE COMPUTER COMP 102", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 2, "lab_hours": 1, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o15", "title_and_code": "INTRO TO SUPPLY CHAIN MGT SCM 1", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o16", "title_and_code": "BORDER CONTROL & SECURITY CM 1", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o17", "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2", "course": "BSCA", "year_level": 1, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o18", "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2", "course": "BSCA", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o19", "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o20", "title_and_code": "THE CONTEMPORARY WORLD GE 107", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o21", "title_and_code": "PHILIPPINE LITERATURE GE EL 102", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o22", "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o23", "title_and_code": "WAREHOUSE OPERATIONS MGT SCM 2", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o24", "title_and_code": "CUSTOMS OPERATIONS & CARGO HANDLING CM 2", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o25", "title_and_code": "COMMODITY CLASSIFICATION SYSTEM TM 2", "course": "BSCA", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o26", "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3", "course": "BSCA", "year_level": 2, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o27", "title_and_code": "BUSINESS ETHICS GE 108", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o28", "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o29", "title_and_code": "OBLIGATION AND CONTRACT SBEC 1", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o30", "title_and_code": "TAXATION (INCOME AND BUSINESS TAXATION) SBEC 2", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o31", "title_and_code": "PROCUREMENT AND INVENTORY MANAGEMENT SCM 3", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o32", "title_and_code": "CUSTOMS VALUATION SYSTEM TM 3", "course": "BSCA", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o33", "title_and_code": "CUSTOMS WAREHOUSING CM 3", "course": "BSCA", "year_level": 2, "semester": 2, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o34", "title_and_code": "SPORTS PATHFIT 4", "course": "BSCA", "year_level": 2, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o35", "title_and_code": "STATISTICS GE 111", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o36", "title_and_code": "LIFE AND WORKS OF RIZAL RZL", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o37", "title_and_code": "TRANSPORTATION MANAGEMENT SCM 4", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o38", "title_and_code": "CUSTOMS CLEARANCE CM 4", "course": "BSCA", "year_level": 3, "semester": 1, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o39", "title_and_code": "OPERATIONS MANAGEMENT CMBE 1", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o40", "title_and_code": "CUSTOMS APPRAISAL AND ASSESSMENT TM 4", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o41", "title_and_code": "THESIS WRITING 1 RES 1", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o42", "title_and_code": "FINANCIAL MANAGEMENT EL 2", "course": "BSCA", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o43", "title_and_code": "GENDER AND SOCIETY GE 112", "course": "BSCA", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsca_o44", "title_and_code": "CUSTOMS PROCEEDING CM 5", "course": "BSCA", "year_level": 3, "semester": 2, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o45", "title_and_code": "EXCISE TAXES, LIQUIDATION OF DUTY AND SURCHARGES TM 5", "course": "BSCA", "year_level": 3, "semester": 2, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o46", "title_and_code": "INTERNATIONAL MARKETING EL 3", "course": "BSCA", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o47", "title_and_code": "THESIS WRITING 2 RES 2", "course": "BSCA", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o48", "title_and_code": "STRATEGIC MANAGEMENT CMBE 2", "course": "BSCA", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o49", "title_and_code": "CUSTOMS POST CLEARANCE AUDIT AND FRAUD DETECTION CM 6", "course": "BSCA", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o50", "title_and_code": "INTERNSHIP/PRACTICUM FOR CUSTOMS ADMINISTRATION (400HRS) INTERN", "course": "BSCA", "year_level": 3, "semester": 3, "units": 4, "lec_hours": 4, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o51", "title_and_code": "ETHICS AND STANDARDS OF THE CUSTOMS BROKER CM 7", "course": "BSCA", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o52", "title_and_code": "SPECIAL DUTIES AND TRADE REMEDIES TM 6", "course": "BSCA", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o53", "title_and_code": "INTERNATIONAL TRADE ORGANIZATIONS, AGREEMENT AND RULES OF ORIGIN TM 7", "course": "BSCA", "year_level": 4, "semester": 1, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o54", "title_and_code": "COMPETENCIES ASSESSMENT IN CUSTOMS MANAGEMENT CM 8", "course": "BSCA", "year_level": 4, "semester": 2, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsca_o55", "title_and_code": "COMPETENCIES ASSESSMENT IN TARIFF MANAGEMENT TM 8", "course": "BSCA", "year_level": 4, "semester": 2, "units": 5, "lec_hours": 5, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+        {
+            "id": "beed_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n2",
+            "title_and_code": "Good Manners And Right Conduct VED",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n3",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n4",
+            "title_and_code": "Teaching Math In The Primary Grades MATH 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n5",
+            "title_and_code": "Computer 1 COMP 101",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n6",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n7",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n8",
+            "title_and_code": "The Child And Adolescent Learners And Learning Principles PROF ED 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n9",
+            "title_and_code": "Teaching English In The Elementary Grades (Language Arts) ENG 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n10",
+            "title_and_code": "Mathematics in the Modern World GE 103",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n11",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n12",
+            "title_and_code": "Pagbasa At Pagsulat Sa Ibat-Ibang Disiplina GE 105",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n13",
+            "title_and_code": "Teaching Science In The Elementary Grades (Biology And Chemistry) SCI 1",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n14",
+            "title_and_code": "Teaching Math In The Intermediate Grades MATH 2",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n15",
+            "title_and_code": "Rhythmic Activities PATHFIT 2",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n16",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n17",
+            "title_and_code": "The Teaching Profession PROF ED 2",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n18",
+            "title_and_code": "Teaching Music In The Elementary Grades MUSIC",
+            "course": "BEED",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n19",
+            "title_and_code": "Science, Technology And Society GE 106",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n20",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n21",
+            "title_and_code": "Foundation Of Special And Inclusive Education PROF ED 4",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n22",
+            "title_and_code": "Life And Works Of Rizal RZL",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n23",
+            "title_and_code": "Dual Sports And Games PATHFIT 3",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n24",
+            "title_and_code": "The Teacher And The Community, School Culture And Organizational Leadership PROF ED 3",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n25",
+            "title_and_code": "Teaching English In The Elementary Grades Through Literature ENG 2",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n26",
+            "title_and_code": "Pagtuturo Ng Filipino Sa Elementarya - Estraktura At Gamit Ng Wikang Filipino FIL",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n27",
+            "title_and_code": "Teaching Science In The Elementary Grades (Physics, Space And Earth Science) SCI 2",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n28",
+            "title_and_code": "Ethics GE 108",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n29",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n30",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n31",
+            "title_and_code": "Team Sports And Games PATHFIT 4",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n32",
+            "title_and_code": "Facilitating Learner-Centered Teaching PROF ED 5",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n33",
+            "title_and_code": "Assessment In Learning 1 PROF ED 6",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n34",
+            "title_and_code": "Technology For Teaching And Elementary Grades TTL",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n35",
+            "title_and_code": "Content And Pedagogy In The Mother Tongue MTB-MLE",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n36",
+            "title_and_code": "Pagtuturo And Filipino Sa Elementarya - Panitikan Ng Pilipinas FIL",
+            "course": "BEED",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n37",
+            "title_and_code": "Statistics GE 111",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n38",
+            "title_and_code": "Educational Research 1 EDUC RES 1",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n39",
+            "title_and_code": "Teaching Social Studies In The Elementary Grades (Philippine History And Government) SSC 1",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n40",
+            "title_and_code": "Assessment In Learning 2 PROF ED 7",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n41",
+            "title_and_code": "Technology For Teaching And Learning PROF ED 8",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n42",
+            "title_and_code": "Edukasyong Pantahanan At Pangkabuhayan TLE",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n43",
+            "title_and_code": "Teaching Arts In The Elementary Grades ARTS",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n44",
+            "title_and_code": "Field Study 1 FS 1",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n45",
+            "title_and_code": "Educational Enhancement Course EHC 1",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n46",
+            "title_and_code": "The Teacher And The School Curriculum PROF ED 9",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n47",
+            "title_and_code": "Teaching Social Studies In The Elementary Grades (Culture And Geography) SSC 2",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n48",
+            "title_and_code": "Teaching Pe And Health In The Elementary Grades PEH",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n49",
+            "title_and_code": "Edukasyong Pantahanan At Pangkabuhayan With Entrepreneurship TLE",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n50",
+            "title_and_code": "Field Study 2 FS",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n51",
+            "title_and_code": "Building And Enhancing New Literacies Across The Curriculum. PROF ED 10",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n52",
+            "title_and_code": "Educational Research 2 EDUC RES 2",
+            "course": "BEED",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_n53",
+            "title_and_code": "Educational Enhancement Course 2 EHC 2",
+            "course": "BEED",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n54",
+            "title_and_code": "Teaching Multigrade Classes ED ELEC",
+            "course": "BEED",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "beed_n55",
+            "title_and_code": "Teaching Internship PT",
+            "course": "BEED",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "beed_o1",
+            "title_and_code": "UNDERSTANDING THE SELF GE 101",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o2",
+            "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o3",
+            "title_and_code": "ENTREPRENEURIAL MIND GE EL 101",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o4",
+            "title_and_code": "SOCIAL ARTS 1 SIBTECH 101",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o5",
+            "title_and_code": "COMPUTER 1 COMP 101",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o6",
+            "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o7",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o8",
+            "title_and_code": "THE CHILD AND ADOLESCENT LEARNERS AND LEARNING PRINCIPLES PROF ED 1",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o9",
+            "title_and_code": "TEACHING ENGLISH IN THE ELEMENTARY GRADES (LANGUAGE ARTS) ENG 1",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o10",
+            "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o11",
+            "title_and_code": "PURPOSIVE COMMUNICATION GE 104",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o12",
+            "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o13",
+            "title_and_code": "SOCIAL ARTS 2 SIBTECH 102",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o14",
+            "title_and_code": "ADVANCE COMPUTER COMP 102",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o15",
+            "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o16",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o17",
+            "title_and_code": "THE TEACHING PROFESSION PROF ED 2",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o18",
+            "title_and_code": "EDUCATION ENHANCEMENT COURSE 1 EHC 1",
+            "course": "BEED",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o19",
+            "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o20",
+            "title_and_code": "THE CONTEMPORARY WORLD GE 107",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o21",
+            "title_and_code": "PHILIPPINE LITERATURE GE EL 102",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o22",
+            "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o23",
+            "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o24",
+            "title_and_code": "THE TEACHER AND THE COMMUNITY, SCHOOL CULTURE AND ORGANIZATIONAL LEADERSHIP PROF ED 3",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o25",
+            "title_and_code": "TEACHING MATH IN THE PRIMARY GRADES MATH 1",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o26",
+            "title_and_code": "TEACHING ENGLISH IN THE ELEMENTARY GRADES THROUGH LITERATURE ENG 2",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o27",
+            "title_and_code": "ETHICS GE 108",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o28",
+            "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o29",
+            "title_and_code": "ART APPRECIATION GE 110",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o30",
+            "title_and_code": "SPORTS PATHFIT 4",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o31",
+            "title_and_code": "FOUNDATION OF SPECIAL AND INCLUSIVE EDUCATION PROF ED 4",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o32",
+            "title_and_code": "FACILITATING LEARNER-CENTERED TEACHING PROF ED 5",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o33",
+            "title_and_code": "TEACHING SCIENCE IN THE ELEMENTARY GRADES (BIOLOGY AND CHEMISTRY) SCI 1",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o34",
+            "title_and_code": "TEACHING MATH IN THE INTERMEDIATE GRADES MATH 2",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o35",
+            "title_and_code": "EDUCATION ENHANCEMENT COURSE 2 EHC 2",
+            "course": "BEED",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o36",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o37",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o38",
+            "title_and_code": "CONTENT AND PEDAGOGY IN THE MOTHER TONGUE MTB-MLE",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o39",
+            "title_and_code": "ASSESSMENT IN LEARNING 1 PROF ED 6",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o40",
+            "title_and_code": "TECHNOLOGY FOR TEACHING AND LEARNING PROF ED 7",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o41",
+            "title_and_code": "TEACHING SOCIAL STUDIES IN THE ELEMENTARY GRADES (PHILIPPINE HISTORY AND GOVERNMENT) SSC 1",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o42",
+            "title_and_code": "PAGTUTURO NG FILIPINO SA ELEMENTARYA - ESTRAKTURA AT GAMIT NG WIKANG FILIPINO FIL 1",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o43",
+            "title_and_code": "EDUKASYONG PANTAHANAN AT PANGKABUHAYAN TLE 1",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o44",
+            "title_and_code": "TEACHING SCIENCE IN THE ELEMENTARY GRADES (PHYSICS, SPACE AND EARTH SCIENCE) SCI 2",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o45",
+            "title_and_code": "ASSESSMENT IN LEARNING 2 PROF ED 8",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o46",
+            "title_and_code": "THE TEACHER AND THE SCHOOL CURRICULUM PROF ED 9",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o47",
+            "title_and_code": "TEACHING SOCIAL STUDIES IN THE ELEMENTARY GRADES (CULTURE AND GEOGRAPHY) SSC 2",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o48",
+            "title_and_code": "PAGTUTURO NG FILIPINO SA ELEMENTARYA - PANITIKAN NG PILIPINAS FIL 2",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o49",
+            "title_and_code": "EDUKASYONG PANTAHANAN AT PANGKABUHAYAN WITH ENTREPRENEURSHIP TLE 2",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o50",
+            "title_and_code": "TEACHING MUSIC IN THE ELEMENTARY GRADES MUSIC",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o51",
+            "title_and_code": "FIELD STUDY 1 FS 1",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o52",
+            "title_and_code": "TEACHING PE AND HEALTH IN THE ELEMENTARY GRADES PEH",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o53",
+            "title_and_code": "EDUCATION ENHANCEMENT COURSE 3 EHC 3",
+            "course": "BEED",
+            "year_level": 3,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o54",
+            "title_and_code": "BUILDING AND ENHANCING NEW LITERACIES ACROSS THE CURRICULUM PROF ED 10",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o55",
+            "title_and_code": "GOOD MANNERS AND RIGHT CONDUCT VED",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o56",
+            "title_and_code": "TECHNOLOGY FOR TEACHING AND ELEMENTARY GRADES TTL",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o57",
+            "title_and_code": "TEACHING ARTS IN THE ELEMENTARY GRADES ARTS",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o58",
+            "title_and_code": "FIELD STUDY 2 FS 2",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o59",
+            "title_and_code": "TEACHING MULTIGRADE CLASSES ED ELEC",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o60",
+            "title_and_code": "EDUCATIONAL RESEARCH 1 EDUC RES 1",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o61",
+            "title_and_code": "EDUCATIONAL RESEARCH 2 EDUC RES 2",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o62",
+            "title_and_code": "TEACHING INTERNSHIP PT",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 2,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "beed_o63",
+            "title_and_code": "MOCK BOARD COURSE EHC 4",
+            "course": "BEED",
+            "year_level": 4,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_n1",
+            "title_and_code": "Understanding the Self GE 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n2",
+            "title_and_code": "Sining ng Pakikipagtalastasan GE 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n3",
+            "title_and_code": "Entrepreneurial Mind GE EL 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n4",
+            "title_and_code": "Computer Programming 1 CC 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n5",
+            "title_and_code": "Movement Competency Training PATHFIT 1",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n6",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n7",
+            "title_and_code": "Introduction to Computing CC 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n8",
+            "title_and_code": "Discrete Mathematics MS 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n9",
+            "title_and_code": "Mathematics in the Modern World GE 103",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n10",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n11",
+            "title_and_code": "Pagbasa at Pagsulat sa Iba’t Ibang Disiplina GE 105",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n12",
+            "title_and_code": "Information Technology Fundamentals CC 104",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n13",
+            "title_and_code": "Exercise-Based Fitness Activities PATHFIT 2",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n14",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n15",
+            "title_and_code": "Computer Programming 2 CC 103",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n16",
+            "title_and_code": "Quantitative Methods MS 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n17",
+            "title_and_code": "Science, Technology, and Society GE 106",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n18",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n19",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n20",
+            "title_and_code": "Indigenous Creative Arts GE EL 103",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n21",
+            "title_and_code": "Group Exercise PATHFIT 3",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n22",
+            "title_and_code": "Event Driven Programming PF 102",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n23",
+            "title_and_code": "Fundamentals of Database Systems IM 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n24",
+            "title_and_code": "Object-Oriented Programming PF 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n25",
+            "title_and_code": "Business Ethics GE 108",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n26",
+            "title_and_code": "Readings in Philippine History GE 109",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n27",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n28",
+            "title_and_code": "Sports PATHFIT 4",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n29",
+            "title_and_code": "Data Structures and Algorithms CC 106",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n30",
+            "title_and_code": "Information Management CC 105",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n31",
+            "title_and_code": "Info Assurance and Security 1 IAS 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n32",
+            "title_and_code": "Statistics GE 111",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n33",
+            "title_and_code": "Life and Works of Rizal RZL",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n34",
+            "title_and_code": "App Dev. & Emerging Technologies CC 107",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n35",
+            "title_and_code": "Networking 1 NET 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n36",
+            "title_and_code": "Intro to Human-Computer Interaction HCI 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n37",
+            "title_and_code": "System Admin & Maintenance SA 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n38",
+            "title_and_code": "Social and Professional Issues SP 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n39",
+            "title_and_code": "Web Systems and Technology WS 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n40",
+            "title_and_code": "Integrative Programming & Technologies IPT 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n41",
+            "title_and_code": "Networking 2 NET 102",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n42",
+            "title_and_code": "Info Assurance and Security 2 IAS 102",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n43",
+            "title_and_code": "System Integration and Architecture 1 SIA 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n44",
+            "title_and_code": "Capstone Project and Research 1 CAP 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n45",
+            "title_and_code": "System Integration and Architecture 2 SIA 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n46",
+            "title_and_code": "Platform Technologies PT 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsit_n47",
+            "title_and_code": "Multimedia and Animation IT 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n48",
+            "title_and_code": "Human-Computer Interaction 2 HCI 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n49",
+            "title_and_code": "Capstone Project and Research 2 CAP 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_n50",
+            "title_and_code": "Practicum (600 hours) PRAC 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsit_o1",
+            "title_and_code": "UNDERSTANDING THE SELF GE 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o2",
+            "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o3",
+            "title_and_code": "ENTREPRENEURIAL MIND GE EL 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o4",
+            "title_and_code": "SOCIAL ARTS 1 SIBTECH 103",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o5",
+            "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o6",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o7",
+            "title_and_code": "INTRODUCTION TO COMPUTING CC 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o8",
+            "title_and_code": "DISCRETE MATHEMATICS MS 101",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o9",
+            "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o10",
+            "title_and_code": "PURPOSIVE COMMUNICATION GE 104",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o11",
+            "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o12",
+            "title_and_code": "SOCIAL ARTS 2 SIBTECH 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o13",
+            "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o14",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o15",
+            "title_and_code": "COMPUTER PROGRAMMING 1 CC 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o16",
+            "title_and_code": "QUANTITATIVE METHODS (INCLUDING MODELLING AND SIMULATION) MS 102",
+            "course": "BSIT",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o17",
+            "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o18",
+            "title_and_code": "THE CONTEMPORARY WORLD GE 107",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o19",
+            "title_and_code": "PHILIPPINE LITERATURE GE EL 102",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o20",
+            "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o21",
+            "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o22",
+            "title_and_code": "COMPUTER PROGRAMMING 2 CC 103",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o23",
+            "title_and_code": "FUNDAMENTALS OF DATABASE SYSTEM IM 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o24",
+            "title_and_code": "OBJECT ORIENTED PROGRAMMING PF 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o25",
+            "title_and_code": "Business ETHICS GE 108",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o26",
+            "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o27",
+            "title_and_code": "ART APPRECIATION GE 110",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o28",
+            "title_and_code": "SPORTS PATHFIT 4",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o29",
+            "title_and_code": "DATA STRUCTURES AND ALGORITHM CC 104",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o30",
+            "title_and_code": "INFORMATION MANAGEMENT CC 105",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o31",
+            "title_and_code": "INTRODUCTION TO HUMAN AND COMPUTER INTERACTION HCI 101",
+            "course": "BSIT",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o32",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o33",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o34",
+            "title_and_code": "APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGY CC 106",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o35",
+            "title_and_code": "NETWORKING 1 NET 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o36",
+            "title_and_code": "INFORMATION ASSURANCE AND SECURITY 1 IAS 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o37",
+            "title_and_code": "SYSTEM ADMINISTRATION AND MAINTENANCE SA 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o38",
+            "title_and_code": "SOCIAL AND PROFESSIONAL ISSUES SP 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o39",
+            "title_and_code": "WEB SYSTEMS AND TECHNOLOGY WS 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o40",
+            "title_and_code": "INTEGRATIVE PROGRAMMING AND TECHNOLOGY IPT 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o41",
+            "title_and_code": "NETWORKING 2 NET 102",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o42",
+            "title_and_code": "INFORMATION ASSURANCE AND SECURITY 2 IAS 102",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o43",
+            "title_and_code": "SYSTEM INTEGRATION AND ARCHITECTURE 1 SIA 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o44",
+            "title_and_code": "CAPSTONE PROJECT AND RESEARCH 1 CAP 101",
+            "course": "BSIT",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o45",
+            "title_and_code": "SYSTEM INTEGRATION AND ARCHITECTURE 2 SIA 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o46",
+            "title_and_code": "PLATFORM TECHNOLOGY PT 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o47",
+            "title_and_code": "MULTIMEDIA AND ANIMATION IT 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o48",
+            "title_and_code": "HUMAN COMPUTER INTERACTION 2 HCI 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o49",
+            "title_and_code": "CAPSTONE PROJECT AND RESEARCH 2 CAP 102",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsit_o50",
+            "title_and_code": "PRACTICUM PRAC 101",
+            "course": "BSIT",
+            "year_level": 4,
+            "semester": 2,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n2",
+            "title_and_code": "Sining Ng Pakikipagtalastasan GE 102",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n3",
+            "title_and_code": "Entrepreurial Mind GE EL 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n4",
+            "title_and_code": "Business Finance (For Non-Abm) (NABMB 153)",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n5",
+            "title_and_code": "Computer 1 COMP 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n6",
+            "title_and_code": "Physical Fitness PTHFIT 1",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n7",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n8",
+            "title_and_code": "Philippine Culture and Tourism Geography THC 111",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n9",
+            "title_and_code": "Operations Management BME 141",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n10",
+            "title_and_code": "Mathematics In The Modern World GE 103",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n11",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n12",
+            "title_and_code": "Pagbasa At Pagsulat Sa Ibat-Ibang Disiplina GE 105",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n13",
+            "title_and_code": "Kitchen Essentials And Basic Food Preparations HPC 121",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n14",
+            "title_and_code": "Advance Computer COMP 102",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n15",
+            "title_and_code": "Rhytmic Activities PATHFIT 2",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n16",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n17",
+            "title_and_code": "Risk Management As Applied To Safety, Security And Sanitation THC 112",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n18",
+            "title_and_code": "Business Marketing (NABMB 152)",
+            "course": "BSHM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n19",
+            "title_and_code": "Science, Technology and Society GE 106",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n20",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n21",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n22",
+            "title_and_code": "Indigenous Creative Arts GE EL 103",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n23",
+            "title_and_code": "Dual Sports and Games PATHFIT 3",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n24",
+            "title_and_code": "Quality Service Management in Tourism and Hospitality THC 113",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n25",
+            "title_and_code": "Applied Economics (For Non-Abm) (NABMB 154)",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n26",
+            "title_and_code": "Life And Works Of Rizal RZL",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n27",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n28",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n29",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n30",
+            "title_and_code": "Team Sports And Games PATHFIT 4",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n31",
+            "title_and_code": "Legal Aspects in Tourism and Hospitality THC 114",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n32",
+            "title_and_code": "Fundamentals In Food Service Operation HPC 122",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 1,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n33",
+            "title_and_code": "Culinary Fundamentals HMPE 131",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n34",
+            "title_and_code": "Strategic Management BME 142",
+            "course": "BSHM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n35",
+            "title_and_code": "Statistics GE 111",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n36",
+            "title_and_code": "Macro Perspective of Tourism and Hospitality THC 115",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n37",
+            "title_and_code": "Professional Development and Applied Ethics THC 116",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n38",
+            "title_and_code": "Fundamentals In Lodging Operations HPC 123",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n39",
+            "title_and_code": "Food And Beverage Operation HMPE 132",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n40",
+            "title_and_code": "Housekeeping Operations HMPE 133",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n41",
+            "title_and_code": "Fundamentals Of Accounting (For Non- Abm) NABMB 155",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n42",
+            "title_and_code": "Hospitality Research 1 RESEARCH 1",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n43",
+            "title_and_code": "Multicultural Diversity in Workplace for The Tourism Professional THC 117",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n44",
+            "title_and_code": "Micro Perspective of Tourism and Hospitality THC 118",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n45",
+            "title_and_code": "Applied Business Tools and Technologies HPC 124",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n46",
+            "title_and_code": "Front Office Operation HMPE 134",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n47",
+            "title_and_code": "Room Division Management HMPE 135",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n48",
+            "title_and_code": "Supply Chain Management in Hospitality Industry HPC 125",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n49",
+            "title_and_code": "Foreign Language 1 (Spanish) HPC 128",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n50",
+            "title_and_code": "Hospitality Research 2 RESEARCH 2",
+            "course": "BSHM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n51",
+            "title_and_code": "Introduction To Meetings, Incentives, Conferences and Events Management (MICE) HPC 126",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n52",
+            "title_and_code": "Ergonometric And Facilities Planning for The Hospitality Industry HPC 127",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n53",
+            "title_and_code": "Foreign Language 2 (Spanish) HPC 129",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bshm_n54",
+            "title_and_code": "Tourism And Hospitality Marketing THC 119",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n55",
+            "title_and_code": "Entrepreneurship In Tourism and Hospitality THC 120",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_n56",
+            "title_and_code": "INTERNSHIP/PRACTICUM INT",
+            "course": "BSHM",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bshm_o1",
+            "title_and_code": "UNDERSTANDING THE SELF GE 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o2",
+            "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o3",
+            "title_and_code": "ENTREPRENEURIAL MIND GE EL 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o4",
+            "title_and_code": "SOCIAL ARTS 1 SIBTECH 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o5",
+            "title_and_code": "COMPUTER 1 COMP 101",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o6",
+            "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o7",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o8",
+            "title_and_code": "PHILIPPINE CULTURE AND TOURISM GEOGRAPHY THC 111",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o9",
+            "title_and_code": "ORGANIZATION AND MANAGEMENT (NABMB 151)",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o10",
+            "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o11",
+            "title_and_code": "PURPOSIVE COMMUNICATION GE 104",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o12",
+            "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o13",
+            "title_and_code": "SOCIAL ARTS 2 SIBTECH 102",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o14",
+            "title_and_code": "ADVANCE COMPUTER COMP 102",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o15",
+            "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o16",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o17",
+            "title_and_code": "RISK MANAGEMENT AS APPLIED TO SAFETY, SECURITY AND SANITATION THC 112",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o18",
+            "title_and_code": "BUSINESS MARKETING (NABMB 152)",
+            "course": "BSHM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o19",
+            "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o20",
+            "title_and_code": "THE CONTEMPORARY WORLD GE 107",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o21",
+            "title_and_code": "PHILIPPINE LITERATURE GE EL 102",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o22",
+            "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o23",
+            "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o24",
+            "title_and_code": "QUALITY SERVICE MANAGEMENT IN TOURISM AND HOSPITALITY THC 113",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o25",
+            "title_and_code": "KITCHEN ESSENTIALS AND BASIC FOOD PREPARATIONS HPC 121",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o26",
+            "title_and_code": "OPERATIONS MANAGEMENT (TQM) BME 141",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o27",
+            "title_and_code": "BUSINESS FINANCE (FOR NON-ABM) (NABMB 153)",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o28",
+            "title_and_code": "BUSINESS ETHICS GE 108",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o29",
+            "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o30",
+            "title_and_code": "ART APPRECIATION GE 110",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o31",
+            "title_and_code": "SPORTS PATHFIT 4",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o32",
+            "title_and_code": "LEGAL ASPECTS IN TOURISM AND HOSPITALITY THC 114",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o33",
+            "title_and_code": "FUNDAMENTALS IN FOOD SERVICE OPERATION HPC 122",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 1,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o34",
+            "title_and_code": "CULINARY FUNDAMENTALS HMPE 131",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o35",
+            "title_and_code": "STRATEGIC MANAGEMENT BME 142",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o36",
+            "title_and_code": "APPLIED ECONOMICS (FOR NON-ABM) (NABMB 154)",
+            "course": "BSHM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o37",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o38",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o39",
+            "title_and_code": "MACRO PERSPECTIVE OF TOURISM AND HOSPITALITY THC 115",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o40",
+            "title_and_code": "PROFESSIONAL DEVELOPMENT AND APPLIED ETHICS THC 116",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o41",
+            "title_and_code": "FUNDAMENTALS IN LODGING OPERATIONS HPC 123",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o42",
+            "title_and_code": "FOOD AND BEVERAGE OPERATION HMPE 132",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o43",
+            "title_and_code": "HOUSEKEEPING OPERATIONS HMPE 133",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o44",
+            "title_and_code": "FUNDAMENTALS OF ACCOUNTING (FOR NON-ABM) NABMB 155",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o45",
+            "title_and_code": "MULTICULTURAL DIVERSITY IN WORKPLACE FOR THE TOURISM PROFESSIONAL THC 117",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o46",
+            "title_and_code": "MICRO PERSPECTIVE OF TOURISM AND HOSPITALITY THC 118",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o47",
+            "title_and_code": "APPLIED BUSINESS TOOLS AND TECHNOLOGIES HPC 124",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o48",
+            "title_and_code": "FRONT OFFICE OPERATION HMPE 134",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o49",
+            "title_and_code": "ROOM DIVISION MANAGEMENT HMPE 135",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o50",
+            "title_and_code": "SUPPLY CHAIN MANAGEMENT IN HOSPITALITY INDUSTRY HPC 125",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o51",
+            "title_and_code": "FOREIGN LANGUAGE 1 (SPANISH) HPC 128",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o52",
+            "title_and_code": "HOSPITALITY RESEARCH 1 RESEARCH 1",
+            "course": "BSHM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o53",
+            "title_and_code": "INTRODUCTION TO MEETINGS, INCENTIVES, CONFERENCES AND EVENTS MANAGEMENT (MICE) HPC 126",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o54",
+            "title_and_code": "ERGONOMETRIC AND FACILITIES PLANNING FOR THE HOSPITALITY INDUSTRY HPC 127",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o55",
+            "title_and_code": "FOREIGN LANGUAGE 2 (SPANISH) HPC 129",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o56",
+            "title_and_code": "TOURISM AND HOSPITALITY MARKETING THC 119",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o57",
+            "title_and_code": "ENTREPRENEURSHIP IN TOURISM AND HOSPITALITY THC 120",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o58",
+            "title_and_code": "HOSPITALITY RESEARCH 2 RESEARCH 2",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bshm_o59",
+            "title_and_code": "INTERNSHIP/PRACTICUM INT",
+            "course": "BSHM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n2",
+            "title_and_code": "Entrepreneurial Mind GE EL 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n3",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n4",
+            "title_and_code": "Financial Management PROF COR FM 121",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n5",
+            "title_and_code": "Basic Microeconomics BUS CORE 111",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n6",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n7",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n8",
+            "title_and_code": "Mathematics in the Modern World GE 103",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n9",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n10",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n11",
+            "title_and_code": "Personal Finance FM ELEC 131",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n12",
+            "title_and_code": "Business Law (Obligation And Contracts) BUS CORE 112",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n13",
+            "title_and_code": "Rhythmic Activities PATHFIT 2",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n14",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n15",
+            "title_and_code": "Science, Technology, and Society GE 106",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n16",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n17",
+            "title_and_code": "Indigenous Creative Arts GE EL 103",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n18",
+            "title_and_code": "Banking And Financial Institution PROF COR FM 122",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n19",
+            "title_and_code": "Operations Management (Tom) BME 141",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n20",
+            "title_and_code": "Good Governance And Social Responsibility BUS CORE 113",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n21",
+            "title_and_code": "Dual Sports And Games PATHFIT 3",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n22",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n23",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n24",
+            "title_and_code": "Income Taxation BUSCOR E 114",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n25",
+            "title_and_code": "Investment And Portfolio Management PROF COR FM 123",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n26",
+            "title_and_code": "Capital Market PROF COR FM 124",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n27",
+            "title_and_code": "Strategic Management BME 142",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n28",
+            "title_and_code": "Team Sports And Games PATHFIT 4",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n29",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n30",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n31",
+            "title_and_code": "HUMAN RESOURCE MANAGEMENT BUS CORE 115",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n32",
+            "title_and_code": "BUSINESS RESEARCH BUS CORE 116",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n33",
+            "title_and_code": "FINANCIAL ANALYSIS AND REPORTING PROF COR FM 125",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n34",
+            "title_and_code": "CREDIT AND COLLECTION PROF COR FM 126",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n35",
+            "title_and_code": "INTRODUCTION TO COMPUTING COMP 104",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n36",
+            "title_and_code": "MONETARY POLICY AND CENTRAL BANKING PROF COR FM 127",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n37",
+            "title_and_code": "SPECIAL TOPICS IN FINANCIAL MANGEMENT PROF COR FM 128",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n38",
+            "title_and_code": "BEHAVIORAL FINANCE FM ELEC 132",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n39",
+            "title_and_code": "TREASURY MANAGEMENT FM ELEC 133",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n40",
+            "title_and_code": "MUTUAL FUND FM ELEC 134",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n41",
+            "title_and_code": "RESEARCH 1 THESIS 1",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_n42",
+            "title_and_code": "INTERNATIONAL BUSINESS AND TRADE BUS CORE 117",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n43",
+            "title_and_code": "ENTREPRENEURIAL MANAGEMENT FM ELEC 135",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n44",
+            "title_and_code": "RISK MANAGEMENT FM ELEC 136",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n45",
+            "title_and_code": "RESEARCH 2 THESIS 2",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_mm_n46",
+            "title_and_code": "INTERNSHIP INT",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 0,
+            "lab_hours": 6,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_mm_o1",
+            "title_and_code": "UNDERSTANDING THE SELF GE 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o2",
+            "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o3",
+            "title_and_code": "ENTREPRENEURIAL MIND GE EL 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o4",
+            "title_and_code": "SOCIAL ARTS 1 SIBTECH 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o5",
+            "title_and_code": "COMPUTER 1 COMP 101",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o6",
+            "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o7",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o8",
+            "title_and_code": "BASIC MICROECONOMICS BUS CORE 1",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o9",
+            "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o10",
+            "title_and_code": "PURPOSIVE COMMUNICATION GE 104",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o11",
+            "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o12",
+            "title_and_code": "SOCIAL ARTS 2 SIBTECH 102",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o13",
+            "title_and_code": "ADVANCE COMPUTER COMP 102",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o14",
+            "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o15",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o16",
+            "title_and_code": "BUSINESS LAW (OBLIGATION AND CONTRACTS) BUS CORE 112",
+            "course": "BSBA-MM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o17",
+            "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o18",
+            "title_and_code": "THE CONTEMPORARY WORLD GE 107",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o19",
+            "title_and_code": "PHILIPPINE LITERATURE GE EL 102",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o20",
+            "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o21",
+            "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o22",
+            "title_and_code": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY BUS CORE 113",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o23",
+            "title_and_code": "PROFESSIONAL SALESMANSHIP PROF COR MM 121",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o24",
+            "title_and_code": "MARKETING MANAGEMENT PROF COR MM 122",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o25",
+            "title_and_code": "OPERATIONS MANAGEMENT (TQM) BME 141",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o26",
+            "title_and_code": "BUSINESS ETHICS GE 108",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o27",
+            "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o28",
+            "title_and_code": "ART APPRECIATION GE 110",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o29",
+            "title_and_code": "SPORTS PATHFIT 4",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o30",
+            "title_and_code": "INCOME TAXATION BUS CORE 114",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o31",
+            "title_and_code": "DISTRIBUTION MANAGEMENT PROF COR MM 123",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o32",
+            "title_and_code": "ADVERTISING PROF COR MM 124",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o33",
+            "title_and_code": "PERSONAL FINANCE MM ELEC 131",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o34",
+            "title_and_code": "STRATEGIC MANAGEMENT BME 142",
+            "course": "BSBA-MM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o35",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o36",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o37",
+            "title_and_code": "HUMAN RESOURCE MANAGEMENT BUS CORE 115",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o38",
+            "title_and_code": "BUSINESS RESEARCH BUS CORE 116",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o39",
+            "title_and_code": "PRODUCT MANAGEMENT PROF COR MM 125",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o40",
+            "title_and_code": "CUSTOMER SERVICE MANAGEMENT MM ELEC 132",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o41",
+            "title_and_code": "FRANCHISING MM ELEC 133",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o42",
+            "title_and_code": "COOPERATIVE MANAGEMENT MM ELEC 134",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o43",
+            "title_and_code": "RETAIL MANAGEMENT PROF COR MM 126",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o44",
+            "title_and_code": "PRICING STRATEGY PROF COR MM 127",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o45",
+            "title_and_code": "MARKETING RESEARCH PROF COR MM 128",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o46",
+            "title_and_code": "CONSUMER BEHAVIOR MM ELEC 135",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o47",
+            "title_and_code": "SALES MANAGEMENT MM ELEC 136",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o48",
+            "title_and_code": "INDUSTRIAL/AGRICULTURAL MARKETING MM ELEC 137",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o49",
+            "title_and_code": "PROJECT MANAGEMENT MM ELEC 138",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o50",
+            "title_and_code": "RESEARCH 1 THESIS 1",
+            "course": "BSBA-MM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o51",
+            "title_and_code": "INTERNATIONAL BUSINESS AND TRADE BUS CORE 117",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o52",
+            "title_and_code": "ENTREPRENEURIAL MANAGEMENT MM ELEC 139",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o53",
+            "title_and_code": "SPECIAL TOPICS IN MARKETING MANAGEMENT MM ELEC 140",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o54",
+            "title_and_code": "INTRODUCTION TO COMPUTING COMP 103",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o55",
+            "title_and_code": "WEB DEVELOPMENT COMP 104",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o56",
+            "title_and_code": "RESEARCH 2 THESIS 2",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_mm_o57",
+            "title_and_code": "INTERNSHIP INT",
+            "course": "BSBA-MM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n2",
+            "title_and_code": "Entrepreneurial Mind GE EL 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n3",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n4",
+            "title_and_code": "Financial Management PROF COR FM 121",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n5",
+            "title_and_code": "Basic Microeconomics BUS CORE 111",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n6",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n7",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n8",
+            "title_and_code": "Mathematics in the Modern World GE 103",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n9",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n10",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n11",
+            "title_and_code": "Personal Finance FM ELEC 131",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n12",
+            "title_and_code": "Business Law (Obligation And Contracts) BUS CORE 112",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n13",
+            "title_and_code": "Rhythmic Activities PATHFIT 2",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n14",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n15",
+            "title_and_code": "Science, Technology, and Society GE 106",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n16",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n17",
+            "title_and_code": "Indigenous Creative Arts GE EL 103",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n18",
+            "title_and_code": "Banking And Financial Institution PROF COR FM 122",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n19",
+            "title_and_code": "Operations Management (Tqm) BME 141",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n20",
+            "title_and_code": "Good Governance And Social Responsibility BUS CORE 113",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n21",
+            "title_and_code": "Dual Sports And Games PATHFIT 3",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n22",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n23",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n24",
+            "title_and_code": "Income Taxation BUSCORE 114",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n25",
+            "title_and_code": "Investment And Portfolio Management PROF COR FM 123",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n26",
+            "title_and_code": "Capital Market PROF COR FM 124",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n27",
+            "title_and_code": "Strategic Management BME 142",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n28",
+            "title_and_code": "Team Sports And Games PATHFIT 4",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n29",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n30",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n31",
+            "title_and_code": "HUMAN RESOURCE MANAGEMENT BUS CORE 115",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n32",
+            "title_and_code": "BUSINESS RESEARCH BUS CORE 116",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n33",
+            "title_and_code": "FINANCIAL ANALYSIS AND REPORTING PROF COR FM 125",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n34",
+            "title_and_code": "CREDIT AND COLLECTION PROF COR FM 126",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n35",
+            "title_and_code": "INTRODUCTION  TO COMPUTING COMP 104",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n36",
+            "title_and_code": "MONETARY POLICY AND CENTRAL BANKING PROF COR FM 127",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n37",
+            "title_and_code": "SPECIAL TOPICS IN FINANCIAL MANGEMENT PROF COR FM 128",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n38",
+            "title_and_code": "BEHAVIORAL FINANCE FM ELEC 132",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n39",
+            "title_and_code": "TREASURY MANAGEMENT FM ELEC 133",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n40",
+            "title_and_code": "MUTUAL FUND FM ELEC 134",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n41",
+            "title_and_code": "RESEARCH 1 THESIS 1",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n42",
+            "title_and_code": "INTERNATIONAL BUSINESS AND TRADE BUS CORE 117",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n43",
+            "title_and_code": "ENTREPRENEURIAL MANAGEMENT FM ELEC 135",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n44",
+            "title_and_code": "RISK MANAGEMENT FM ELEC 136",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_fm_n45",
+            "title_and_code": "RESEARCH 2 THESIS 2",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_n46",
+            "title_and_code": "INTERNSHIP INT",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_fm_o1",
+            "title_and_code": "UNDERSTANDING THE SELF GE 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o2",
+            "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o3",
+            "title_and_code": "ENTREPRENEURIAL MIND GE EL 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o4",
+            "title_and_code": "SOCIAL ARTS 1 SIBTECH 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o5",
+            "title_and_code": "COMPUTER 1 COMP 101",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o6",
+            "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o7",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o8",
+            "title_and_code": "BASIC MICROECONOMICS BUS CORE 1",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o9",
+            "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o10",
+            "title_and_code": "PURPOSIVE COMMUNICATION GE 104",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o11",
+            "title_and_code": "PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA GE 105",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o12",
+            "title_and_code": "SOCIAL ARTS 2 SIBTECH 102",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o13",
+            "title_and_code": "ADVANCE COMPUTER COMP 102",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o14",
+            "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o15",
+            "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o16",
+            "title_and_code": "BUSINESS LAW (OBLIGATION AND CONTRACTS) BUS CORE 112",
+            "course": "BSBA-FM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o17",
+            "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o18",
+            "title_and_code": "THE CONTEMPORARY WORLD GE 107",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o19",
+            "title_and_code": "PHILIPPINE LITERATURE GE EL 102",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o20",
+            "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o21",
+            "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o22",
+            "title_and_code": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY BUS CORE 113",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o23",
+            "title_and_code": "FINANCIAL MANAGEMENT PROF COR FM 121",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o24",
+            "title_and_code": "BANKING AND FINANCIAL INSTITUTION PROF COR FM 122",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o25",
+            "title_and_code": "OPERATIONS MANAGEMENT (TQM) BME 141",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o26",
+            "title_and_code": "BUSINESS ETHICS GE 108",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o27",
+            "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o28",
+            "title_and_code": "ART APPRECIATION GE 110",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o29",
+            "title_and_code": "SPORTS PATHFIT 4",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o30",
+            "title_and_code": "INCOME TAXATION BUS CORE 4",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o31",
+            "title_and_code": "INVESTMENT AND PORTFOLIO MANAGEMENT PROF COR FM 123",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o32",
+            "title_and_code": "CAPITAL MARKET PROF COR FM 124",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o33",
+            "title_and_code": "PERSONAL FINANCE FM ELEC 131",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o34",
+            "title_and_code": "STRATEGIC MANAGEMENT BME 142",
+            "course": "BSBA-FM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o35",
+            "title_and_code": "STATISTICS GE 111",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o36",
+            "title_and_code": "LIFE AND WORKS OF RIZAL RZL",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o37",
+            "title_and_code": "HUMAN RESOURCE MANAGEMENT BUS CORE 115",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o38",
+            "title_and_code": "BUSINESS RESEARCH BUS CORE 116",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o39",
+            "title_and_code": "FINANCIAL ANALYSIS AND REPORTING PROF COR FM 125",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o40",
+            "title_and_code": "CUSTOMER SERVICE MANAGEMENT FM ELEC 132",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o41",
+            "title_and_code": "FRANCHISING FM ELEC 133",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o42",
+            "title_and_code": "COOPERATIVE MANAGEMENT FM ELEC 134",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o43",
+            "title_and_code": "CREDIT AND COLLECTION PROF COR FM 126",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o44",
+            "title_and_code": "MONETARY POLICY AND CENTRAL BANKING PROF COR FM 127",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o45",
+            "title_and_code": "SPECIAL TOPICS IN FINANCIAL MANGEMENT PROF COR FM 128",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o46",
+            "title_and_code": "BEHAVIORAL FINANCE FM ELEC 135",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o47",
+            "title_and_code": "TREASURY MANAGEMENT FM ELEC 136",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o48",
+            "title_and_code": "MUTUAL FUND FM ELEC 137",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o49",
+            "title_and_code": "PROJECT MANAGEMENT FM ELEC 138",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o50",
+            "title_and_code": "RESEARCH 1 THESIS 1",
+            "course": "BSBA-FM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o51",
+            "title_and_code": "INTERNATIONAL BUSINESS AND TRADE BUS CORE 117",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o52",
+            "title_and_code": "ENTREPRENEURIAL MANAGEMENT FM ELEC 139",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o53",
+            "title_and_code": "RISK MANAGEMENT FM ELEC 140",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o54",
+            "title_and_code": "INTRODUCTION TO COMPUTING COMP 103",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o55",
+            "title_and_code": "COMPUTER PROGRAMMING 1 COMP 104",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o56",
+            "title_and_code": "RESEARCH 2 THESIS 2",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_fm_o57",
+            "title_and_code": "INTERNSHIP INT",
+            "course": "BSBA-FM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 6,
+            "lec_hours": 6,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+},
+        {
+            "id": "bsba_hrdm_n1",
+            "title_and_code": "Understanding The Self GE 101",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n2",
+            "title_and_code": "Entrepreneurial Mind GE EL 101",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n3",
+            "title_and_code": "Human Resource Management MGT 1",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n4",
+            "title_and_code": "Philippine Literature GE EL 102",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n5",
+            "title_and_code": "Basic Microeconomics BUS CORE 111",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n6",
+            "title_and_code": "Physical Fitness PATHFIT 1",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n7",
+            "title_and_code": "National Service Training Program 1 NSTP 1",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n8",
+            "title_and_code": "Mathematics In Modern World GE 103",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n9",
+            "title_and_code": "Purposive Communication GE 104",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n10",
+            "title_and_code": "Ethics GE 108",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n11",
+            "title_and_code": "Business Law (Obligation And Contract) BUSCORE 112",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n12",
+            "title_and_code": "Personal Finance HRM ELEC 1",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n13",
+            "title_and_code": "Rhytmic Activities PATHFIT 2",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n14",
+            "title_and_code": "National Service Training Program 2 NSTP 2",
+            "course": "BSBA-HRDM",
+            "year_level": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n15",
+            "title_and_code": "Science, Technology, and Society GE 106",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n16",
+            "title_and_code": "The Contemporary World GE 107",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n17",
+            "title_and_code": "Administrative And Office Management HRM 1",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n18",
+            "title_and_code": "Labor Law And Legislation HRM 2",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n19",
+            "title_and_code": "Good Governance And Social Responsibility BUS CORE 113",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n20",
+            "title_and_code": "Operations Management BME 141",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n21",
+            "title_and_code": "Dual Sports And Games PATHFIT 3",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n22",
+            "title_and_code": "Readings On Philippine History GE 109",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n23",
+            "title_and_code": "Art Appreciation GE 110",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n24",
+            "title_and_code": "Income Taxation BUS CORE 114",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n25",
+            "title_and_code": "Advance Computer COMP 102",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n26",
+            "title_and_code": "Recruitment And Selection HRM 3",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n27",
+            "title_and_code": "Strategic Management BME 142",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n28",
+            "title_and_code": "Team Sports And Games PATHFIT 4",
+            "course": "BSBA-HRDM",
+            "year_level": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n29",
+            "title_and_code": "Statistics GE 111",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n30",
+            "title_and_code": "Life And Works Of Rizal RZL",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n31",
+            "title_and_code": "Environmental Science GE EL 104",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n32",
+            "title_and_code": "Marketing Management HRM ELEC 2",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n33",
+            "title_and_code": "Training And Development HRM 4",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n34",
+            "title_and_code": "Business Research BUS CORE 116",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n35",
+            "title_and_code": "Business English And Correspondence ENG 2",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n36",
+            "title_and_code": "Project Management HRM ELEC 3",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n37",
+            "title_and_code": "Compensation And Administration HRM 5",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n38",
+            "title_and_code": "Labor Relations And Negotiations HRM 6",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n39",
+            "title_and_code": "Special Topics In HRDM HRM 7",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n40",
+            "title_and_code": "Thesis Writing 1 THESIS 1",
+            "course": "BSBA-HRDM",
+            "year_level": 3,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+        {
+            "id": "bsba_hrdm_n41",
+            "title_and_code": "Organizational Development HRM 8",
+            "course": "BSBA-HRDM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n42",
+            "title_and_code": "International Business and Trade BUS CORE 117",
+            "course": "BSBA-HRDM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n43",
+            "title_and_code": "Entrepreneurial Management HRM ELEC 4",
+            "course": "BSBA-HRDM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n44",
+            "title_and_code": "Thesis Writing 2 THESIS 2",
+            "course": "BSBA-HRDM",
+            "year_level": 4,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 1
+        },
+        {
+            "id": "bsba_hrdm_n45",
+            "title_and_code": "INTERNSHIP INT",
+            "course": "BSBA-HRDM",
+            "year_level": 4,
+            "units": 6,
+            "lec_hours": 0,
+            "lab_hours": 6,
+            "is_major": 1,
+            "curriculum_type": "new",
+            "semester": 2
+        },
+            {"id": "bsba_hrdm_o1", "title_and_code": "UNDERSTANDING THE SELF GE 101", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o2", "title_and_code": "SINING NG PAKIKIPAGTALASTASAN GE 102", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o3", "title_and_code": "PRINCIPLES OF MANAGEMENT MGT 1", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o4", "title_and_code": "ENTREPRENEURIAL MIND GE EL 101", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o5", "title_and_code": "SOCIAL ARTS 1 SIBTECH 101", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o6", "title_and_code": "BASIC MICROECONOMICS BUS CORE 111", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o7", "title_and_code": "COMPUTER 1 COMP 101", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 2, "lab_hours": 1, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o8", "title_and_code": "MOVEMENT COMPETENCY TRAINING PATHFIT 1", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o9", "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 1 NSTP 1", "course": "BSBA-HRDM", "year_level": 1, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o10", "title_and_code": "MATHEMATICS IN MODERN WORLD GE 103", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o11", "title_and_code": "PURPOSIVE COMMUNICATION GE 104", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o12", "title_and_code": "BASIC FINANCE FIN 1", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o13", "title_and_code": "FUNDAMENTALS OF ACCOUNTING ACCTG 1", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o14", "title_and_code": "SOCIAL ARTS 2 SIBTECH 102", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o15", "title_and_code": "HUMAN BEHAVIOR IN ORGANIZATION MGT 2", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o16", "title_and_code": "ADVANCE COMPUTER COMP 102", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 2, "lab_hours": 1, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o17", "title_and_code": "EXERCISE-BASED FITNESS ACTIVITIES PATHFIT 2", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o18", "title_and_code": "NATIONAL SERVICE TRAINING PROGRAM 2 NSTP 2", "course": "BSBA-HRDM", "year_level": 1, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o19", "title_and_code": "SCIENCE, TECHNOLOGY AND SOCIETY GE 106", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o20", "title_and_code": "THE CONTEMPORARY WORLD GE 107", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o21", "title_and_code": "PHILIPPINE LITERATURE GE EL 102", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o22", "title_and_code": "INDIGENOUS CREATIVE ARTS GE EL 103", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o23", "title_and_code": "HUMAN RESOURCE MANAGEMENT MGT 3", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o24", "title_and_code": "ADMINISTRATIVE AND OFFICE MANAGEMENT HRDM 1", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o25", "title_and_code": "LABOR LAW AND LEGISLATION HRDM 2", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o26", "title_and_code": "GROUP EXERCISE (AEROBICS, YOGA, ETC.) PATHFIT 3", "course": "BSBA-HRDM", "year_level": 2, "semester": 1, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o27", "title_and_code": "BUSINESS ETHICS GE 108", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o28", "title_and_code": "READINGS ON PHILIPPINE HISTORY GE 109", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o29", "title_and_code": "ART APPRECIATION GE 110", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o30", "title_and_code": "RECRUITMENT AND SELECTION HRDM 3", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o31", "title_and_code": "INCOME TAXATION TAX 1", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o32", "title_and_code": "FINANCIAL ACCOUNTING ACCTG 2", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o33", "title_and_code": "PRINCIPLES OF MARKETING MKTG 1", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o34", "title_and_code": "SPORTS PATHFIT 4", "course": "BSBA-HRDM", "year_level": 2, "semester": 2, "units": 2, "lec_hours": 2, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o35", "title_and_code": "BUSINESS STATISTICS GE 111", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o36", "title_and_code": "LIFE AND WORKS OF RIZAL RZL", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o37", "title_and_code": "GENERAL PSYCHOLOGY PSYCHO", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o38", "title_and_code": "BASIC COMMUNICATION SKILLS ENG 1", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o39", "title_and_code": "TOTAL QUALITY MANAGEMENT MGT 4", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o40", "title_and_code": "MARKETING MANAGEMENT HRDM ELEC 1", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o41", "title_and_code": "TRAINING AND DEVELOPMENT HRDM 4", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o42", "title_and_code": "GOOD GOVERNANCE AND SOCIAL RESPONSIBILITY BUS CORE 113", "course": "BSBA-HRDM", "year_level": 3, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o43", "title_and_code": "PROJECT MANAGEMENT HRDM ELEC 2", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o44", "title_and_code": "GENDER AND SOCIETY GE EL 105", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o45", "title_and_code": "BUSINESS LAW (OBLIGATION AND CONTRACT) BUS CORE 112", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o46", "title_and_code": "BUSINESS ENGLISH AND CORRESPONDENCE ENG 2", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o47", "title_and_code": "SPECIAL TOPICS IN HRDM HRDM ELEC 3", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o48", "title_and_code": "COMPENSATION AND ADMINISTRATION HRDM 5", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o49", "title_and_code": "THESIS WRITING 1 THESIS 1", "course": "BSBA-HRDM", "year_level": 3, "semester": 2, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o50", "title_and_code": "STRATEGIC HUMAN RESOURCE MANAGEMENT HRDM 6", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o51", "title_and_code": "ORGANIZATION AND DEVELOPMENT HRDM 7", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o52", "title_and_code": "ENVIRONMENTAL SCIENCE GE EL 104", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 0, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o53", "title_and_code": "ENTREPRENEURIAL MANAGEMENT HRDM ELEC 4", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o54", "title_and_code": "OPERATIONS MANAGEMENT HRDM ELEC 5", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o55", "title_and_code": "THESIS WRITING 2 THESIS 2", "course": "BSBA-HRDM", "year_level": 4, "semester": 1, "units": 3, "lec_hours": 3, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+            {"id": "bsba_hrdm_o56", "title_and_code": "INTERNSHIP INT", "course": "BSBA-HRDM", "year_level": 4, "semester": 2, "units": 6, "lec_hours": 6, "lab_hours": 0, "is_major": 1, "curriculum_type": "old"},
+        {
+            "id": "crim_o1",
+            "title_and_code": "GE 101 Understanding The Self (General Psychology)",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o2",
+            "title_and_code": "GE 102 Sining ng Pakikipagtalastasan",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o3",
+            "title_and_code": "GE EL 101 Entrepreneurial Mind",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o4",
+            "title_and_code": "GE EL 103 Environmental Science",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o5",
+            "title_and_code": "GE EL 104 Gender and Society",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o6",
+            "title_and_code": "CRIM 111 Introduction to Criminology",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o7",
+            "title_and_code": "CLJ 121 Introduction to Philippine Criminal Justice",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o8",
+            "title_and_code": "NSTP 1 Reserve Officers' Training Corps 1",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o9",
+            "title_and_code": "PE 181 Fundamentals of Martial Arts",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o10",
+            "title_and_code": "GE 103 Mathematics in Modern World (Plane Trigonometry)",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o11",
+            "title_and_code": "GE 104 Purposive Communication",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o12",
+            "title_and_code": "GE 105 PAGBASA AT PAGSULAT SA IBAT-IBANG DISIPLINA",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o13",
+            "title_and_code": "CDI 131 Fundamentals of Investigation and Intelligence",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o14",
+            "title_and_code": "LEA 151 Law Enforcement Organization and Administration",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o15",
+            "title_and_code": "LEA 152 Comparative Models in Policing",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o16",
+            "title_and_code": "NSTP 2 Reserve Officers' Training Corps 2",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o17",
+            "title_and_code": "PE 182 Arnis and Disarming Technique",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o18",
+            "title_and_code": "EHC 171 ENHANCEMENT COURSE 1",
+            "course": "BSCRIM",
+            "year_level": 1,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o19",
+            "title_and_code": "GE 106 SCIENCE, TECHNOLOGY AND SOCIETY",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o20",
+            "title_and_code": "GE 107 THE CONTEMPORARY WORLD",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o21",
+            "title_and_code": "GE EL 102 PHILIPPINE LITERATURE",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o22",
+            "title_and_code": "FORENSIC 141 Forensic Photography",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o23",
+            "title_and_code": "CA 161 Institutional Corrections",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o24",
+            "title_and_code": "CFLM-1 Character Formation, Nationalism and Patriotism",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o25",
+            "title_and_code": "CRIM 112 Theories of Crime Causation",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o26",
+            "title_and_code": "CDI 132 Specialized Crime Investigation 1 with Legal Medicine",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o27",
+            "title_and_code": "PE 183 First Aid and Water Safety",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o28",
+            "title_and_code": "GE 108 ETHICS",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o29",
+            "title_and_code": "GE 109 READINGS ON PHILIPPINE HISTORY",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o30",
+            "title_and_code": "GE 110 ART APPRECIATION",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o31",
+            "title_and_code": "ADGE General Chemistry (Organic)",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o32",
+            "title_and_code": "FORENSIC 142 Personal Identification Techniques",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o33",
+            "title_and_code": "CRIM 113 Human Behavior and Victimology",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o34",
+            "title_and_code": "LEA 153 Introduction to Industrial Security Concepts",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o35",
+            "title_and_code": "PE 184 Fundamentals of Marksmanship",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o36",
+            "title_and_code": "EHC 172 ENHANCEMENT COURSE 2",
+            "course": "BSCRIM",
+            "year_level": 2,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o37",
+            "title_and_code": "RZL LIFE AND WORKS OF RIZAL",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 0,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o38",
+            "title_and_code": "CFLM-2 Character Formation with Leadership, Decision Making, Management and Administration",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o39",
+            "title_and_code": "CLJ 122 Human Rights Education",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o40",
+            "title_and_code": "CLJ 123 Criminal Law (Book 1)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o41",
+            "title_and_code": "FORENSIC 143 Forensic Chemistry and Toxicology",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 5,
+            "lec_hours": 3,
+            "lab_hours": 2,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o42",
+            "title_and_code": "CDI 133 Specialized Crime Investigation 2 with Simulation on Interrogation and Interview",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o43",
+            "title_and_code": "CDI 134 Traffic Management and Accident Investigation with Driving",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o44",
+            "title_and_code": "LEA 154 Law Enforcement Operations and Planning with Crime Mapping",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o45",
+            "title_and_code": "CA 162 Non-Institutional Corrections",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o46",
+            "title_and_code": "CLJ 124 Criminal Law (Book 2)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o47",
+            "title_and_code": "CRIM 114 Professional Conduct and Ethical Standards",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o48",
+            "title_and_code": "CRIM 115 Juvenile Delinquency and Juvenile Justice System",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 4,
+            "lec_hours": 4,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o49",
+            "title_and_code": "FORENSIC 114 Questioned Documents Examination",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o50",
+            "title_and_code": "FORENSIC 115 Lie Detection Techniques",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o51",
+            "title_and_code": "CDI 135 Technical English 1 (Technical Report Writing and Presentation)",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o52",
+            "title_and_code": "EHC 3 ENHANCEMENT COURSE 3",
+            "course": "BSCRIM",
+            "year_level": 3,
+            "semester": 2,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o53",
+            "title_and_code": "CA 163 Therapeutic Modalities",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 2,
+            "lec_hours": 2,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o54",
+            "title_and_code": "CLJ 125 Evidence",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o55",
+            "title_and_code": "CRIM 116 Dispute Resolution and Crises/Incidents Management",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o56",
+            "title_and_code": "CRIM 117 Criminological Research 1 (Research Methods with Applied Statistics)",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o57",
+            "title_and_code": "CDI 136 Fire Protection and Arson Investigation",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o58",
+            "title_and_code": "CDI 137 Vice and Drug Education and Control",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o59",
+            "title_and_code": "CP 191 Internship (On-the Job Training)",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 1,
+            "units": 3,
+            "lec_hours": 0,
+            "lab_hours": 3,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o60",
+            "title_and_code": "CLJ 126 Criminal Procedure and Court Testimony",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o61",
+            "title_and_code": "FORENSIC 146 Forensic Ballistics",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o62",
+            "title_and_code": "CRIM 118 Criminological Research 2 (Thesis Writing and Presentation)",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o63",
+            "title_and_code": "CDI 138 Technical English 2 (Legal Forms)",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 3,
+            "lab_hours": 0,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o64",
+            "title_and_code": "CDI 139 Introduction to Cybercrime and Environmental Laws and Protection",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 2,
+            "lab_hours": 1,
+            "is_major": 1,
+            "curriculum_type": "old"
+        },
+        {
+            "id": "crim_o65",
+            "title_and_code": "CP 192 Internship (On-the Job Training)",
+            "course": "BSCRIM",
+            "year_level": 4,
+            "semester": 2,
+            "units": 3,
+            "lec_hours": 0,
+            "lab_hours": 3,
+            "is_major": 1,
+            "curriculum_type": "old"
         }
-],
-    "sections": [
-        { "id": "sec_bsit_1a", "course": "BSIT", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsit_1b", "course": "BSIT", "year_level": 1, "section_name": "1B" },
-        { "id": "sec_bsit_2a", "course": "BSIT", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsit_2b", "course": "BSIT", "year_level": 2, "section_name": "2B" },
-        { "id": "sec_bsit_3a", "course": "BSIT", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsit_3b", "course": "BSIT", "year_level": 3, "section_name": "3B" },
-        { "id": "sec_bsit_4a", "course": "BSIT", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsit_4b", "course": "BSIT", "year_level": 4, "section_name": "4B" },
-        { "id": "sec_beed_1a", "course": "BEED", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_beed_2a", "course": "BEED", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_beed_3a", "course": "BEED", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_beed_4a", "course": "BEED", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsed_1a", "course": "BSED", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsed_2a", "course": "BSED", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsed_3a", "course": "BSED", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsed_4a", "course": "BSED", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsca_1a", "course": "BSCA", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsca_2a", "course": "BSCA", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsca_3a", "course": "BSCA", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsca_4a", "course": "BSCA", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bscrim_1a", "course": "BSCRIM", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bscrim_2a", "course": "BSCRIM", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bscrim_3a", "course": "BSCRIM", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bscrim_4a", "course": "BSCRIM", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bshm_1a", "course": "BSHM", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bshm_2a", "course": "BSHM", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bshm_3a", "course": "BSHM", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bshm_4a", "course": "BSHM", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsba_fm_1a", "course": "BSBA-FM", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsba_fm_2a", "course": "BSBA-FM", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsba_fm_3a", "course": "BSBA-FM", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsba_fm_4a", "course": "BSBA-FM", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsba_hrdm_1a", "course": "BSBA-HRDM", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsba_hrdm_2a", "course": "BSBA-HRDM", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsba_hrdm_3a", "course": "BSBA-HRDM", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsba_hrdm_4a", "course": "BSBA-HRDM", "year_level": 4, "section_name": "4A" },
-        { "id": "sec_bsba_mm_1a", "course": "BSBA-MM", "year_level": 1, "section_name": "1A" },
-        { "id": "sec_bsba_mm_2a", "course": "BSBA-MM", "year_level": 2, "section_name": "2A" },
-        { "id": "sec_bsba_mm_3a", "course": "BSBA-MM", "year_level": 3, "section_name": "3A" },
-        { "id": "sec_bsba_mm_4a", "course": "BSBA-MM", "year_level": 4, "section_name": "4A" }
     ],
     "schedules": [
         {
@@ -12345,22 +10588,16 @@ const demoData = {
             "day": "W",
             "time_start": "08:00",
             "time_end": "11:00",
-            "subject_id": "bsit_n1",
-            "course": "BSIT",
-            "year_level": 1,
-            "block_section": "1A"
+            "subject_id": "s1"
         },
         {
             "id": "sch2",
-            "instructor_id": "t2",
+            "instructor_id": "t1",
             "room_id": "r1",
-            "day": "M",
-            "time_start": "13:00",
-            "time_end": "16:00",
-            "subject_id": "bsit_n2",
-            "course": "BSIT",
-            "year_level": 1,
-            "block_section": "1A"
+            "day": "S",
+            "time_start": "12:00",
+            "time_end": "14:00",
+            "subject_id": "s2"
         },
         {
             "id": "sch3",
@@ -12454,20 +10691,15 @@ function calculateTeacherTotalUnits(teacherId) {
 
 // Load DB from MySQL with LocalStorage fallback
 async function loadDatabase() {
-  let loadedSuccessfully = false;
   try {
     const response = await fetch(`${API_URL}?action=get_all`);
     const result = await response.json();
-    if (result && result.status === 'success' && result.subjects && result.subjects.length > 0) {
+    if (result && result.status === 'success') {
       db.instructors = (result.instructors || []).map(i => ({
         ...i,
         max_units: parseInt(i.max_units, 10)
       }));
       db.rooms = result.rooms || [];
-      db.sections = (result.sections || []).map(sec => ({
-        ...sec,
-        year_level: parseInt(sec.year_level, 10)
-      }));
       db.subjects = (result.subjects || []).map(s => ({
         ...s,
         year_level: parseInt(s.year_level, 10),
@@ -12478,52 +10710,35 @@ async function loadDatabase() {
       }));
       db.schedules = result.schedules || [];
       
+      // Keep local storage copy updated for complete sync
       localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
       console.log("Database successfully synced with XAMPP MySQL backend.");
-      loadedSuccessfully = true;
+    } else {
+      throw new Error("API returned non-success status");
     }
   } catch (e) {
-    console.warn("Could not sync with MySQL database. Trying local storage fallback.", e);
-  }
-
-  if (!loadedSuccessfully) {
+    console.warn("Could not sync with MySQL database. Using offline local storage mode instead.", e);
     // Offline local storage fallback
     const saved = localStorage.getItem('sibt_scheduling_db');
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        if (parsed.subjects && parsed.subjects.length > 0) {
-          db = parsed;
-          db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
-          db.sections = (db.sections || demoData.sections || []).map(sec => ({
-            ...sec,
-            year_level: parseInt(sec.year_level, 10)
-          }));
-          db.subjects = (db.subjects || []).map(s => ({
-            ...s,
-            year_level: parseInt(s.year_level, 10),
-            units: parseInt(s.units, 10),
-            lec_hours: parseInt(s.lec_hours, 10),
-            lab_hours: parseInt(s.lab_hours, 10),
-            is_major: parseInt(s.is_major || 0, 10)
-          }));
-          loadedSuccessfully = true;
-        }
+        db = JSON.parse(saved);
+        // Ensure values are numbers in localstorage too
+        db.instructors = (db.instructors || []).map(i => ({ ...i, max_units: parseInt(i.max_units, 10) }));
+        db.subjects = (db.subjects || []).map(s => ({
+          ...s,
+          year_level: parseInt(s.year_level, 10),
+          units: parseInt(s.units, 10),
+          lec_hours: parseInt(s.lec_hours, 10),
+          lab_hours: parseInt(s.lab_hours, 10),
+          is_major: parseInt(s.is_major || 0, 10)
+        }));
       } catch (parseErr) {
-        console.warn("Error parsing local storage DB:", parseErr);
+        db = JSON.parse(JSON.stringify(demoData));
       }
+    } else {
+      db = JSON.parse(JSON.stringify(demoData));
     }
-  }
-
-  // Ensure db.sections is initialized
-  if (!db.sections || db.sections.length === 0) {
-    db.sections = JSON.parse(JSON.stringify(demoData.sections || []));
-  }
-
-  // Final fallback: Seed demoData if still empty
-  if (!db.subjects || db.subjects.length === 0) {
-    db = JSON.parse(JSON.stringify(demoData));
-    localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
   }
 
   updateStats();
@@ -12570,27 +10785,27 @@ function parseTimeToMinutes(timeStr) {
   return hrs * 60 + mins;
 }
 
+// Day Overlap check
+function daysOverlap(day1, day2) {
+  if (day1 === day2) return true;
+  if (day1 === 'MT' && (day2 === 'M' || day2 === 'T')) return true;
+  if (day2 === 'MT' && (day1 === 'M' || day1 === 'T')) return true;
+  if (day1 === 'TTH' && (day2 === 'T' || day2 === 'TH')) return true;
+  if (day2 === 'TTH' && (day1 === 'T' || day1 === 'TH')) return true;
+  if (day1 === 'MWF' && (day2 === 'M' || day2 === 'W' || day2 === 'F')) return true;
+  if (day2 === 'MWF' && (day1 === 'M' || day1 === 'W' || day1 === 'F')) return true;
+  if (day1 === 'Monday-Friday' || day2 === 'Monday-Friday') return true;
+  return false;
+}
+
 // Get constituent single days from a composite day code
 function getConstituentDays(dayStr) {
   if (!dayStr) return [];
   if (dayStr === 'MT') return ['M', 'T'];
-  if (dayStr === 'MW') return ['M', 'W'];
-  if (dayStr === 'MF') return ['M', 'F'];
-  if (dayStr === 'TF') return ['T', 'F'];
-  if (dayStr === 'WF') return ['W', 'F'];
   if (dayStr === 'TTH') return ['T', 'TH'];
   if (dayStr === 'MWF') return ['M', 'W', 'F'];
   if (dayStr === 'Monday-Friday') return ['M', 'T', 'W', 'TH', 'F'];
   return [dayStr]; // e.g. M, T, W, TH, F, S
-}
-
-// Day Overlap check via set intersection of constituent days
-function daysOverlap(day1, day2) {
-  if (!day1 || !day2) return false;
-  if (day1 === day2) return true;
-  const days1 = getConstituentDays(day1);
-  const days2 = getConstituentDays(day2);
-  return days1.some(d => days2.includes(d));
 }
 
 // Check if a room name is designated for high school (205-208, or HS101-HS110)
@@ -12631,7 +10846,6 @@ function isComputerSubject(subject) {
   const normalizeStr = str => str.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
   const targetTitles = [
-    'COMPUTER PROGRAMMING 1',
     'COMPUTER PROGRAMMING 1',
     'INFORMATION TECHNOLOGY FUNDAMENTALS',
     'IT FUNDAMENTALS',
@@ -12702,7 +10916,7 @@ function isCriminologySubject(subject) {
 
   if (exactCrimLabCodes.some(c => normCode.includes(normalizeStr(c)) || normTitle.includes(normalizeStr(c)))) return true;
 
-  if (course === 'BSCRIM' && (subject.lab_hours > 0 || normCode.startsWith('FORENSIC'))) return true;
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || normCode.startsWith('FORENSIC') || normCode.startsWith('CDI') || normCode.startsWith('LEA') || normCode.startsWith('CRIM') || normCode.startsWith('CLJ'))) return true;
 
   return false;
 }
@@ -13036,24 +11250,9 @@ function checkRealtimeConflict() {
 
 // Tab Switching Routing Function
 function switchTab(tabName) {
-  const pageMap = {
-    'board': 'board.html',
-    'manual': 'input.html',
-    'input': 'input.html',
-    'auto': 'auto.html',
-    'manage': 'manage.html',
-    'print': 'print.html'
-  };
-
-  const panel = document.getElementById(`panel-${tabName}`);
-  if (!panel && pageMap[tabName]) {
-    window.location.href = pageMap[tabName];
-    return;
-  }
-
   // Hide all panels
-  document.querySelectorAll('.tab-panel').forEach(p => {
-    p.classList.add('d-none');
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.add('d-none');
   });
   // Un-active all nav items
   document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
@@ -13061,6 +11260,7 @@ function switchTab(tabName) {
   });
 
   // Show active panel
+  const panel = document.getElementById(`panel-${tabName}`);
   if (panel) panel.classList.remove('d-none');
 
   // Highlight active link
@@ -13071,14 +11271,14 @@ function switchTab(tabName) {
   if (tabName === 'print') {
     populatePrintTeachers();
     renderOfficialPrintout();
-  } else if (tabName === 'manual' || tabName === 'input') {
+  } else if (tabName === 'manual') {
     populateFormSelects();
     checkRealtimeConflict();
   }
 }
 
 // Switch between settings manage tables
-function switchManageSubTab(subTab, el) {
+function switchManageSubTab(subTab) {
   document.querySelectorAll('.manage-panel').forEach(panel => {
     panel.classList.add('d-none');
   });
@@ -13088,22 +11288,7 @@ function switchManageSubTab(subTab, el) {
   document.querySelectorAll('#manageSubTabs .list-group-item').forEach(btn => {
     btn.classList.remove('active');
   });
-  if (el) {
-    el.classList.add('active');
-  } else if (window.event && window.event.target) {
-    const target = window.event.target.closest('.list-group-item');
-    if (target) target.classList.add('active');
-  }
-
-  if (subTab === 'teachers') {
-    renderInstructorsTable();
-  } else if (subTab === 'subjects') {
-    renderSubjectsTable();
-  } else if (subTab === 'rooms') {
-    renderRoomsTable();
-  } else if (subTab === 'sections') {
-    renderSectionsTable();
-  }
+  event.target.classList.add('active');
 }
 
 // Generate unique ID
@@ -13155,16 +11340,10 @@ function showToast(message, type = "success") {
 
 // Core DB Stats Display
 function updateStats() {
-  const instEl = document.getElementById('stat-instructors');
-  if (instEl) instEl.innerText = db.instructors.length;
-  const subjEl = document.getElementById('stat-subjects');
-  if (subjEl) subjEl.innerText = db.subjects.length;
-  const roomEl = document.getElementById('stat-rooms');
-  if (roomEl) roomEl.innerText = db.rooms.length;
-  const secEl = document.getElementById('stat-sections');
-  if (secEl) secEl.innerText = (db.sections || []).length;
-  const schEl = document.getElementById('stat-schedules');
-  if (schEl) schEl.innerText = db.schedules.length;
+  document.getElementById('stat-instructors').innerText = db.instructors.length;
+  document.getElementById('stat-subjects').innerText = db.subjects.length;
+  document.getElementById('stat-rooms').innerText = db.rooms.length;
+  document.getElementById('stat-schedules').innerText = db.schedules.length;
 }
 
 // Populate Dropdowns dynamically
@@ -13188,12 +11367,10 @@ function populateFormSelects() {
 
   // Room selector
   const roomSel = document.getElementById('input-room');
-  if (roomSel) {
-    roomSel.innerHTML = '<option value="">Select Room...</option>';
-    db.rooms.forEach(r => {
-      roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
-    });
-  }
+  roomSel.innerHTML = '<option value="">Select Room...</option>';
+  db.rooms.forEach(r => {
+    roomSel.innerHTML += `<option value="${r.id}">${r.name} (${r.room_type})</option>`;
+  });
 
   // Subject selector (decoupled unique subject title list)
   const subSel = document.getElementById('input-subject');
@@ -13211,32 +11388,26 @@ function populateFormSelects() {
 
   // Filters selectors on the schedule board page
   const filterTeacher = document.getElementById('filter-teacher');
-  if (filterTeacher) {
-    filterTeacher.innerHTML = '<option value="">All Teachers</option>';
-    db.instructors.forEach(t => {
-      filterTeacher.innerHTML += `<option value="${t.id}">${t.name}</option>`;
-    });
-  }
+  filterTeacher.innerHTML = '<option value="">All Teachers</option>';
+  db.instructors.forEach(t => {
+    filterTeacher.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+  });
 
   // Course Selector filter
   const filterCourse = document.getElementById('filter-course');
-  if (filterCourse) {
-    filterCourse.innerHTML = '<option value="">All Courses</option>';
-    const courses = [...new Set(db.subjects.map(s => s.course))];
-    courses.forEach(c => {
-      filterCourse.innerHTML += `<option value="${c}">${c}</option>`;
-    });
-  }
+  filterCourse.innerHTML = '<option value="">All Courses</option>';
+  const courses = [...new Set(db.subjects.map(s => s.course))];
+  courses.forEach(c => {
+    filterCourse.innerHTML += `<option value="${c}">${c}</option>`;
+  });
 
   // Blocks filter
   const filterBlock = document.getElementById('filter-block');
-  if (filterBlock) {
-    filterBlock.innerHTML = '<option value="">All Blocks</option>';
-    const blocks = [...new Set(db.subjects.map(s => s.block_section).filter(Boolean))];
-    blocks.forEach(b => {
-      filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
-    });
-  }
+  filterBlock.innerHTML = '<option value="">All Blocks</option>';
+  const blocks = [...new Set(db.subjects.map(s => s.block_section).filter(Boolean))];
+  blocks.forEach(b => {
+    filterBlock.innerHTML += `<option value="${b}">${b}</option>`;
+  });
 
   // Subject filter
   const filterSubject = document.getElementById('filter-subject');
@@ -13391,15 +11562,10 @@ function populatePrintTeachers() {
 // Update UI view renderings
 function renderAllViews() {
   populateFormSelects();
-  populatePrintTeachers();
   renderSchedulesTable();
   renderInstructorsTable();
   renderSubjectsTable();
   renderRoomsTable();
-  renderSectionsTable();
-  if (document.getElementById('print-teacher-select')) {
-    renderOfficialPrintout();
-  }
 }
 
 // RENDER SCHEDULE RECORDS TABLE (With Custom Filter Logic)
@@ -13430,24 +11596,6 @@ function resetFilters() {
   renderSchedulesTable();
 }
 
-function autoSaveSchedule(id, field, value) {
-  const sch = db.schedules.find(s => s.id === id);
-  if (!sch) return;
-
-  sch[field] = value;
-
-  // Run validation check
-  const validation = validateSchedule(sch);
-  if (!validation.valid) {
-    showToast(`Warning: Schedule conflict detected: ${validation.errors.join(', ')}`, "warning");
-  } else {
-    showToast("Schedule updated successfully!", "info");
-  }
-
-  saveDatabase();
-  renderSchedulesTable();
-}
-
 function renderSchedulesTable() {
   const listEl = document.getElementById('scheduleList');
   if (!listEl) return;
@@ -13462,37 +11610,30 @@ function renderSchedulesTable() {
   let filtered = db.schedules.filter(sch => {
     const t = db.instructors.find(i => i.id === sch.instructor_id);
     const sub = db.subjects.find(s => s.id === sch.subject_id);
-
-    const schCourse = sch.course || (sub ? sub.course : '');
-    const schYear = sch.year_level || (sub ? sub.year_level : 0);
-    const schBlock = sch.block_section || (sub ? sub.block_section : '');
     
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
     if (activeFilters.subject && (!sub || sub.title_and_code !== activeFilters.subject)) return false;
-    if (activeFilters.course && schCourse !== activeFilters.course) return false;
-    if (activeFilters.year && schYear !== parseInt(activeFilters.year, 10)) return false;
-    if (activeFilters.block && schBlock !== activeFilters.block && !schBlock.endsWith(activeFilters.block)) return false;
-
+    if (sub) {
+      if (activeFilters.course && sub.course !== activeFilters.course) return false;
+      if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
+      if (activeFilters.block && (sub.block_section || '') !== activeFilters.block) return false;
+    }
     return true;
   });
 
-  const countBadgeEl = document.getElementById('filtered-count');
-  if (countBadgeEl) countBadgeEl.innerText = `Showing ${filtered.length} records`;
-
-  const noSchedEl = document.getElementById('noSchedulesMsg');
-  const tableEl = document.getElementById('scheduleTable');
+  document.getElementById('filtered-count').innerText = `Showing ${filtered.length} records`;
 
   if (filtered.length === 0) {
-    if (noSchedEl) noSchedEl.style.display = 'block';
-    if (tableEl) tableEl.style.display = 'none';
+    document.getElementById('noSchedulesMsg').style.display = 'block';
+    document.getElementById('scheduleTable').style.display = 'none';
     return;
   }
 
-  if (noSchedEl) noSchedEl.style.display = 'none';
-  if (tableEl) tableEl.style.display = 'table';
+  document.getElementById('noSchedulesMsg').style.display = 'none';
+  document.getElementById('scheduleTable').style.display = 'table';
 
   // Sort by day, time start
-  const dayOrder = { "M": 1, "T": 2, "W": 3, "TH": 4, "F": 5, "S": 6, "MT": 1.5, "MW": 1.6, "MF": 1.7, "TF": 2.2, "WF": 3.5, "TTH": 2.5, "MWF": 1.2, "Monday-Friday": 0.5 };
+  const dayOrder = { "M": 1, "T": 2, "W": 3, "TH": 4, "F": 5, "S": 6, "MT": 1.5, "TTH": 2.5, "MWF": 1.2, "Monday-Friday": 0.5 };
   filtered.sort((a, b) => {
     const dayDiff = (dayOrder[a.day] || 9) - (dayOrder[b.day] || 9);
     if (dayDiff !== 0) return dayDiff;
@@ -13511,74 +11652,47 @@ function renderSchedulesTable() {
   const startIdx = (schedulesCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = filtered.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
-  const standardDaysList = ['M', 'T', 'W', 'TH', 'F', 'S', 'MT', 'MW', 'MF', 'TF', 'WF', 'TTH', 'MWF', 'Monday-Friday'];
-
   pagedItems.forEach(sch => {
     const teacher = db.instructors.find(t => t.id === sch.instructor_id);
     const room = db.rooms.find(r => r.id === sch.room_id);
     const subject = db.subjects.find(s => s.id === sch.subject_id);
 
+    const tName = teacher ? teacher.name : 'Unknown';
+    const rName = room ? room.name : 'Unknown';
     const subTitle = subject ? subject.title_and_code : 'Unknown';
-    const course = sch.course || (subject ? subject.course : '-');
-    const year = sch.year_level || (subject ? subject.year_level : '-');
-    const rawBlock = sch.block_section || (subject && subject.block_section ? subject.block_section : '');
-    const currentBlockName = rawBlock ? (rawBlock.includes(course) ? rawBlock.replace(course, '').trim() : rawBlock) : '';
-
-    const sectionOptions = (db.sections || [])
-      .filter(sec => !course || course === '-' || sec.course === course)
-      .map(sec => `<option value="${sec.section_name}" ${currentBlockName === sec.section_name ? 'selected' : ''}>${sec.course} ${sec.section_name}</option>`)
-      .join('');
-
-    const sectionSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold" style="min-width: 90px;" onchange="autoSaveSchedule('${sch.id}', 'block_section', this.value)">
-        <option value="" ${!currentBlockName ? 'selected' : ''}>- None -</option>
-        ${sectionOptions}
-      </select>
-    `;
-
+    const course = subject ? subject.course : '-';
+    const year = subject ? subject.year_level : '-';
+    const block = (subject && subject.block_section) ? subject.block_section : '-';
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
-    const teacherSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold ${!sch.instructor_id ? 'text-danger' : 'text-dark'}" onchange="autoSaveSchedule('${sch.id}', 'instructor_id', this.value)" style="min-width: 160px;">
-        <option value="" ${!sch.instructor_id ? 'selected' : ''}>-- Unassigned (Blank) --</option>
-        ${db.instructors.map(i => `<option value="${i.id}" ${sch.instructor_id === i.id ? 'selected' : ''}>${i.name}</option>`).join('')}
-      </select>
-    `;
-
-    const roomSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveSchedule('${sch.id}', 'room_id', this.value)">
-        ${db.rooms.map(r => `<option value="${r.id}" ${sch.room_id === r.id ? 'selected' : ''}>${r.name}</option>`).join('')}
-      </select>
-    `;
-
-    const daySelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold text-primary" onchange="autoSaveSchedule('${sch.id}', 'day', this.value)">
-        ${standardDaysList.map(d => `<option value="${d}" ${sch.day === d ? 'selected' : ''}>${d}</option>`).join('')}
-      </select>
-    `;
-
-    const subjectSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field text-wrap small text-muted" style="max-width: 220px;" onchange="autoSaveSchedule('${sch.id}', 'subject_id', this.value)">
-        ${db.subjects.map(s => `<option value="${s.id}" ${sch.subject_id === s.id ? 'selected' : ''}>${s.title_and_code} (${s.course})</option>`).join('')}
-      </select>
-    `;
+    // Standard 12 hour formatting for rendering
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '-';
+      const [hrs, mins] = timeStr.split(':').map(Number);
+      const ampm = hrs >= 12 ? 'PM' : 'AM';
+      const formattedHrs = hrs % 12 || 12;
+      return `${formattedHrs}:${String(mins).padStart(2, '0')} ${ampm}`;
+    };
 
     listEl.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-schedules" value="${sch.id}" onchange="toggleItemSelection('schedules', '${sch.id}', this.checked)"></td>
-        <td>${teacherSelect}</td>
-        <td>${roomSelect}</td>
-        <td>${daySelect}</td>
-        <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_start}" onchange="autoSaveSchedule('${sch.id}', 'time_start', this.value)"></td>
-        <td><input type="time" class="form-control form-control-sm border-0 bg-transparent editable-field px-1" value="${sch.time_end}" onchange="autoSaveSchedule('${sch.id}', 'time_end', this.value)"></td>
+        <td class="fw-bold text-dark">${tName}</td>
+        <td><span class="badge bg-secondary py-1 px-2">${rName}</span></td>
+        <td class="fw-bold text-primary">${sch.day}</td>
+        <td>${formatTime(sch.time_start)}</td>
+        <td>${formatTime(sch.time_end)}</td>
         <td class="text-center">${year}</td>
-        <td>${sectionSelect}</td>
-        <td>${subjectSelect}</td>
+        <td>${course} ${block}</td>
+        <td class="text-wrap small text-muted" style="max-width: 200px;">${subTitle}</td>
         <td>${course}</td>
         <td class="text-center fw-medium">${lec}</td>
         <td class="text-center fw-medium">${lab}</td>
         <td class="text-end">
+          <button class="btn btn-outline-info btn-xs py-0 px-1 me-1" onclick="editSchedule('${sch.id}')" title="Edit Schedule">
+            <i class="bi bi-pencil-square"></i>
+          </button>
           <button class="btn btn-outline-danger btn-xs py-0 px-1" onclick="deleteSchedule('${sch.id}')" title="Delete Schedule">
             <i class="bi bi-trash-fill"></i>
           </button>
@@ -13586,183 +11700,6 @@ function renderSchedulesTable() {
       </tr>
     `;
   });
-}
-
-// RENDER SECTIONS TABLE
-function renderSectionsTable() {
-  const table = document.getElementById('sectionsListTable');
-  if (!table) return;
-  table.innerHTML = '';
-
-  selectedSectionIds.clear();
-  const checkAll = document.getElementById('check-all-sections');
-  if (checkAll) checkAll.checked = false;
-  updateBulkDeleteUI('sections');
-
-  sectionsCurrentPage = renderPaginationControls(
-    (db.sections || []).length,
-    sectionsCurrentPage,
-    GENERAL_PAGE_SIZE,
-    'sections-pagination',
-    'sections-page-info',
-    'changeSectionsPage'
-  );
-  const startIdx = (sectionsCurrentPage - 1) * GENERAL_PAGE_SIZE;
-  const pagedItems = (db.sections || []).slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
-
-  const courses = ['BSIT', 'BEED', 'BSED', 'BSCA', 'BSCRIM', 'BSHM', 'BSBA-FM', 'BSBA-HRDM', 'BSBA-MM'];
-
-  pagedItems.forEach(sec => {
-    const courseSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-bold" onchange="autoSaveSection('${sec.id}', 'course', this.value)">
-        ${courses.map(c => `<option value="${c}" ${sec.course === c ? 'selected' : ''}>${c}</option>`).join('')}
-      </select>
-    `;
-
-    const yearSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field text-center fw-bold" onchange="autoSaveSection('${sec.id}', 'year_level', this.value)">
-        <option value="1" ${sec.year_level === 1 ? 'selected' : ''}>1st Year</option>
-        <option value="2" ${sec.year_level === 2 ? 'selected' : ''}>2nd Year</option>
-        <option value="3" ${sec.year_level === 3 ? 'selected' : ''}>3rd Year</option>
-        <option value="4" ${sec.year_level === 4 ? 'selected' : ''}>4th Year</option>
-      </select>
-    `;
-
-    table.innerHTML += `
-      <tr>
-        <td><input type="checkbox" class="form-check-input chk-bulk-sections" value="${sec.id}" onchange="toggleItemSelection('sections', '${sec.id}', this.checked)"></td>
-        <td>${courseSelect}</td>
-        <td>${yearSelect}</td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${sec.section_name || ''}" onchange="autoSaveSection('${sec.id}', 'section_name', this.value)"></td>
-        <td class="text-end">
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSection('${sec.id}')" title="Delete Section">
-            <i class="bi bi-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-}
-
-function autoSaveSection(id, field, value) {
-  const sec = (db.sections || []).find(s => s.id === id);
-  if (!sec) return;
-
-  if (field === 'year_level') {
-    sec.year_level = parseInt(value, 10) || 1;
-  } else {
-    sec[field] = value;
-  }
-
-  saveDatabase();
-  showToast("Section updated successfully!");
-}
-
-function saveSection(e) {
-  if (e) e.preventDefault();
-  const id = document.getElementById('section-id') ? document.getElementById('section-id').value : '';
-  const course = document.getElementById('section-course-val') ? document.getElementById('section-course-val').value : 'BSIT';
-  const year_level = document.getElementById('section-year-val') ? parseInt(document.getElementById('section-year-val').value, 10) : 1;
-  const section_name = document.getElementById('section-name-val') ? document.getElementById('section-name-val').value.trim() : '';
-
-  if (!section_name) {
-    showToast("Please enter a section name.", "danger");
-    return;
-  }
-
-  if (id) {
-    const sec = (db.sections || []).find(s => s.id === id);
-    if (sec) {
-      sec.course = course;
-      sec.year_level = year_level;
-      sec.section_name = section_name;
-    }
-  } else {
-    const newSec = {
-      id: 'sec_' + uniqueId(),
-      course,
-      year_level,
-      section_name
-    };
-    if (!db.sections) db.sections = [];
-    db.sections.push(newSec);
-  }
-
-  saveDatabase();
-  clearSectionForm();
-  showToast("Section saved successfully!");
-}
-
-function deleteSection(id) {
-  if (confirm("Are you sure you want to delete this section?")) {
-    db.sections = (db.sections || []).filter(s => s.id !== id);
-    saveDatabase();
-    showToast("Section deleted successfully!", "danger");
-  }
-}
-
-function clearSectionForm() {
-  const form = document.getElementById('sectionForm');
-  if (form) form.reset();
-  if (document.getElementById('section-id')) document.getElementById('section-id').value = "";
-}
-
-function bulkDeleteSections() {
-  if (selectedSectionIds.size === 0) return;
-  if (confirm(`Are you sure you want to delete ${selectedSectionIds.size} selected section(s)?`)) {
-    db.sections = (db.sections || []).filter(s => !selectedSectionIds.has(s.id));
-    selectedSectionIds.clear();
-    saveDatabase();
-    showToast("Selected sections deleted successfully!", "danger");
-  }
-}
-
-// AUTO-SAVE HELPERS FOR MANAGE DATA INLINE EDITING
-function autoSaveInstructor(id, field, value) {
-  const teacher = db.instructors.find(i => i.id === id);
-  if (!teacher) return;
-
-  if (field === 'max_units') {
-    teacher.max_units = parseFloat(value) || 0;
-  } else if (field === 'designation') {
-    teacher.designation = value;
-    teacher.max_units = getWorkloadLimitByDesignation(value);
-    renderInstructorsTable();
-  } else {
-    teacher[field] = value;
-  }
-
-  saveDatabase();
-  showToast(`Auto-saved instructor "${teacher.name}"`, "info");
-}
-
-function autoSaveSubject(id, field, value) {
-  const sub = db.subjects.find(s => s.id === id);
-  if (!sub) return;
-
-  if (field === 'units' || field === 'lec_hours' || field === 'lab_hours' || field === 'year_level' || field === 'semester') {
-    sub[field] = parseFloat(value) || 0;
-  } else if (field === 'is_major') {
-    sub.is_major = parseInt(value, 10);
-    renderSubjectsTable();
-  } else if (field === 'course') {
-    sub.course = value;
-    renderSubjectsTable();
-  } else {
-    sub[field] = value;
-  }
-
-  saveDatabase();
-  showToast(`Auto-saved subject "${sub.title_and_code}"`, "info");
-}
-
-function autoSaveRoom(id, field, value) {
-  const room = db.rooms.find(r => r.id === id);
-  if (!room) return;
-
-  room[field] = value;
-  saveDatabase();
-  showToast(`Auto-saved room "${room.name}"`, "info");
 }
 
 // RENDER INSTRUCTORS TABLE
@@ -13787,35 +11724,21 @@ function renderInstructorsTable() {
   const startIdx = (instructorsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.instructors.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
-  const desigOptions = [
-    'Licensed Teacher',
-    'Regular Teacher',
-    'Program Head',
-    'Director',
-    'Part-time Teacher',
-    'Admin'
-  ];
-
   pagedItems.forEach(t => {
-    const desigSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveInstructor('${t.id}', 'designation', this.value)">
-        ${desigOptions.map(d => `<option value="${d}" ${t.designation === d ? 'selected' : ''}>${d}</option>`).join('')}
-      </select>
-    `;
-
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-teachers" value="${t.id}" onchange="toggleItemSelection('teachers', '${t.id}', this.checked)"></td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${t.name || ''}" onchange="autoSaveInstructor('${t.id}', 'name', this.value)"></td>
-        <td>${desigSelect}</td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.degree || ''}" onchange="autoSaveInstructor('${t.id}', 'degree', this.value)" placeholder="Degree"></td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.area || ''}" onchange="autoSaveInstructor('${t.id}', 'area', this.value)" placeholder="Department/Area"></td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent editable-field" value="${t.employee_no || ''}" onchange="autoSaveInstructor('${t.id}', 'employee_no', this.value)" placeholder="Emp #"></td>
-        <td class="text-center">
-          <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center fw-bold text-primary editable-field mx-auto" style="width: 60px;" value="${t.max_units}" onchange="autoSaveInstructor('${t.id}', 'max_units', this.value)">
-        </td>
+        <td class="fw-bold">${t.name}</td>
+        <td><span class="badge bg-light text-dark border">${t.designation}</span></td>
+        <td>${t.degree || '-'}</td>
+        <td>${t.area || '-'}</td>
+        <td>${t.employee_no || '-'}</td>
+        <td class="text-center fw-semibold text-primary">${t.max_units}</td>
         <td class="text-end">
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteTeacher('${t.id}')" title="Delete Instructor">
+          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editTeacher('${t.id}')">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteTeacher('${t.id}')">
             <i class="bi bi-trash"></i>
           </button>
         </td>
@@ -13846,50 +11769,25 @@ function renderSubjectsTable() {
   const startIdx = (subjectsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.subjects.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
-  const courseOptions = ['BSIT', 'BEED', 'BSED', 'BSCA', 'BSCRIM', 'BSHM', 'BSBA-FM', 'BSBA-HRDM', 'BSBA-MM'];
-
   pagedItems.forEach(s => {
-    const courseSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveSubject('${s.id}', 'course', this.value)">
-        ${courseOptions.map(c => `<option value="${c}" ${s.course === c ? 'selected' : ''}>${c}</option>`).join('')}
-      </select>
-    `;
-
-    const majorSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold ${s.is_major ? 'text-danger' : 'text-secondary'}" onchange="autoSaveSubject('${s.id}', 'is_major', this.value)">
-        <option value="1" ${s.is_major ? 'selected' : ''}>Major</option>
-        <option value="0" ${!s.is_major ? 'selected' : ''}>General</option>
-      </select>
-    `;
-
-    const yearSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field" onchange="autoSaveSubject('${s.id}', 'year_level', this.value)">
-        <option value="1" ${s.year_level == 1 ? 'selected' : ''}>Year 1</option>
-        <option value="2" ${s.year_level == 2 ? 'selected' : ''}>Year 2</option>
-        <option value="3" ${s.year_level == 3 ? 'selected' : ''}>Year 3</option>
-        <option value="4" ${s.year_level == 4 ? 'selected' : ''}>Year 4</option>
-      </select>
-    `;
+    const typeBadge = s.is_major
+      ? '<span class="badge bg-danger">Major</span>'
+      : '<span class="badge bg-secondary">General</span>';
 
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-subjects" value="${s.id}" onchange="toggleItemSelection('subjects', '${s.id}', this.checked)"></td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold text-dark editable-field" value="${s.title_and_code || ''}" onchange="autoSaveSubject('${s.id}', 'title_and_code', this.value)"></td>
-        <td>${courseSelect}</td>
-        <td>${majorSelect}</td>
-        <td>${yearSelect}</td>
-        <td class="text-center">
-          <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center fw-bold text-primary editable-field mx-auto" style="width: 55px;" value="${s.units}" onchange="autoSaveSubject('${s.id}', 'units', this.value)">
-        </td>
-        <td class="text-center">
-          <div class="d-flex align-items-center justify-content-center gap-1">
-            <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center editable-field" style="width: 45px;" value="${s.lec_hours}" onchange="autoSaveSubject('${s.id}', 'lec_hours', this.value)" title="Lecture Hours">
-            <span>/</span>
-            <input type="number" class="form-control form-control-sm border-0 bg-transparent text-center editable-field" style="width: 45px;" value="${s.lab_hours}" onchange="autoSaveSubject('${s.id}', 'lab_hours', this.value)" title="Lab Hours">
-          </div>
-        </td>
+        <td class="fw-bold text-dark">${s.title_and_code}</td>
+        <td>${s.course}</td>
+        <td>${typeBadge}</td>
+        <td>${s.year_level} Year</td>
+        <td class="text-center fw-bold text-primary">${s.units}</td>
+        <td class="text-center">${s.lec_hours} / ${s.lab_hours}</td>
         <td class="text-end">
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSubject('${s.id}')" title="Delete Subject">
+          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editSubject('${s.id}')">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteSubject('${s.id}')">
             <i class="bi bi-trash"></i>
           </button>
         </td>
@@ -13920,22 +11818,21 @@ function renderRoomsTable() {
   const startIdx = (roomsCurrentPage - 1) * GENERAL_PAGE_SIZE;
   const pagedItems = db.rooms.slice(startIdx, startIdx + GENERAL_PAGE_SIZE);
 
-  const roomTypes = ['Lecture', 'Laboratory', 'Special Room'];
-
   pagedItems.forEach(r => {
-    const typeSelect = `
-      <select class="form-select form-select-sm border-0 bg-transparent editable-field fw-semibold" onchange="autoSaveRoom('${r.id}', 'room_type', this.value)">
-        ${roomTypes.map(rt => `<option value="${rt}" ${r.room_type === rt ? 'selected' : ''}>${rt}</option>`).join('')}
-      </select>
-    `;
-
     table.innerHTML += `
       <tr>
         <td><input type="checkbox" class="form-check-input chk-bulk-rooms" value="${r.id}" onchange="toggleItemSelection('rooms', '${r.id}', this.checked)"></td>
-        <td><input type="text" class="form-control form-control-sm border-0 bg-transparent fw-bold editable-field" value="${r.name || ''}" onchange="autoSaveRoom('${r.id}', 'name', this.value)"></td>
-        <td>${typeSelect}</td>
+        <td class="fw-bold">${r.name}</td>
+        <td>
+          <span class="badge ${r.room_type === 'Laboratory' ? 'bg-primary' : r.room_type === 'Lecture' ? 'bg-success' : 'bg-warning'} text-white">
+            ${r.room_type}
+          </span>
+        </td>
         <td class="text-end">
-          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteRoom('${r.id}')" title="Delete Room">
+          <button class="btn btn-outline-dark btn-sm py-1 px-2 me-1" onclick="editRoom('${r.id}')">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm py-1 px-2" onclick="deleteRoom('${r.id}')">
             <i class="bi bi-trash"></i>
           </button>
         </td>
@@ -13947,10 +11844,8 @@ function renderRoomsTable() {
 // --- FORM ADD / EDIT / DELETE ACTIONS ---
 
 // SCHEDULE
-const schedFormEl = document.getElementById('scheduleForm');
-if (schedFormEl) {
-  schedFormEl.addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+  e.preventDefault();
   
   const id = document.getElementById('edit-id').value;
   const instructor_id = document.getElementById('input-teacher').value;
@@ -14000,8 +11895,7 @@ if (schedFormEl) {
   saveDatabase();
   clearForm();
   switchTab('board');
-  });
-}
+});
 
 function editSchedule(id) {
   const sch = db.schedules.find(s => s.id === id);
@@ -14271,15 +12165,11 @@ function editTeacher(id) {
 }
 
 function deleteTeacher(id) {
-  if (confirm("Are you sure you want to delete this instructor? Their associated schedules will remain with a blank instructor assignment.")) {
+  if (confirm("Are you sure you want to delete this instructor? This will also remove all their associated schedules.")) {
     db.instructors = db.instructors.filter(ins => ins.id !== id);
-    db.schedules.forEach(sch => {
-      if (sch.instructor_id === id) {
-        sch.instructor_id = "";
-      }
-    });
+    db.schedules = db.schedules.filter(sch => sch.instructor_id !== id);
     saveDatabase();
-    showToast("Instructor deleted. Associated schedules preserved with blank instructor.", "warning");
+    showToast("Instructor and related schedules deleted successfully!", "danger");
   }
 }
 
@@ -14409,6 +12299,230 @@ function clearRoomForm() {
   document.getElementById('room-id').value = "";
 }
 
+// --- INTELLIGENT AUTO-SCHEDULER ENGINE ---
+// Schedules all un-scheduled subjects sequentially while satisfying all conflict conditions.
+function runAutoScheduler() {
+  const overwrite = document.getElementById('overwriteSchedules').checked;
+  const logContainer = document.getElementById('autoSchedulerResults');
+  const consoleEl = document.getElementById('schedulerConsole');
+
+  logContainer.classList.remove('d-none');
+  consoleEl.innerHTML = `Starting Intelligent Auto-Scheduling engine...<br>`;
+
+  if (overwrite) {
+    db.schedules = [];
+    consoleEl.innerHTML += `<span class="text-warning">Cleared existing schedules as selected.</span><br>`;
+  }
+
+  // Define Standard Time slots and days available for schedule blocks
+  // Adding more evening/afternoon slots for High School Room constraints if needed
+  const standardTimeSlots = [
+    // 2 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "09:00", dur: 2 },
+    { start: "08:00", end: "10:00", dur: 2 },
+    { start: "10:00", end: "12:00", dur: 2 },
+    { start: "13:00", end: "15:00", dur: 2 },
+    { start: "15:00", end: "17:00", dur: 2 },
+    { start: "17:00", end: "19:00", dur: 2 },
+    { start: "16:00", end: "18:00", dur: 2 },
+
+    // 3 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "10:00", dur: 3 },
+    { start: "08:00", end: "11:00", dur: 3 },
+    { start: "09:00", end: "12:00", dur: 3 },
+    { start: "13:00", end: "16:00", dur: 3 },
+    { start: "16:00", end: "19:00", dur: 3 },
+
+    // 1.5 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:30", dur: 1.5 },
+    { start: "07:30", end: "09:00", dur: 1.5 },
+    { start: "09:00", end: "10:30", dur: 1.5 },
+    { start: "10:30", end: "12:00", dur: 1.5 },
+    { start: "13:00", end: "14:30", dur: 1.5 },
+    { start: "14:30", end: "16:00", dur: 1.5 },
+    { start: "16:00", end: "17:30", dur: 1.5 },
+    { start: "17:30", end: "19:00", dur: 1.5 },
+
+    // 1 Hour blocks (7:00 AM to 7:00 PM)
+    { start: "07:00", end: "08:00", dur: 1 },
+    { start: "08:00", end: "09:00", dur: 1 },
+    { start: "09:00", end: "10:00", dur: 1 },
+    { start: "10:00", end: "11:00", dur: 1 },
+    { start: "11:00", end: "12:00", dur: 1 },
+    { start: "13:00", end: "14:00", dur: 1 },
+    { start: "14:00", end: "15:00", dur: 1 },
+    { start: "15:00", end: "16:00", dur: 1 },
+    { start: "16:00", end: "17:00", dur: 1 },
+    { start: "17:00", end: "18:00", dur: 1 },
+    { start: "18:00", end: "19:00", dur: 1 }
+  ];
+
+  const autoDaysSetting = document.getElementById("auto-days-count") ? document.getElementById("auto-days-count").value : "all";
+  const standardDays = getFilteredStandardDays(autoDaysSetting);
+
+  let scheduledCount = 0;
+  let unscheduledCount = 0;
+
+  const scheduledSubjectIds = new Set(db.schedules.map(sch => sch.subject_id));
+
+  // Sort subjects to prioritize major subjects first
+  // major subjects (is_major === 1) should be scheduled first to prioritize COMLAB and CRIMLAB
+  const sortedSubjects = [...db.subjects].sort((a, b) => {
+    return (b.is_major || 0) - (a.is_major || 0);
+  });
+
+  // Loop through all subjects
+  sortedSubjects.forEach(subject => {
+    if (scheduledSubjectIds.has(subject.id)) {
+      consoleEl.innerHTML += `Subject: <span class="text-info">${subject.title_and_code}</span> is already scheduled.<br>`;
+      scheduledCount++;
+      return;
+    }
+
+    let isScheduled = false;
+    consoleEl.innerHTML += `Scheduling subject: <strong>${subject.title_and_code}</strong> (${subject.is_major ? '<span class="text-danger fw-bold">MAJOR</span>' : 'GENERAL'} - ${subject.course} Year ${subject.year_level})...<br>`;
+
+    const targetDuration = subject.lab_hours > 0 ? 3 : 2; // labs prefer 3 hours, lectures prefer 2
+    const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
+
+    // Sort rooms based on major vs general subject room priorities, with special rooms (Library 1, 2, TBL) as absolute last resource:
+    const sortedRooms = [...db.rooms].sort((a, b) => {
+      const aSpecial = isSpecialRoom(a.name);
+      const bSpecial = isSpecialRoom(b.name);
+
+      // If one is special and the other is not, the special room goes to the end
+      if (aSpecial && !bSpecial) return 1;
+      if (!aSpecial && bSpecial) return -1;
+      if (aSpecial && bSpecial) return 0; // maintain relative order of special rooms
+
+      const isALab = a.name.toUpperCase().includes('COMLAB') || a.name.toUpperCase().includes('CRIMLAB');
+      const isBLab = b.name.toUpperCase().includes('COMLAB') || b.name.toUpperCase().includes('CRIMLAB');
+
+      if (subject.is_major) {
+        // Prioritize lab rooms
+        if (isALab && !isBLab) return -1;
+        if (!isALab && isBLab) return 1;
+      } else {
+        // Prioritize non-lab rooms first
+        if (!isALab && isBLab) return -1;
+        if (isALab && !isBLab) return 1;
+      }
+      return 0;
+    });
+
+    // Waterfall logic for choosing teachers: Always prioritize instructors with fewer units currently assigned
+    const sortedTeachers = [...db.instructors].sort((a, b) => {
+      return calculateTeacherTotalUnits(a.id) - calculateTeacherTotalUnits(b.id);
+    });
+
+    let conflictsEncountered = new Set();
+
+    for (let teacher of sortedTeachers) {
+      const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
+
+      // Prefer Saturday (S) and Evening time blocks (4 PM to 7 PM) for part-time schedules
+      const sortedDays = [...standardDays].sort((a, b) => {
+        if (isPartTime) {
+          if (a === 'S' && b !== 'S') return -1;
+          if (b === 'S' && a !== 'S') return 1;
+        }
+        return 0;
+      });
+
+      const sortedSlots = [...filteredSlots].sort((a, b) => {
+        if (isPartTime) {
+          const aIsEve = timesOverlap(a.start, a.end, "16:00", "19:00");
+          const bIsEve = timesOverlap(b.start, b.end, "16:00", "19:00");
+          if (aIsEve && !bIsEve) return -1;
+          if (!aIsEve && bIsEve) return 1;
+        }
+        return 0;
+      });
+
+      for (let room of sortedRooms) {
+        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue; // Lab classes need ComLab/CrimLab
+        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
+
+        // For auto-scheduler (which finds any room): if the subject is general (non-lab and non-major),
+        // do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
+        if (subject.lab_hours === 0 && !subject.is_major) {
+          const rNameUpper = room.name.toUpperCase();
+          const isComLab = rNameUpper.includes('COMLAB');
+          const isCrimLab = rNameUpper.includes('CRIMLAB');
+          const isSpecial = isSpecialRoom(room.name);
+          if (isComLab || isCrimLab || isSpecial) {
+            continue;
+          }
+        }
+
+        for (let day of sortedDays) {
+          for (let slot of sortedSlots) {
+
+            const candidate = {
+              id: 'temp_' + uniqueId(),
+              instructor_id: teacher.id,
+              room_id: room.id,
+              day,
+              time_start: slot.start,
+              time_end: slot.end,
+              subject_id: subject.id
+            };
+
+            const validation = validateSchedule(candidate);
+            if (validation.valid) {
+              candidate.id = uniqueId();
+              db.schedules.push(candidate);
+              isScheduled = true;
+              scheduledCount++;
+              consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-success">✔ Assigned:</span> ${teacher.name} inside ${room.name} on ${day} (${slot.start}-${slot.end})<br>`;
+              break;
+            } else {
+              validation.errors.forEach(err => conflictsEncountered.add(err));
+            }
+          }
+          if (isScheduled) break;
+        }
+        if (isScheduled) break;
+      }
+      if (isScheduled) break;
+    }
+
+    if (!isScheduled) {
+      unscheduledCount++;
+      consoleEl.innerHTML += `&nbsp;&nbsp;<span class="text-danger">✖ Failed:</span> No conflict-free slots found for ${subject.title_and_code}.<br>`;
+      if (conflictsEncountered.size > 0) {
+        consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
+        Array.from(conflictsEncountered).slice(0, 5).forEach(err => {
+          consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
+        });
+      }
+    }
+  });
+
+  document.getElementById('log-total-subjects').innerText = db.subjects.length;
+  document.getElementById('log-scheduled').innerText = scheduledCount;
+  document.getElementById('log-unscheduled').innerText = unscheduledCount;
+
+  const statusEl = document.getElementById('schedulerStatusBadge');
+  if (unscheduledCount === 0) {
+    statusEl.className = "badge bg-success";
+    statusEl.innerText = "Complete Success";
+  } else {
+    statusEl.className = "badge bg-warning text-dark";
+    statusEl.innerText = "Partially Scheduled";
+  }
+
+  saveDatabase();
+
+  const isSuccess = unscheduledCount === 0;
+  const alertType = isSuccess ? 'success' : 'warning';
+  const alertTitle = isSuccess ? 'Auto-Scheduler Engine Completed Successfully!' : 'Auto-Scheduler Finished with Conflicts';
+  const alertMsg = `Scheduled ${scheduledCount} out of ${db.subjects.length} subjects.` +
+    (!isSuccess ? ` ${unscheduledCount} subject(s) could not be scheduled conflict-free. Check the execution logs for details.` : '');
+
+  showGlobalAlert(alertTitle, alertMsg, alertType);
+  showToast(alertMsg, isSuccess ? 'success' : 'warning');
+}
 
 // --- WATERFALL SUBJECT SHARING ENGINE ---
 async function runWaterfallScheduler() {
@@ -14577,15 +12691,14 @@ async function runWaterfallScheduler() {
 
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
-    // Sort and filter rooms using getPrioritizedRooms based on subject type and preferred room
-    let sortedRooms = getPrioritizedRooms(subject, db.rooms);
-    if (preferredRoomId) {
-      sortedRooms = [...sortedRooms].sort((a, b) => {
+    // Sort rooms: If a specific room is preferred, put it first in the list
+    const sortedRooms = [...db.rooms].sort((a, b) => {
+      if (preferredRoomId) {
         if (a.id === preferredRoomId) return -1;
         if (b.id === preferredRoomId) return 1;
-        return 0;
-      });
-    }
+      }
+      return 0;
+    });
 
     for (let teacher of participatingTeachers) {
       const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
@@ -14610,6 +12723,19 @@ async function runWaterfallScheduler() {
       });
 
       for (let room of sortedRooms) {
+        if (subject.lab_hours > 0 && room.room_type === 'Lecture') continue;
+        if (subject.lab_hours === 0 && room.room_type === 'Laboratory' && room.name !== 'COMLAB' && room.name !== 'CRIMLAB') continue;
+
+        // If 'Any' room is selected, do NOT put them on COMLAB, CRIMLAB, or the 3 special case rooms (Library 1, 2, TBL Room)
+        if (!preferredRoomId) {
+          const rNameUpper = room.name.toUpperCase();
+          const isComLab = rNameUpper.includes('COMLAB');
+          const isCrimLab = rNameUpper.includes('CRIMLAB');
+          const isSpecial = isSpecialRoom(room.name);
+          if (isComLab || isCrimLab || isSpecial) {
+            continue;
+          }
+        }
 
         for (let day of sortedDays) {
           for (let slot of sortedSlots) {
@@ -14655,8 +12781,6 @@ async function runWaterfallScheduler() {
   }
 
   await saveDatabase();
-  renderSchedulesTable();
-  updateStats();
 
   const failedCount = subjectsToSchedule.length - successfullyScheduled;
   const isSuccess = failedCount === 0;
@@ -14712,9 +12836,7 @@ function renderOfficialPrintout() {
     const rm = db.rooms.find(r => r.id === sch.room_id);
     
     const subjectName = sub ? sub.title_and_code : 'Administrative Service';
-    const courseCode = sch.course || (sub ? sub.course : '');
-    const blockSec = sch.block_section || (sub ? sub.block_section : '');
-    const section = (courseCode || blockSec) ? `${courseCode} ${blockSec}`.trim() : 'N/A';
+    const section = sub ? `${sub.course} ${sub.block_section}` : 'N/A';
     const day = sch.day;
     const room = rm ? rm.name : 'N/A';
     const units = sub ? sub.units : 0;
@@ -14967,17 +13089,12 @@ function bulkDeleteSchedules() {
 
 function bulkDeleteTeachers() {
   if (selectedTeacherIds_manage.size === 0) return;
-  if (confirm(`Are you sure you want to delete ${selectedTeacherIds_manage.size} selected instructor(s)? Their associated schedules will remain with blank instructor assignments.`)) {
-    const idsToDelete = Set ? Array.from(selectedTeacherIds_manage) : [];
+  if (confirm(`Are you sure you want to delete ${selectedTeacherIds_manage.size} selected instructor(s)? This will also delete their associated schedules.`)) {
     db.instructors = db.instructors.filter(t => !selectedTeacherIds_manage.has(t.id));
-    db.schedules.forEach(sch => {
-      if (selectedTeacherIds_manage.has(sch.instructor_id)) {
-        sch.instructor_id = "";
-      }
-    });
+    db.schedules = db.schedules.filter(sch => !selectedTeacherIds_manage.has(sch.instructor_id));
     selectedTeacherIds_manage.clear();
     saveDatabase();
-    showToast("Selected instructors deleted. Associated schedules preserved with blank instructor.", "warning");
+    showToast("Selected instructors deleted successfully!", "danger");
   }
 }
 
@@ -15004,38 +13121,6 @@ function bulkDeleteRooms() {
 }
 
 // Per-Section Generator Logic
-function updateSectionBlockOptions() {
-  const courseEl = document.getElementById('section-course');
-  const yearEl = document.getElementById('section-year');
-  const blockEl = document.getElementById('section-block');
-  if (!yearEl || !blockEl) return;
-
-  const course = courseEl ? courseEl.value : '';
-  const y = parseInt(yearEl.value, 10) || 1;
-  const currentVal = blockEl.value;
-
-  // Filter sections matching course and year level
-  const matchingSections = (db.sections || []).filter(sec => {
-    if (course && sec.course !== course) return false;
-    if (sec.year_level !== y) return false;
-    return true;
-  });
-
-  if (matchingSections.length > 0) {
-    blockEl.innerHTML = matchingSections.map(sec =>
-      `<option value="${sec.section_name}" ${currentVal === sec.section_name ? 'selected' : ''}>${sec.section_name}</option>`
-    ).join('');
-  } else {
-    // Fallback default options
-    blockEl.innerHTML = `
-      <option value="${y}A" ${currentVal === y+'A' ? 'selected' : ''}>${y}A</option>
-      <option value="${y}B" ${currentVal === y+'B' ? 'selected' : ''}>${y}B</option>
-      <option value="${y}C" ${currentVal === y+'C' ? 'selected' : ''}>${y}C</option>
-      <option value="${y}D" ${currentVal === y+'D' ? 'selected' : ''}>${y}D</option>
-    `;
-  }
-}
-
 function loadSectionSubjects() {
   const courseEl = document.getElementById('section-course');
   const yearEl = document.getElementById('section-year');
@@ -15046,8 +13131,6 @@ function loadSectionSubjects() {
   const countEl = document.getElementById('section-subject-count');
 
   if (!courseEl || !yearEl || !listEl) return;
-
-  updateSectionBlockOptions();
 
   const course = courseEl.value;
   const year = parseInt(yearEl.value, 10);
@@ -15259,8 +13342,8 @@ async function runSingleTeacherScheduler() {
           subject_id: subject.id
         };
 
-        const roomsToTry = getPrioritizedRooms(subject, db.rooms);
-        const availableRoom = roomsToTry.find(r => {
+        const availableRoom = db.rooms.find(r => {
+          if (isSpecialRoom(r.name)) return false; // prefer regular standard rooms
           candidate.room_id = r.id;
           const validation = validateSchedule(candidate);
           if (validation.valid) {
@@ -15355,7 +13438,6 @@ async function runPerSectionScheduler() {
 
   let scheduledCount = 0;
   let unscheduledCount = 0;
-  window.lastSectionConflictsList = [];
 
   for (let sel of selects) {
     const subId = sel.getAttribute('data-subject-id');
@@ -15373,13 +13455,6 @@ async function runPerSectionScheduler() {
 
     // Update target block section
     sub.block_section = block;
-
-    // Prevent duplicate scheduling if subject is already scheduled for this section
-    if (db.schedules.some(sch => sch.subject_id === sub.id)) {
-      consoleEl.innerHTML += `<span class="text-info">ℹ Already Scheduled:</span> ${sub.title_and_code} (${sub.course} ${year}${block}) is already in schedule.<br>`;
-      scheduledCount++;
-      continue;
-    }
 
     let teachersToTry = [];
     if (assignedTeacherId) {
@@ -15455,10 +13530,7 @@ async function runPerSectionScheduler() {
             day: day,
             time_start: slot.start,
             time_end: slot.end,
-            subject_id: sub.id,
-            course: course,
-            year_level: year,
-            block_section: `${year}${block}`
+            subject_id: sub.id
           };
 
           const roomsToTry = getPrioritizedRooms(sub, db.rooms);
@@ -15481,10 +13553,7 @@ async function runPerSectionScheduler() {
               day: day,
               time_start: slot.start,
               time_end: slot.end,
-              subject_id: sub.id,
-              course: course,
-              year_level: year,
-              block_section: block
+              subject_id: sub.id
             };
             db.schedules.push(newSch);
             scheduledCount++;
@@ -15498,18 +13567,10 @@ async function runPerSectionScheduler() {
 
     if (!scheduled) {
       unscheduledCount++;
-      const conflictMsg = `Subject "${sub.title_and_code}" (${course} ${year}${block}): Could not find a conflict-free slot.`;
-      const reasons = Array.from(sectionConflicts);
-      window.lastSectionConflictsList.push({
-        subject: sub.title_and_code,
-        message: conflictMsg,
-        reasons: reasons.length > 0 ? reasons : ["No available teacher/room timeslot combination satisfied constraints."]
-      });
-
       consoleEl.innerHTML += `<span class="text-danger">✖ Failed:</span> No conflict-free slot for ${sub.title_and_code}.<br>`;
       if (sectionConflicts.size > 0) {
         consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-warning fw-bold">Conflicts observed:</span><br>`;
-        reasons.slice(0, 5).forEach(err => {
+        Array.from(sectionConflicts).slice(0, 5).forEach(err => {
           consoleEl.innerHTML += `&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="bi bi-exclamation-triangle text-warning me-1"></i> ${err}<br>`;
         });
       }
@@ -15519,17 +13580,6 @@ async function runPerSectionScheduler() {
   saveDatabase();
   renderSchedulesTable();
   updateStats();
-
-  const viewConflictsBtn = document.getElementById('viewSectionConflictsBtn');
-  const conflictCountSpan = document.getElementById('sectionConflictCount');
-
-  if (unscheduledCount > 0) {
-    if (viewConflictsBtn) viewConflictsBtn.classList.remove('d-none');
-    if (conflictCountSpan) conflictCountSpan.innerText = unscheduledCount;
-  } else {
-    if (viewConflictsBtn) viewConflictsBtn.classList.add('d-none');
-    if (conflictCountSpan) conflictCountSpan.innerText = '0';
-  }
 
   const isSuccess = unscheduledCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
@@ -15541,49 +13591,9 @@ async function runPerSectionScheduler() {
   showToast(alertMsg, isSuccess ? 'success' : 'warning');
 }
 
-function openConflictsModal() {
-  const modalList = document.getElementById('conflictsModalList');
-  if (!modalList) return;
-
-  const conflicts = window.lastSectionConflictsList || [];
-  if (conflicts.length === 0) {
-    modalList.innerHTML = `<div class="p-3 text-center text-muted">No specific conflicts recorded. All subjects scheduled cleanly.</div>`;
-  } else {
-    let html = '';
-    conflicts.forEach((c, idx) => {
-      html += `
-        <div class="list-group-item p-3">
-          <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-            <h6 class="mb-0 fw-bold text-danger"><i class="bi bi-exclamation-circle me-1"></i> ${c.subject}</h6>
-            <span class="badge bg-danger">Conflict #${idx + 1}</span>
-          </div>
-          <p class="mb-2 text-dark small fw-semibold">${c.message}</p>
-          <div class="bg-light p-2 rounded border">
-            <span class="text-muted small fw-bold d-block mb-1">Observed Constraint Breaches:</span>
-            <ul class="mb-0 ps-3 small text-secondary">
-              ${c.reasons.map(r => `<li>${r}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-      `;
-    });
-    modalList.innerHTML = html;
-  }
-
-  const modalEl = document.getElementById('conflictsModal');
-  if (modalEl) {
-    const bsModal = new bootstrap.Modal(modalEl);
-    bsModal.show();
-  }
-}
-
-function scrollToSectionLog() {
-  openConflictsModal();
-}
-
 // Initialize on document load
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadDatabase();
+document.addEventListener('DOMContentLoaded', () => {
+  loadDatabase();
 
   // Pre-load logic and first rendering
   populateFormSelects();
