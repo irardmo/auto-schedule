@@ -12842,7 +12842,9 @@ function renderOfficialPrintout() {
     const rm = db.rooms.find(r => r.id === sch.room_id);
     
     const subjectName = sub ? sub.title_and_code : 'Administrative Service';
-    const section = sub ? `${sub.course} ${sub.block_section}` : 'N/A';
+    const courseCode = sch.course || (sub ? sub.course : '');
+    const blockSec = sch.block_section || (sub ? sub.block_section : '');
+    const section = (courseCode || blockSec) ? `${courseCode} ${blockSec}`.trim() : 'N/A';
     const day = sch.day;
     const room = rm ? rm.name : 'N/A';
     const units = sub ? sub.units : 0;
