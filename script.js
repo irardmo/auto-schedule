@@ -1,11 +1,14 @@
 
 function getFilteredStandardDays(selectedSetting) {
-  const allDays = ["MWF", "TTH", "MW", "WF", "MF", "TF", "MT", "M", "T", "W", "TH", "F", "S"];
+  const allDays = [
+    "MWF", "TTH", "MW", "WF", "MF", "TF", "MT", "TW", "WTH", "THF", "FS", "MTH",
+    "M", "T", "W", "TH", "F", "S", "MTW"
+  ];
   if (!selectedSetting || selectedSetting === 'all') return allDays;
   const count = parseInt(selectedSetting, 10);
   if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
-  if (count === 2) return ["TTH", "MW", "WF", "MF", "TF", "MT"];
-  if (count === 3) return ["MWF"];
+  if (count === 2) return ["MW", "TTH", "WF", "MF", "TF", "MT", "TW", "WTH", "THF", "FS", "MTH"];
+  if (count === 3) return ["MWF", "MTW"];
   return allDays;
 }
 
@@ -10786,26 +10789,44 @@ function parseTimeToMinutes(timeStr) {
 }
 
 // Day Overlap check
-function daysOverlap(day1, day2) {
-  if (day1 === day2) return true;
-  if (day1 === 'MT' && (day2 === 'M' || day2 === 'T')) return true;
-  if (day2 === 'MT' && (day1 === 'M' || day1 === 'T')) return true;
-  if (day1 === 'TTH' && (day2 === 'T' || day2 === 'TH')) return true;
-  if (day2 === 'TTH' && (day1 === 'T' || day1 === 'TH')) return true;
-  if (day1 === 'MWF' && (day2 === 'M' || day2 === 'W' || day2 === 'F')) return true;
-  if (day2 === 'MWF' && (day1 === 'M' || day1 === 'W' || day1 === 'F')) return true;
-  if (day1 === 'Monday-Friday' || day2 === 'Monday-Friday') return true;
-  return false;
-}
-
-// Get constituent single days from a composite day code
+// Get constituent single days from any composite day code
 function getConstituentDays(dayStr) {
   if (!dayStr) return [];
-  if (dayStr === 'MT') return ['M', 'T'];
-  if (dayStr === 'TTH') return ['T', 'TH'];
-  if (dayStr === 'MWF') return ['M', 'W', 'F'];
   if (dayStr === 'Monday-Friday') return ['M', 'T', 'W', 'TH', 'F'];
-  return [dayStr]; // e.g. M, T, W, TH, F, S
+  if (dayStr === 'MT') return ['M', 'T'];
+  if (dayStr === 'MW') return ['M', 'W'];
+  if (dayStr === 'MTH') return ['M', 'TH'];
+  if (dayStr === 'MF') return ['M', 'F'];
+  if (dayStr === 'TW') return ['T', 'W'];
+  if (dayStr === 'TTH') return ['T', 'TH'];
+  if (dayStr === 'TF') return ['T', 'F'];
+  if (dayStr === 'WTH') return ['W', 'TH'];
+  if (dayStr === 'WF') return ['W', 'F'];
+  if (dayStr === 'THF') return ['TH', 'F'];
+  if (dayStr === 'FS') return ['F', 'S'];
+  if (dayStr === 'MWF') return ['M', 'W', 'F'];
+  if (dayStr === 'MTW') return ['M', 'T', 'W'];
+  if (dayStr === 'MTH') return ['M', 'T', 'TH'];
+  if (dayStr === 'TTHF') return ['T', 'TH', 'F'];
+
+  // Handle individual day codes
+  if (['M', 'T', 'W', 'TH', 'F', 'S'].includes(dayStr)) return [dayStr];
+
+  return [dayStr];
+}
+
+// Fully generic Day Overlap check based on set intersection
+function daysOverlap(day1, day2) {
+  if (!day1 || !day2) return false;
+  if (day1 === day2) return true;
+
+  const set1 = new Set(getConstituentDays(day1));
+  const set2 = new Set(getConstituentDays(day2));
+
+  for (let d of set1) {
+    if (set2.has(d)) return true;
+  }
+  return false;
 }
 
 // Check if a room name is designated for high school (205-208, or HS101-HS110)
