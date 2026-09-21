@@ -1,10 +1,10 @@
 
 function getFilteredStandardDays(selectedSetting) {
-  const allDays = ["M", "T", "W", "TH", "F", "S", "MT", "TTH", "MWF"];
+  const allDays = ["MWF", "TTH", "MW", "WF", "MF", "TF", "MT", "M", "T", "W", "TH", "F", "S"];
   if (!selectedSetting || selectedSetting === 'all') return allDays;
   const count = parseInt(selectedSetting, 10);
   if (count === 1) return ["M", "T", "W", "TH", "F", "S"];
-  if (count === 2) return ["MT", "TTH"];
+  if (count === 2) return ["TTH", "MW", "WF", "MF", "TF", "MT"];
   if (count === 3) return ["MWF"];
   return allDays;
 }
@@ -12697,14 +12697,15 @@ async function runWaterfallScheduler() {
 
     const filteredSlots = standardTimeSlots.filter(s => s.dur === targetDuration).concat(standardTimeSlots.filter(s => s.dur !== targetDuration));
 
-    // Sort rooms: If a specific room is preferred, put it first in the list
-    const sortedRooms = [...db.rooms].sort((a, b) => {
-      if (preferredRoomId) {
+    // Sort and filter rooms using getPrioritizedRooms
+    let sortedRooms = getPrioritizedRooms(subject, db.rooms);
+    if (preferredRoomId) {
+      sortedRooms = [...sortedRooms].sort((a, b) => {
         if (a.id === preferredRoomId) return -1;
         if (b.id === preferredRoomId) return 1;
-      }
-      return 0;
-    });
+        return 0;
+      });
+    }
 
     for (let teacher of participatingTeachers) {
       const isPartTime = teacher.designation === 'Part-time' || teacher.designation === 'Part-time Teacher';
@@ -13350,8 +13351,8 @@ async function runSingleTeacherScheduler() {
           subject_id: subject.id
         };
 
-        const availableRoom = db.rooms.find(r => {
-          if (isSpecialRoom(r.name)) return false; // prefer regular standard rooms
+        const roomsToTry = getPrioritizedRooms(subject, db.rooms);
+        const availableRoom = roomsToTry.find(r => {
           candidate.room_id = r.id;
           const validation = validateSchedule(candidate);
           if (validation.valid) {
@@ -13585,7 +13586,7 @@ async function runPerSectionScheduler() {
     }
   }
 
-  saveDatabase();
+  await saveDatabase();
   renderSchedulesTable();
   updateStats();
 
