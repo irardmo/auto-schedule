@@ -10897,7 +10897,7 @@ function isComputerSubject(subject) {
   return false;
 }
 
-// Check if subject is criminology lab or special lab related (STRICTLY for CRIMLAB assignment)
+// Check if subject is criminology lab related (STRICTLY for CRIMLAB assignment)
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
@@ -10907,8 +10907,14 @@ function isCriminologySubject(subject) {
   const normalizeStr = str => str.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
   const exactCrimLabCodes = [
-    'HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124',
-    'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'
+    'FORENSIC 141', 'FORENTICS 141',
+    'ADGE', 'GENERAL CHEMISTRY', 'CHEMISTRY',
+    'FORENSIC 142', 'FORENTICS 142',
+    'FORENSIC 143', 'FORENTICS 143',
+    'FORENSIC 114', 'FORENTICS 114',
+    'FORENSIC 146', 'FORENTICS 146',
+    'FORENSIC 115', 'FORENTICS 115',
+    'FORENSIC 1', 'FORENSIC 2', 'FORENSIC 3', 'FORENSIC 4', 'FORENSIC 5', 'FORENSIC 6'
   ];
 
   const normCode = normalizeStr(code);
@@ -10916,7 +10922,7 @@ function isCriminologySubject(subject) {
 
   if (exactCrimLabCodes.some(c => normCode.includes(normalizeStr(c)) || normTitle.includes(normalizeStr(c)))) return true;
 
-  if (course === 'BSCRIM' && (subject.lab_hours > 0 || normCode.startsWith('FORENSIC') || normCode.startsWith('CDI') || normCode.startsWith('LEA') || normCode.startsWith('CRIM') || normCode.startsWith('CLJ'))) return true;
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || normCode.startsWith('FORENSIC') || normCode.startsWith('FORENTIC') || normCode.startsWith('ADGE'))) return true;
 
   return false;
 }
