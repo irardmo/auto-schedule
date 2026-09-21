@@ -12626,22 +12626,28 @@ function isComputerSubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
+  const course = (subject.course || '').toUpperCase();
 
-  const exactComputerSubjects = [
+  const normalizeStr = str => str.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  const targetTitles = [
+    'COMPUTER PROGRAMMING 1',
     'COMPUTER PROGRAMMING 1',
     'INFORMATION TECHNOLOGY FUNDAMENTALS',
     'IT FUNDAMENTALS',
     'COMPUTER PROGRAMMING 2',
-    'OBJECT-ORIENTED PROGRAMMING',
     'OBJECT ORIENTED PROGRAMMING',
+    'OBJECT-ORIENTED PROGRAMMING',
     'FUNDAMENTALS OF DATABASE SYSTEM',
+    'FUNDAMENTALS OF DATABASE SYSTEMS',
     'EVENT DRIVEN PROGRAMMING',
     'DATA STRUCTURES AND ALGORITHM',
+    'DATA STRUCTURES AND ALGORITHMS',
     'INFORMATION MANAGEMENT',
     'INFO ASSURANCE AND SECURITY 1',
     'INFORMATION ASSURANCE AND SECURITY 1',
+    'APP DEV & EMERGING TECHNOLOGIES',
     'APP DEV. & EMERGING TECHNOLOGIES',
-    'APP DEV. AND EMERGING TECHNOLOGIES',
     'APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGY',
     'NETWORKING 1',
     'INTRO TO HUMAN-COMPUTER INTERACTION',
@@ -12660,27 +12666,43 @@ function isComputerSubject(subject) {
     'PLATFORM TECHNOLOGY',
     'MULTIMEDIA AND ANIMATION',
     'HUMAN-COMPUTER INTERACTION 2',
-    'HUMAN COMPUTER INTERACTION 2'
+    'HUMAN COMPUTER INTERACTION 2',
+    'ADVANCE COMPUTER',
+    'COMPUTER 1'
   ];
 
-  return exactComputerSubjects.some(t => title.includes(t) || code.includes(t));
+  const normTitle = normalizeStr(title);
+  const normCode = normalizeStr(code);
+
+  if (targetTitles.some(t => normTitle.includes(normalizeStr(t)) || normCode.includes(normalizeStr(t)))) return true;
+
+  if (course === 'BSIT' && (subject.lab_hours > 0 || normCode.startsWith('CC') || normCode.startsWith('PF') || normCode.startsWith('IM') || normCode.startsWith('NET') || normCode.startsWith('IAS') || normCode.startsWith('SIA') || normCode.startsWith('WS') || normCode.startsWith('IPT') || normCode.startsWith('HCI') || normCode.startsWith('SA') || normCode.startsWith('PT') || normCode.startsWith('IT'))) {
+    return true;
+  }
+
+  return false;
 }
 
-// Check if subject is criminology lab related (STRICTLY for CRIMLAB assignment)
+// Check if subject is criminology lab or special lab related (STRICTLY for CRIMLAB assignment)
 function isCriminologySubject(subject) {
   if (!subject) return false;
   const code = (subject.code || subject.title_and_code || '').toUpperCase();
   const title = (subject.descriptive_title || subject.title_and_code || '').toUpperCase();
   const course = (subject.course || '').toUpperCase();
 
+  const normalizeStr = str => str.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
   const exactCrimLabCodes = [
     'HPC 121', 'HMPE 131', 'HMPE 132', 'HMPE 3', 'HPC 124',
     'HMPE 134', 'HMPE 135', 'HPC 126', 'HPC 127'
   ];
 
-  if (exactCrimLabCodes.some(c => code.includes(c) || title.includes(c))) return true;
+  const normCode = normalizeStr(code);
+  const normTitle = normalizeStr(title);
 
-  if (course === 'BSCRIM' && (subject.lab_hours > 0 || code.startsWith('FORENSIC'))) return true;
+  if (exactCrimLabCodes.some(c => normCode.includes(normalizeStr(c)) || normTitle.includes(normalizeStr(c)))) return true;
+
+  if (course === 'BSCRIM' && (subject.lab_hours > 0 || normCode.startsWith('FORENSIC'))) return true;
 
   return false;
 }
@@ -13369,11 +13391,15 @@ function populatePrintTeachers() {
 // Update UI view renderings
 function renderAllViews() {
   populateFormSelects();
+  populatePrintTeachers();
   renderSchedulesTable();
   renderInstructorsTable();
   renderSubjectsTable();
   renderRoomsTable();
   renderSectionsTable();
+  if (document.getElementById('print-teacher-select')) {
+    renderOfficialPrintout();
+  }
 }
 
 // RENDER SCHEDULE RECORDS TABLE (With Custom Filter Logic)
@@ -14686,7 +14712,9 @@ function renderOfficialPrintout() {
     const rm = db.rooms.find(r => r.id === sch.room_id);
     
     const subjectName = sub ? sub.title_and_code : 'Administrative Service';
-    const section = sub ? `${sub.course} ${sub.block_section}` : 'N/A';
+    const courseCode = sch.course || (sub ? sub.course : '');
+    const blockSec = sch.block_section || (sub ? sub.block_section : '');
+    const section = (courseCode || blockSec) ? `${courseCode} ${blockSec}`.trim() : 'N/A';
     const day = sch.day;
     const room = rm ? rm.name : 'N/A';
     const units = sub ? sub.units : 0;
