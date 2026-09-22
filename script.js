@@ -10588,7 +10588,7 @@ const demoData = {
             "day": "W",
             "time_start": "08:00",
             "time_end": "11:00",
-            "subject_id": "s1"
+            "subject_id": "bsit_n1"
         },
         {
             "id": "sch2",
@@ -10597,7 +10597,7 @@ const demoData = {
             "day": "S",
             "time_start": "12:00",
             "time_end": "14:00",
-            "subject_id": "s2"
+            "subject_id": "bsit_n2"
         },
         {
             "id": "sch3",
@@ -10606,7 +10606,7 @@ const demoData = {
             "day": "F",
             "time_start": "15:00",
             "time_end": "17:00",
-            "subject_id": "s3"
+            "subject_id": "bsit_n3"
         },
         {
             "id": "sch4",
@@ -10615,7 +10615,7 @@ const demoData = {
             "day": "TTH",
             "time_start": "08:00",
             "time_end": "09:00",
-            "subject_id": "s4"
+            "subject_id": "bsit_n4"
         },
         {
             "id": "sch5",
@@ -10624,7 +10624,7 @@ const demoData = {
             "day": "TTH",
             "time_start": "09:00",
             "time_end": "10:00",
-            "subject_id": "s5"
+            "subject_id": "bsit_n5"
         },
         {
             "id": "sch6",
@@ -10633,7 +10633,7 @@ const demoData = {
             "day": "TTH",
             "time_start": "10:00",
             "time_end": "11:00",
-            "subject_id": "s6"
+            "subject_id": "bsit_n6"
         },
         {
             "id": "sch7",
@@ -10642,7 +10642,7 @@ const demoData = {
             "day": "TTH",
             "time_start": "11:00",
             "time_end": "12:00",
-            "subject_id": "s7"
+            "subject_id": "bsit_n7"
         },
         {
             "id": "sch8",
@@ -10651,7 +10651,7 @@ const demoData = {
             "day": "M",
             "time_start": "09:00",
             "time_end": "10:00",
-            "subject_id": "s8"
+            "subject_id": "bsit_n8"
         }
     ]
 };
@@ -10695,24 +10695,34 @@ async function loadDatabase() {
     const response = await fetch(`${API_URL}?action=get_all`);
     const result = await response.json();
     if (result && result.status === 'success') {
-      db.instructors = (result.instructors || []).map(i => ({
-        ...i,
-        max_units: parseInt(i.max_units, 10)
-      }));
-      db.rooms = result.rooms || [];
-      db.subjects = (result.subjects || []).map(s => ({
-        ...s,
-        year_level: parseInt(s.year_level, 10),
-        units: parseInt(s.units, 10),
-        lec_hours: parseInt(s.lec_hours, 10),
-        lab_hours: parseInt(s.lab_hours, 10),
-        is_major: parseInt(s.is_major || 0, 10)
-      }));
-      db.schedules = result.schedules || [];
-      
-      // Keep local storage copy updated for complete sync
-      localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
-      console.log("Database successfully synced with XAMPP MySQL backend.");
+      const fetchedInstructors = result.instructors || [];
+      const fetchedSubjects = result.subjects || [];
+
+      // Auto-seed if database is freshly created / completely empty
+      if (fetchedInstructors.length === 0 && fetchedSubjects.length === 0) {
+        console.log("MySQL Database is empty. Auto-seeding with initial dataset...");
+        db = JSON.parse(JSON.stringify(demoData));
+        await saveDatabase();
+      } else {
+        db.instructors = fetchedInstructors.map(i => ({
+          ...i,
+          max_units: parseInt(i.max_units, 10)
+        }));
+        db.rooms = result.rooms || [];
+        db.subjects = fetchedSubjects.map(s => ({
+          ...s,
+          year_level: parseInt(s.year_level, 10),
+          units: parseInt(s.units, 10),
+          lec_hours: parseInt(s.lec_hours, 10),
+          lab_hours: parseInt(s.lab_hours, 10),
+          is_major: parseInt(s.is_major || 0, 10)
+        }));
+        db.schedules = result.schedules || [];
+
+        // Keep local storage copy updated for complete sync
+        localStorage.setItem('sibt_scheduling_db', JSON.stringify(db));
+        console.log("Database successfully synced with XAMPP MySQL backend.");
+      }
     } else {
       throw new Error("API returned non-success status");
     }
@@ -11478,14 +11488,15 @@ function renderSchedulesTable() {
   let filtered = db.schedules.filter(sch => {
     const t = db.instructors.find(i => i.id === sch.instructor_id);
     const sub = db.subjects.find(s => s.id === sch.subject_id);
+    const courseVal = sch.course || (sub ? sub.course : '');
+    const yearVal = sch.year_level !== undefined && sch.year_level !== null ? sch.year_level : (sub ? sub.year_level : '');
+    const blockVal = sch.block_section || (sub ? sub.block_section : '');
     
     if (activeFilters.teacher && sch.instructor_id !== activeFilters.teacher) return false;
     if (activeFilters.subject && (!sub || sub.title_and_code !== activeFilters.subject)) return false;
-    if (sub) {
-      if (activeFilters.course && sub.course !== activeFilters.course) return false;
-      if (activeFilters.year && sub.year_level !== parseInt(activeFilters.year)) return false;
-      if (activeFilters.block && (sub.block_section || '') !== activeFilters.block) return false;
-    }
+    if (activeFilters.course && courseVal !== activeFilters.course) return false;
+    if (activeFilters.year && parseInt(yearVal, 10) !== parseInt(activeFilters.year, 10)) return false;
+    if (activeFilters.block && blockVal !== activeFilters.block) return false;
     return true;
   });
 
@@ -11525,12 +11536,12 @@ function renderSchedulesTable() {
     const room = db.rooms.find(r => r.id === sch.room_id);
     const subject = db.subjects.find(s => s.id === sch.subject_id);
 
-    const tName = teacher ? teacher.name : 'Unknown';
+    const tName = teacher ? teacher.name : (sch.instructor_id ? 'Unknown' : 'Unassigned');
     const rName = room ? room.name : 'Unknown';
     const subTitle = subject ? subject.title_and_code : 'Unknown';
-    const course = subject ? subject.course : '-';
-    const year = subject ? subject.year_level : '-';
-    const block = (subject && subject.block_section) ? subject.block_section : '-';
+    const course = sch.course || (subject ? subject.course : '-');
+    const year = (sch.year_level !== undefined && sch.year_level !== null) ? sch.year_level : (subject ? subject.year_level : '-');
+    const block = sch.block_section || (subject && subject.block_section ? subject.block_section : '-');
     const lec = subject ? subject.lec_hours : 0;
     const lab = subject ? subject.lab_hours : 0;
 
@@ -12649,6 +12660,9 @@ async function runWaterfallScheduler() {
   }
 
   await saveDatabase();
+  renderSchedulesTable();
+  updateStats();
+  renderAllViews();
 
   const failedCount = subjectsToSchedule.length - successfullyScheduled;
   const isSuccess = failedCount === 0;
@@ -13256,6 +13270,7 @@ async function runSingleTeacherScheduler() {
   await saveDatabase();
   renderSchedulesTable();
   updateStats();
+  renderAllViews();
 
   const isSuccess = failedCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';
@@ -13448,9 +13463,10 @@ async function runPerSectionScheduler() {
     }
   }
 
-  saveDatabase();
+  await saveDatabase();
   renderSchedulesTable();
   updateStats();
+  renderAllViews();
 
   const isSuccess = unscheduledCount === 0;
   const alertType = isSuccess ? 'success' : 'warning';

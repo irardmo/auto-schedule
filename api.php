@@ -176,11 +176,18 @@ switch ($action) {
                 }
 
                 if (isset($data['schedules']) && is_array($data['schedules'])) {
+                    $validInstructorIds = array_column($data['instructors'] ?? [], 'id');
+                    $validRoomIds = array_column($data['rooms'] ?? [], 'id');
+
                     $stmt = $conn->prepare("INSERT INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     foreach ($data['schedules'] as $sch) {
+                        $instructorId = (!empty($sch['instructor_id']) && in_array($sch['instructor_id'], $validInstructorIds)) ? $sch['instructor_id'] : null;
+                        $roomId = (!empty($sch['room_id']) && in_array($sch['room_id'], $validRoomIds)) ? $sch['room_id'] : null;
+                        $subjectId = !empty($sch['subject_id']) ? $sch['subject_id'] : null;
+
                         $stmt->execute([
-                            $sch['id'], $sch['instructor_id'], $sch['room_id'], 
-                            $sch['day'], $sch['time_start'], $sch['time_end'], $sch['subject_id']
+                            $sch['id'], $instructorId, $roomId,
+                            $sch['day'], $sch['time_start'], $sch['time_end'], $subjectId
                         ]);
                     }
                 }
