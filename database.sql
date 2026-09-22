@@ -1338,5 +1338,11 @@ INSERT IGNORE INTO bsba_mm_subject_old (id, title_and_code, course, year_level, 
 
 -- 8. Seed Schedules
 INSERT IGNORE INTO schedules (id, instructor_id, room_id, day, time_start, time_end, subject_id) VALUES
-('sch1', 't1', 'r2', 'W', '08:00', '11:00', 's1'),
-('sch2', 't2', 'r1', 'M', '13:00', '16:00', 's2');
+('sch1', 't1', 'r2', 'W', '08:00', '11:00', 'bsit_n1'),
+('sch2', 't1', 'r1', 'S', '12:00', '14:00', 'bsit_n2'),
+('sch3', 't1', 'r5', 'F', '15:00', '17:00', 'bsit_n3'),
+('sch4', 't2', 'r6', 'TTH', '08:00', '09:00', 'bsit_n4'),
+('sch5', 't2', 'r7', 'TTH', '09:00', '10:00', 'bsit_n5'),
+('sch6', 't2', 'r6', 'TTH', '10:00', '11:00', 'bsit_n6'),
+('sch7', 't2', 'r7', 'TTH', '11:00', '12:00', 'bsit_n7'),
+('sch8', 't2', 'r1', 'M', '09:00', '10:00', 'bsit_n8');
